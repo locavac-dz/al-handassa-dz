@@ -1,14 +1,51 @@
 const router = require('express').Router();
 const { authenticate } = require('../middleware/auth');
-const { SATIMPaymentGateway } = require('../config/satim');
+const SATIMLive = require('../config/satim-live');
 
-const satim = new SATIMPaymentGateway();
+const satim = new SATIMLive();
 
-// SATIM Payment
+// SATIM Payment - LIVE INTEGRATION
 router.post('/satim/initiate', authenticate, async (req, res) => {
-  const { orderId, amount } = req.body;
-  const result = await satim.createPaymentRequest({ id: orderId, total_amount: amount, items: [] });
-  res.json(result);
+  try {
+    const { orderId } = req.body;
+
+    // Get order from database
+    const { query } = require('../config/database');
+    const orderResult = await query(
+      'SELECT * FROM orders WHERE id = $1 AND user_id = $2',
+      [orderId, req.user.id]
+    );
+
+    if (!orderResult.rows.length) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    const order = orderResult.rows[0];
+
+    // Create payment with SATIM LIVE
+    const payment = await satim.createPayment(order);
+
+    if (payment.success) {
+      // Update order with transaction ID
+      await query(
+        'UPDATE orders SET transaction_id = $1, payment_status = $2 WHERE id = $3',
+        [payment.transaction_id, 'pending', orderId]
+      );
+
+      res.json({
+        success: true,
+        payment_url: payment.payment_url,
+        transaction_id: payment.transaction_id,
+        amount: payment.amount
+      });
+    } else {
+      res.status(400).json({ success: false, error: payment.error });
+    }
+
+  } catch (error) {
+    console.error('SATIM initiate error:', error);
+    res.status(500).json({ error: 'Payment initiation failed' });
+  }
 });
 
 // BaridiMob Payment

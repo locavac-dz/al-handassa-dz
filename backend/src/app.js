@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('mongo-sanitize');
 
 const { testConnection } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
@@ -26,6 +27,8 @@ const jobRoutes      = require('./routes/jobs');
 const tenderRoutes       = require('./routes/tenders');
 const professionalRoutes = require('./routes/professionals');
 const assistantRoutes    = require('./routes/assistant');
+const analyticsRoutes    = require('./routes/analytics');
+const paymentsFullRoutes = require('./routes/payments-full');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -33,8 +36,24 @@ const PORT = process.env.PORT || 5000;
 // ── Security ──
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
-  frameguard: false,          // autoriser l'affichage des PDFs dans les iframes
-  contentSecurityPolicy: false, // éviter les blocages CSP sur les ressources statiques
+  frameguard: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      fontSrc: ["'self'"],
+      connectSrc: ["'self'"],
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"]
+    }
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  }
 }));
 
 // ── CORS ──
@@ -76,6 +95,14 @@ const authLimiter = rateLimit({
 // ── Body Parsing ──
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// ── Input Sanitization ──
+app.use(mongoSanitize({
+  replaceWith: '_',
+  onSanitize: ({ req, key }) => {
+    console.warn(`[SECURITY] Sanitized input on key: ${key}`);
+  }
+}));
 
 // ── Logging ──
 if (process.env.NODE_ENV !== 'test') {
@@ -209,10 +236,12 @@ app.use('/api/videos', videoRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/payments', paymentsFullRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/analytics', analyticsRoutes);
 app.use('/api/contact',   contactRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/jobs',     jobRoutes);

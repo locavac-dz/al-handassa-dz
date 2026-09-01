@@ -1,0 +1,38 @@
+{
+  "name": "handassi-dz-backend",
+  "version": "1.0.0",
+  "description": "API Backend — Al Handassa.dz Génie Civil & Architecture Algérie",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "migrate": "node migrations/run.js",
+    "seed": "node migrations/seed.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
+    "adm-zip": "^0.5.17",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.3.1",
+    "express-validator": "^7.1.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongo-sanitize": "^2.1.0",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.1",
+    "nodemailer": "^8.0.7",
+    "pdf-lib": "^1.17.1",
+    "pg": "^8.12.0",
+    "sharp": "^0.35.1",
+    "uuid": "^11.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
