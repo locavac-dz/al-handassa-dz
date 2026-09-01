@@ -1,0 +1,50 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "dockerfile",
+    "buildCommand": "npm install && npm run build"
+  },
+  "deploy": {
+    "startCommand": "node backend/src/app.js & npx serve . --no-clipboard --listen 3000",
+    "restartPolicyType": "on_failure",
+    "restartPolicyMaxRetries": 5
+  },
+  "plugins": {
+    "postgres": {
+      "version": "15"
+    }
+  },
+  "variables": {
+    "NODE_ENV": "production",
+    "PORT": "5000",
+    "FRONTEND_PORT": "3000",
+    "JWT_SECRET": {
+      "description": "Secret key for JWT tokens",
+      "required": true
+    },
+    "SATIM_MERCHANT_ID": {
+      "description": "SATIM merchant ID",
+      "required": false
+    },
+    "SATIM_MERCHANT_KEY": {
+      "description": "SATIM merchant key",
+      "required": false
+    },
+    "SMTP_HOST": {
+      "description": "SMTP server host",
+      "value": "smtp.gmail.com"
+    },
+    "SMTP_PORT": {
+      "description": "SMTP server port",
+      "value": "587"
+    },
+    "SMTP_USER": {
+      "description": "SMTP username (Gmail or other)",
+      "required": true
+    },
+    "SMTP_PASS": {
+      "description": "SMTP password (Gmail app password)",
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": ".",
+  "public": true,
+  "framework": "nodejs",
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3000",
+    "API_URL": "@api_url"
+  },
+  "functions": {
+    "backend/src/app.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "backend/src/app.js"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(?!api).*",
+      "dest": "index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/.*\\.(js|css|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
+}
