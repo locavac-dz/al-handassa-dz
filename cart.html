@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panier — Al Handassa.dz</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.min.css" />
+  <style>
+    .cart-container { max-width: 1200px; margin: 60px auto 40px; padding: 20px; display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
+    .cart-items { background: #f9fafb; border-radius: 8px; padding: 20px; }
+    .cart-header { font-size: 28px; font-weight: 700; color: #1B3A6B; margin-bottom: 20px; }
+    .cart-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: white; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e0e4e8; }
+    .cart-item-info { flex: 1; }
+    .cart-item-title { font-weight: 600; color: #1B3A6B; margin-bottom: 4px; }
+    .cart-item-type { font-size: 12px; color: #888; }
+    .cart-item-price { font-weight: 700; color: #D4A017; margin: 8px 0; }
+    .cart-item-qty { display: flex; align-items: center; gap: 8px; }
+    .qty-btn { width: 32px; height: 32px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    .qty-btn:hover { background: #f0f0f0; }
+    .cart-item-remove { padding: 6px 12px; background: #fee; color: #a32d2d; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .cart-item-remove:hover { background: #fdd; }
+
+    .cart-summary { background: #f9fafb; border-radius: 8px; padding: 24px; height: fit-content; position: sticky; top: 100px; }
+    .summary-title { font-size: 16px; font-weight: 700; color: #1B3A6B; margin-bottom: 16px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e0e4e8; font-size: 14px; }
+    .summary-row.total { font-weight: 700; font-size: 18px; border-bottom: none; color: #D4A017; padding: 16px 0; }
+    .checkout-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #1B3A6B, #2563a8); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+    .checkout-btn:hover { opacity: .9; }
+    .checkout-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .back-btn { display: inline-block; margin-bottom: 20px; padding: 8px 16px; background: #f0f0f0; color: #1B3A6B; text-decoration: none; border-radius: 6px; font-weight: 600; }
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-icon { font-size: 64px; margin-bottom: 16px; }
+    .empty-title { font-size: 20px; color: #1B3A6B; margin-bottom: 8px; }
+
+    @media (max-width: 768px) {
+      .cart-container { grid-template-columns: 1fr; }
+      .cart-summary { position: static; }
+      .cart-item { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body style="background: #f5f6f8;">
+
+<nav style="background: white; box-shadow: 0 1px 3px rgba(0,0,0,.1); padding: 16px 0; position: sticky; top: 0; z-index: 100;">
+  <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;">
+    <a href="index.html" style="font-weight: 700; color: #1B3A6B; text-decoration: none; font-size: 16px;">← Retour au catalogue</a>
+  </div>
+</nav>
+
+<div class="cart-container">
+  <div>
+    <a href="index.html" class="back-btn">← Continuer vos achats</a>
+    <div id="cart-content">
+      <div class="empty-state">
+        <div class="empty-icon">🛒</div>
+        <h2 class="empty-title">Votre panier est vide</h2>
+        <p style="color: #888; margin-bottom: 20px;">Parcourez notre catalogue et ajoutez des ressources.</p>
+        <a href="index.html" style="display: inline-block; padding: 10px 20px; background: #1B3A6B; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">Voir le catalogue</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="cart-summary">
+    <div class="summary-title">Récapitulatif</div>
+    <div class="summary-row">
+      <span>Sous-total:</span>
+      <span id="subtotal">0,00 DA</span>
+    </div>
+    <div class="summary-row">
+      <span>Frais:</span>
+      <span id="fees">0,00 DA</span>
+    </div>
+    <div class="summary-row total">
+      <span>Total:</span>
+      <span id="total">0,00 DA</span>
+    </div>
+    <button class="checkout-btn" id="checkout-btn" onclick="goToCheckout()" disabled>
+      Procéder au paiement
+    </button>
+    <div style="text-align: center; margin-top: 12px; font-size: 12px; color: #888;">
+      Frais de traitement inclus
+    </div>
+  </div>
+</div>
+
+<script src="js/cart.js"></script>
+<script>
+function renderCart() {
+  const content = document.getElementById('cart-content');
+  const checkoutBtn = document.getElementById('checkout-btn');
+
+  if (cart.items.length === 0) {
+    content.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🛒</div>
+        <h2 class="empty-title">Votre panier est vide</h2>
+        <p style="color: #888; margin-bottom: 20px;">Parcourez notre catalogue et ajoutez des ressources.</p>
+        <a href="index.html" style="display: inline-block; padding: 10px 20px; background: #1B3A6B; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">Voir le catalogue</a>
+      </div>
+    `;
+    checkoutBtn.disabled = true;
+    return;
+  }
+
+  let html = '<div class="cart-items">';
+  cart.items.forEach(item => {
+    const subtotal = item.price * item.quantity;
+    html += `
+      <div class="cart-item">
+        <div class="cart-item-info">
+          <div class="cart-item-title">${item.title}</div>
+          <div class="cart-item-type">${item.type}</div>
+          <div class="cart-item-price">${item.price.toLocaleString('fr-DZ')} DA</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+          <div class="cart-item-qty">
+            <button class="qty-btn" onclick="updateQty('${item.id}', ${item.quantity - 1})">−</button>
+            <span style="width: 30px; text-align: center; font-weight: 600;">${item.quantity}</span>
+            <button class="qty-btn" onclick="updateQty('${item.id}', ${item.quantity + 1})">+</button>
+          </div>
+          <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">Retirer</button>
+          <div style="font-weight: 700; color: #D4A017;">${subtotal.toLocaleString('fr-DZ')} DA</div>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  content.innerHTML = html;
+  checkoutBtn.disabled = false;
+  updateSummary();
+}
+
+function updateQty(productId, qty) {
+  cart.updateQuantity(productId, qty);
+  renderCart();
+}
+
+function removeFromCart(productId) {
+  if (confirm('Confirmer la suppression ?')) {
+    cart.removeProduct(productId);
+    renderCart();
+  }
+}
+
+function updateSummary() {
+  const subtotal = cart.getTotal();
+  const fees = subtotal > 0 ? Math.max(100, subtotal * 0.02) : 0;
+  const total = subtotal + fees;
+
+  document.getElementById('subtotal').textContent = subtotal.toLocaleString('fr-DZ') + ' DA';
+  document.getElementById('fees').textContent = fees.toLocaleString('fr-DZ', {maximumFractionDigits: 0}) + ' DA';
+  document.getElementById('total').textContent = total.toLocaleString('fr-DZ', {maximumFractionDigits: 0}) + ' DA';
+}
+
+function goToCheckout() {
+  if (cart.items.length === 0) {
+    alert('Votre panier est vide');
+    return;
+  }
+  location.href = 'checkout.html';
+}
+
+renderCart();
+</script>
+</body>
+</html>

@@ -1,0 +1,2555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Al Handassa.dz — Génie Civil & Architecture Algérie</title>
+  <meta name="description" content="Al Handassa.dz — Plateforme numérique de référence pour le génie civil et l'architecture en Algérie. Ouvrages numériques, cours PDF, vidéos pédagogiques, articles scientifiques." />
+  <meta name="keywords" content="génie civil algérie, architecture algérie, cours bts, licence master génie civil, ouvrages numériques, béton armé, AutoCAD, Revit, ETABS" />
+  <meta name="author" content="Al Handassa.dz" />
+  <meta name="robots" content="index, follow" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="canonical" href="https://handassi.dz/" />
+
+  <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://handassi.dz/" />
+  <meta property="og:title"       content="Al Handassa.dz — Génie Civil & Architecture Algérie" />
+  <meta property="og:description" content="Plus de 2 400 ressources PDF, vidéos et articles pour ingénieurs et architectes algériens. Béton armé, topographie, BIM, AutoCAD, Revit et plus." />
+  <meta property="og:image"       content="https://handassi.dz/img/og-cover.png" />
+  <meta property="og:image:width"  content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale"     content="fr_DZ" />
+  <meta property="og:site_name"  content="Al Handassa.dz" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="Al Handassa.dz — Génie Civil & Architecture Algérie" />
+  <meta name="twitter:description" content="Plus de 2 400 ressources pour ingénieurs et architectes algériens." />
+  <meta name="twitter:image"       content="https://handassi.dz/img/og-cover.png" />
+
+  <!-- Favicon SVG -->
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+
+  <!-- JSON-LD : Organisation (rich snippets Google) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Al Handassa.dz",
+    "url": "https://handassi.dz",
+    "logo": "https://handassi.dz/img/og-cover.png",
+    "description": "Plateforme numérique de référence pour le génie civil, l'architecture et le BTP en Algérie.",
+    "foundingLocation": { "@type": "Place", "addressCountry": "DZ" },
+    "sameAs": [],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "email": "contact@handassi.dz",
+      "availableLanguage": ["French", "Arabic"]
+    }
+  }
+  </script>
+
+  <!-- JSON-LD : WebSite avec SearchAction -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Al Handassa.dz",
+    "url": "https://handassi.dz",
+    "description": "Cours PDF, TD, TP, fiches techniques, vidéos pédagogiques et logiciels pour ingénieurs, architectes et étudiants du BTP en Algérie.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://handassi.dz/index.html?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Preconnect pour accélérer les ressources externes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.min.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     CART OVERLAY
+═══════════════════════════════════════════════ -->
+<div class="cart-overlay" id="cart-overlay"></div>
+
+<!-- ═══════════════════════════════════════════════
+     CART SIDEBAR
+═══════════════════════════════════════════════ -->
+<aside id="cart-sidebar">
+  <div class="cart-header">
+    <h3>🛒 <span data-i18n="cart_title">Mon Panier</span></h3>
+    <button class="cart-close" id="cart-close" aria-label="Fermer le panier" data-i18n-aria="close">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items">
+    <div class="cart-empty">
+      <div class="empty-icon" aria-hidden="true">🛒</div>
+      <p data-i18n="cart_empty">Votre panier est vide</p>
+    </div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span class="cart-total-label" data-i18n="cart_total">Total</span>
+      <span class="cart-total-amount" id="cart-total">0 DZD</span>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="checkout()">💳 <span data-i18n="checkout">Passer la commande</span></button>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════
+     AUTH MODAL
+═══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🏗️ <span data-i18n="modal_title">Accéder à Al Handassa.dz</span></h3>
+      <button class="modal-close" data-modal-close aria-label="Fermer" data-i18n-aria="close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="login" data-i18n="tab_login">Connexion</button>
+        <button class="modal-tab" data-tab="register" data-i18n="tab_register">Inscription</button>
+      </div>
+
+      <!-- Login Panel -->
+      <div id="panel-login" class="modal-panel">
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" data-i18n="label_email">Email</label>
+            <input type="email" name="email" class="form-input" placeholder="exemple@email.com" required autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="label_password">Mot de Passe</label>
+            <input type="password" name="password" class="form-input" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">🚀 <span data-i18n="btn_signin">Se Connecter</span></button>
+          <div style="text-align:center;margin-top:12px">
+            <a href="#" id="forgot-password-link" style="font-size:13px;color:#1B3A6B;text-decoration:none;opacity:.8">
+              <span data-i18n="forgot_pwd">Mot de passe oublié ?</span>
+            </a>
+          </div>
+        </form>
+
+        <!-- Forgot password inline panel -->
+        <div id="panel-forgot" style="display:none">
+          <div style="text-align:center;margin-bottom:20px">
+            <div style="font-size:36px;margin-bottom:8px">🔑</div>
+            <h4 style="margin:0 0 6px;color:#1B3A6B">Mot de passe oublié</h4>
+            <p style="margin:0;font-size:13px;color:#666">Entrez votre email — nous vous enverrons un lien de réinitialisation.</p>
+          </div>
+          <form id="forgot-form">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" id="forgot-email" class="form-input" placeholder="exemple@email.com" required autocomplete="email" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">📧 Envoyer le lien</button>
+            <div id="forgot-msg" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px;text-align:center"></div>
+          </form>
+          <div style="text-align:center;margin-top:16px">
+            <a href="#" id="back-to-login-link" style="font-size:13px;color:#1B3A6B;text-decoration:none">← Retour à la connexion</a>
+          </div>
+        </div>
+
+        <div class="form-divider" data-i18n="or_continue">ou continuer avec</div>
+        <div class="social-login">
+          <button class="btn-social" onclick="showToast('📱 Google disponible bientôt','info')">
+            <span aria-hidden="true">🌐</span> Continuer avec Google
+          </button>
+          <button class="btn-social" onclick="showToast('📘 Facebook disponible bientôt','info')">
+            <span aria-hidden="true">📘</span> Continuer avec Facebook
+          </button>
+        </div>
+      </div>
+
+      <!-- Register Panel -->
+      <div id="panel-register" class="modal-panel" style="display:none">
+        <form id="register-form">
+          <div class="grid-2" style="gap:14px;display:grid;grid-template-columns:1fr 1fr;">
+            <div class="form-group">
+              <label class="form-label" data-i18n="label_firstname">Prénom *</label>
+              <input type="text" name="first_name" class="form-input" placeholder="Ahmed" required autocomplete="given-name" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="label_lastname">Nom *</label>
+              <input type="text" name="last_name" class="form-input" placeholder="Benali" required autocomplete="family-name" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="label_email">Email *</label>
+            <input type="email" name="email" class="form-input" placeholder="ahmed@email.com" required autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="label_phone">Téléphone (Algérie)</label>
+            <input type="tel" name="phone" class="form-input" placeholder="07X XXX XX XX" autocomplete="tel" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="label_level">Niveau d'études</label>
+            <select name="study_level" class="form-select">
+              <option value="">Votre niveau</option>
+              <option value="Bac Technique">Bac Technique (Génie Civil / Architecture)</option>
+              <option value="BTS Génie Civil">BTS Génie Civil</option>
+              <option value="Licence Génie Civil">Licence Génie Civil</option>
+              <option value="Licence Architecture">Licence Architecture</option>
+              <option value="Master Génie Civil">Master Génie Civil</option>
+              <option value="Master Architecture">Master Architecture</option>
+              <option value="École d'Ingénieurs">École d'Ingénieurs</option>
+              <option value="Professionnel">Professionnel</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="label_password_new">Mot de Passe * (min. 8 caractères)</label>
+            <input type="password" name="password" class="form-input" placeholder="••••••••" required autocomplete="new-password" minlength="8" />
+          </div>
+          <button type="submit" class="btn btn-secondary btn-full">✅ <span data-i18n="btn_create">Créer mon Compte Gratuit</span></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     NAVBAR
+═══════════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#hero" class="nav-logo">
+        <img src="img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+      </a>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#catalog" class="active" data-i18n="nav_catalog">Catalogue</a></li>
+        <li><a href="#videos" data-i18n="nav_videos">Vidéos</a></li>
+        <li><a href="#logiciels" data-i18n="nav_software">Logiciels</a></li>
+        <li><a href="#articles" data-i18n="nav_articles">Articles</a></li>
+        <li><a href="#pricing" data-i18n="nav_pricing">Tarifs</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div style="display: flex; align-items: center; gap: 8px; background: #f0f0f0; border-radius: 6px; padding: 6px 12px;">
+          <input type="text" id="nav-search" placeholder="🔍 Rechercher..." style="border: none; background: transparent; outline: none; font-family: Cairo; font-size: 13px; width: 200px;" onkeypress="if(event.key==='Enter') location.href='search.html?q=' + encodeURIComponent(this.value)" />
+        </div>
+        <div class="lang-switcher" id="lang-dropdown">
+          <button class="lang-current" onclick="document.getElementById('lang-dropdown').classList.toggle('open')">
+            <span id="lang-flag">🇫🇷</span>
+            <span id="lang-label">FR</span>
+            <span class="lang-arrow">▾</span>
+          </button>
+          <ul class="lang-menu">
+            <li onclick="setLanguage('fr')"><span>🇫🇷</span> Français</li>
+            <li onclick="setLanguage('ar')"><span>🇩🇿</span> عربي</li>
+            <li onclick="setLanguage('en')"><span>🇬🇧</span> English</li>
+          </ul>
+        </div>
+        <button class="cart-btn" id="cart-btn" aria-label="Panier d'achats" title="Panier">
+          <span aria-hidden="true">🛒</span>
+          <span class="cart-badge" id="cart-badge" style="display:none" aria-live="polite">0</span>
+        </button>
+        <div id="nav-auth-actions" style="display:contents">
+          <button class="btn btn-outline btn-sm" data-modal="auth" data-i18n="btn_login">Connexion</button>
+          <button class="btn btn-primary btn-sm" data-modal="auth" data-i18n="btn_register">S'inscrire</button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="nav-links" data-i18n-aria="menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span class="dot" aria-hidden="true"></span>
+          <span data-i18n="hero_badge">🇩🇿 Référence nationale génie civil</span>
+        </div>
+        <h1 class="hero-title">
+          <span data-i18n="hero_title1">Tous les DTR, RPA</span><br>
+          <span class="highlight line2"><span data-i18n="hero_title2">et cours de génie civil</span><br><span data-i18n="hero_title3">conformes au programme algérien</span></span>
+        </h1>
+        <p class="hero-subtitle" data-i18n="hero_sub">
+          2 400 ressources vérifiées — normes, cours, vidéos et logiciels — accessibles aux étudiants et ingénieurs des 48 wilayas, du bac technique au mastère.
+        </p>
+        <div class="hero-actions">
+          <a href="#catalog" class="btn btn-secondary btn-lg">📚 <span data-i18n="btn_explore">Explorer le Catalogue</span></a>
+          <button class="btn btn-white btn-lg" data-modal="auth">🎁 <span data-i18n="btn_free">Essai Gratuit</span></button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-number" data-count="2400" data-suffix="+">2400+</div>
+            <div class="stat-label" data-i18n="stat_resources">Ressources</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" data-count="18500" data-suffix="+">18500+</div>
+            <div class="stat-label" data-i18n="stat_students">Étudiants</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" data-count="48">48</div>
+            <div class="stat-label" data-i18n="stat_wilayas">Wilayas</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number" data-count="320" data-suffix="+">320+</div>
+            <div class="stat-label" data-i18n="stat_videos">Vidéos</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-card">
+          <div class="hcard-top">
+            <div class="hcard-icon blue">📋</div>
+            <div class="hcard-info">
+              <h4 data-i18n="hcard1_title">DTR &amp; RPA</h4>
+              <p data-i18n="hcard1_sub">Textes réglementaires algériens complets</p>
+            </div>
+          </div>
+          <div class="hcard-norms">
+            <span class="norm-tag">RPA 99 v2003</span>
+            <span class="norm-tag">DTR BC 2.48</span>
+            <span class="norm-tag">DTR C3-2</span>
+            <span class="norm-tag">DTR C3-4</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="hcard-top">
+            <div class="hcard-icon gold">🎓</div>
+            <div class="hcard-info">
+              <h4 data-i18n="hcard2_title">Cours &amp; Polycopiés</h4>
+              <p data-i18n="hcard2_sub">Conformes au programme MESRS</p>
+            </div>
+          </div>
+          <div class="hcard-norms">
+            <span class="norm-tag">Béton armé</span>
+            <span class="norm-tag">Mécanique des sols</span>
+            <span class="norm-tag">Topographie</span>
+            <span class="norm-tag">Hydraulique</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="hcard-top">
+            <div class="hcard-icon green">🛠️</div>
+            <div class="hcard-info">
+              <h4 data-i18n="hcard3_title">Logiciels &amp; DAO</h4>
+              <p data-i18n="hcard3_sub">Formations aux outils professionnels</p>
+            </div>
+          </div>
+          <div class="hcard-norms">
+            <span class="norm-tag">AutoCAD</span>
+            <span class="norm-tag">ETABS</span>
+            <span class="norm-tag">SAP2000</span>
+            <span class="norm-tag">SAFE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     TICKER
+═══════════════════════════════════════════════ -->
+<div id="ticker">
+  <div class="container">
+    <div class="ticker-inner">
+      <span class="ticker-label">📢 Actualités</span>
+      <div class="ticker-track">
+        <div class="ticker-content">
+          <span class="ticker-item">🎓 Nouveau cours : Calcul des structures parasismiques selon le RPA 99v2003</span>
+          <span class="ticker-item">📖 Ouvrage mis à jour : Béton Armé — Édition 2024 conforme DTR Algeria</span>
+          <span class="ticker-item">🎥 Série vidéo : Projet de fin d'études BTS Génie Civil — 12 vidéos</span>
+          <span class="ticker-item">💳 Paiement BaridiMob disponible — Payez avec CCP facilement</span>
+          <span class="ticker-item">🏆 +500 étudiants inscrits ce mois — Rejoignez la communauté !</span>
+          <span class="ticker-item">📐 Tutoriels AutoCAD Civil 3D — De zéro au niveau professionnel</span>
+          <span class="ticker-item">🔬 Articles : Étude géotechnique des sols argileux en Algérie du Nord</span>
+          <span class="ticker-item">🎓 Nouveau cours : Calcul des structures parasismiques selon le RPA 99v2003</span>
+          <span class="ticker-item">📖 Ouvrage mis à jour : Béton Armé — Édition 2024 conforme DTR Algeria</span>
+          <span class="ticker-item">🎥 Série vidéo : Projet de fin d'études BTS Génie Civil — 12 vidéos</span>
+          <span class="ticker-item">💳 Paiement BaridiMob disponible — Payez avec CCP facilement</span>
+          <span class="ticker-item">🏆 +500 étudiants inscrits ce mois — Rejoignez la communauté !</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     LEVELS
+═══════════════════════════════════════════════ -->
+<section id="levels" class="section section-alt">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="label">🎓 Niveaux d'Études</span>
+      <h2>Contenu adapté à <span>votre niveau</span></h2>
+      <div class="divider divider-center"></div>
+      <p>Du lycée technique jusqu'aux écoles d'ingénieurs — des ressources spécialement conçues pour chaque cycle d'études.</p>
+    </div>
+    <div class="levels-grid" id="levels-grid">
+      <!-- Chargement dynamique depuis l'API -->
+      <div class="level-card skeleton-card"></div>
+      <div class="level-card skeleton-card"></div>
+      <div class="level-card skeleton-card"></div>
+      <div class="level-card skeleton-card"></div>
+    </div>
+
+    <!-- ── Sujets d'Examen par diplôme ───────────────────────────────────── -->
+    <div style="margin-top:3rem;">
+      <div class="section-header" style="margin-bottom:1.5rem;">
+        <span class="label">📝 Sujets d'Examen</span>
+        <h3 style="font-size:1.4rem;margin:.4rem 0 0;">Annales corrigées par diplôme</h3>
+        <div class="divider"></div>
+      </div>
+
+      <div id="sujet-diplomes-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+        <!-- Chargé dynamiquement -->
+        <div style="height:90px;background:#f0f4fa;border-radius:10px;animation:pulse 1.5s infinite;"></div>
+        <div style="height:90px;background:#f0f4fa;border-radius:10px;animation:pulse 1.5s infinite;"></div>
+        <div style="height:90px;background:#f0f4fa;border-radius:10px;animation:pulse 1.5s infinite;"></div>
+      </div>
+
+      <!-- Zone d'affichage des sujets du diplôme sélectionné -->
+      <div id="sujet-diplome-results" style="display:none;margin-top:2rem;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     CATALOG
+═══════════════════════════════════════════════ -->
+<section id="catalog" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="label" data-i18n="section_catalog">CATALOGUE</span>
+      <h2 data-i18n="section_catalog_h2">Ressources & <span>Ouvrages Numériques</span></h2>
+      <div class="divider"></div>
+      <p data-i18n="section_catalog_sub">Ouvrages numériques, cours PDF, résumés de cours, examens corrigés — tous conformes au programme algérien.</p>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="catalog-search-wrap">
+      <div class="catalog-search-box">
+        <i class="fas fa-search catalog-search-icon"></i>
+        <input
+          type="text"
+          id="catalog-search"
+          class="catalog-search-input"
+          placeholder="Rechercher un cours, sujet, ouvrage…"
+          autocomplete="off"
+        />
+        <button class="catalog-search-clear" id="catalog-search-clear" style="display:none" onclick="clearCatalogSearch()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="catalog-filters">
+      <button class="filter-btn active" data-filter="all">🌐 Tout</button>
+      <button class="filter-btn" data-filter="ouvrage">📚 Ouvrages</button>
+      <button class="filter-btn" data-filter="cours">📄 Cours PDF</button>
+
+      <button class="filter-btn" data-filter="td">📒 TD PDF</button>
+      <button class="filter-btn" data-filter="tp">🔬 TP PDF</button>
+      <button class="filter-btn" data-filter="tuto">🎯 Tutos PDF</button>
+      <button class="filter-btn" data-filter="normes">📋 Normes DTR/RPA</button>
+      <button class="filter-btn" data-filter="document_word">📋 Documents de Chantier</button>
+      <button class="filter-btn" data-filter="affiches_chantier">🦺 Affiches de Chantier</button>
+      <button class="filter-btn" data-filter="gratuit">🆓 Gratuits</button>
+      <button class="filter-btn" data-filter="labo-beton">🧪 Fiches Laboratoire</button>
+      <button class="filter-btn" data-filter="topo-docs">📐 Documents Topographie</button>
+      <button class="filter-btn" data-filter="entreprise-btp">🏢 Documents Entreprise BTP</button>
+    </div>
+
+    <!-- Sous-filtres DOCUMENTS ENTREPRISE BTP -->
+    <div id="subfilters-entreprise" class="sujet-levels-wrap" style="display:none">
+      <p class="sujet-levels-title"><i class="fas fa-building"></i> Phase du projet :</p>
+      <div class="theme-chips-wrap">
+        <button class="theme-chip active" data-entreprise-cat="">📋 Toutes les phases</button>
+        <button class="theme-chip" data-entreprise-cat="entreprise-go">🏗️ Phase 2 — Gros Œuvre</button>
+        <button class="theme-chip" data-entreprise-cat="entreprise-so">🪟 Phase 3 — Second Œuvre</button>
+        <button class="theme-chip" data-entreprise-cat="entreprise-qua">✅ Phase 5 — Contrôle Qualité</button>
+        <button class="theme-chip" data-entreprise-cat="entreprise-rec">🏁 Phase 6 — Réception & Clôture</button>
+      </div>
+    </div>
+
+    <!-- Sous-filtres DOCUMENTS TOPOGRAPHIE -->
+    <div id="subfilters-topo" class="sujet-levels-wrap" style="display:none">
+      <p class="sujet-levels-title"><i class="fas fa-drafting-compass"></i> Type de fiche :</p>
+      <div class="theme-chips-wrap">
+        <button class="theme-chip active" data-topo-cat="">📋 Toutes les fiches</button>
+        <button class="theme-chip" data-topo-cat="fiches-bureau-topo">📐 Fiches Bureau</button>
+        <button class="theme-chip" data-topo-cat="fiches-terrain-topo">🏗️ Fiches Terrain</button>
+      </div>
+    </div>
+
+    <!-- Sous-filtres FICHES LABORATOIRE -->
+    <div id="subfilters-labo" class="sujet-levels-wrap" style="display:none">
+      <p class="sujet-levels-title"><i class="fas fa-flask"></i> Domaine :</p>
+      <div class="theme-chips-wrap">
+        <button class="theme-chip active" data-labo-tag="">📋 Toutes les fiches</button>
+        <button class="theme-chip" data-labo-tag="Granulats">🪨 Granulats</button>
+        <button class="theme-chip" data-labo-tag="Eau de gâchage">💧 Eau de gâchage</button>
+        <button class="theme-chip" data-labo-tag="Ciment">🏭 Ciment</button>
+        <button class="theme-chip" data-labo-tag="Béton frais">🥣 Béton frais</button>
+        <button class="theme-chip" data-labo-tag="Béton durci">🧱 Béton durci</button>
+        <button class="theme-chip" data-labo-tag="Formulation béton">⚗️ Formulation béton</button>
+        <button class="theme-chip" data-labo-tag="Essais spéciaux">🔬 Essais spéciaux</button>
+      </div>
+    </div>
+
+    <!-- Sous-filtres COURS PDF : visible quand "Cours PDF" est actif -->
+    <div class="sujet-levels-wrap" id="cours-subfilters" style="display:none">
+      <p class="sujet-levels-title"><i class="fas fa-folder-open"></i> Thème du cours :</p>
+      <div class="theme-chips-wrap">
+        <button class="theme-chip active" data-cours-tag="">📚 Tous</button>
+        <button class="theme-chip" data-cours-tag="Topographie">📐 Topographie</button>
+        <button class="theme-chip" data-cours-tag="Thermique">🌡️ Thermique</button>
+        <button class="theme-chip" data-cours-tag="Acoustique">🔊 Acoustique</button>
+        <button class="theme-chip" data-cours-tag="Technologie">⚙️ Technologie</button>
+        <button class="theme-chip" data-cours-tag="Résistance des matériaux">🏗️ Résistance des matériaux</button>
+        <button class="theme-chip" data-cours-tag="Rotation des banches">🔄 Rotation des banches</button>
+        <button class="theme-chip" data-cours-tag="Etudes de prix">💰 Études de prix</button>
+        <button class="theme-chip" data-cours-tag="Déboursés d'ouvrages">📊 Déboursés d'ouvrages</button>
+        <button class="theme-chip" data-cours-tag="Laboratoire">🧪 Laboratoire</button>
+        <button class="theme-chip" data-cours-tag="Quantification">📐 Quantification</button>
+        <button class="theme-chip" data-cours-tag="Terrassement">🚜 Terrassement</button>
+        <button class="theme-chip" data-cours-tag="Planification">📅 Planification</button>
+        <button class="theme-chip" data-cours-tag="Temps unitaire">⏱️ Temps unitaire</button>
+        <button class="theme-chip" data-cours-tag="Poste de bétonnage">🏭 Poste de bétonnage</button>
+        <button class="theme-chip" data-cours-tag="Installation de chantier">🏕️ Installation de chantier</button>
+        <button class="theme-chip" data-cours-tag="Lecture de plans">📐 Lecture de plans</button>
+        <button class="theme-chip" data-cours-tag="Poste de levage">🏗️ Poste de levage</button>
+        <button class="theme-chip" data-cours-tag="Rotation de camion">🚛 Rotation de camions</button>
+      </div>
+    </div>
+
+    <!-- Sous-filtres TD PDF : visible quand "TD PDF" est actif -->
+    <div class="sujet-levels-wrap" id="td-subfilters" style="display:none">
+      <p class="sujet-levels-title"><i class="fas fa-folder-open"></i> Thème du TD :</p>
+      <div class="theme-chips-wrap">
+        <button class="theme-chip active" data-td-tag="">📒 Tous</button>
+        <button class="theme-chip" data-td-tag="Topographie">📐 Topographie</button>
+        <button class="theme-chip" data-td-tag="Thermique">🌡️ Thermique</button>
+        <button class="theme-chip" data-td-tag="Acoustique">🔊 Acoustique</button>
+        <button class="theme-chip" data-td-tag="Technologie">⚙️ Technologie</button>
+        <button class="theme-chip" data-td-tag="Résistance des matériaux">🏗️ Résistance des matériaux</button>
+        <button class="theme-chip" data-td-tag="Rotation des banches">🔄 Rotation des banches</button>
+        <button class="theme-chip" data-td-tag="Rotation de camion">🚛 Rotation de camions</button>
+        <button class="theme-chip" data-td-tag="Études de prix">💰 Études de prix</button>
+        <button class="theme-chip" data-td-tag="Déboursés d'ouvrages">📊 Déboursés d'ouvrages</button>
+        <button class="theme-chip" data-td-tag="Laboratoire">🧪 Laboratoire</button>
+        <button class="theme-chip" data-td-tag="Quantification">📐 Quantification</button>
+        <button class="theme-chip" data-td-tag="Terrassement">🚜 Terrassement</button>
+        <button class="theme-chip" data-td-tag="Planification">📅 Planification</button>
+        <button class="theme-chip" data-td-tag="Temps unitaire">⏱️ Temps unitaire</button>
+        <button class="theme-chip" data-td-tag="Poste de bétonnage">🏭 Poste de bétonnage</button>
+        <button class="theme-chip" data-td-tag="Installation de chantier">🏕️ Installation de chantier</button>
+        <button class="theme-chip" data-td-tag="Lecture de plans">📐 Lecture de plans</button>
+        <button class="theme-chip" data-td-tag="Poste de levage">🏗️ Poste de levage</button>
+      </div>
+    </div>
+
+    <!-- Sous-filtres TP PDF : visible quand "TP PDF" est actif -->
+    <div class="sujet-levels-wrap" id="tp-subfilters" style="display:none">
+      <p class="sujet-levels-title"><i class="fas fa-folder-open"></i> Thème du TP :</p>
+      <div class="theme-chips-wrap">
+        <button class="theme-chip active" data-tp-tag="">🔬 Tous</button>
+        <button class="theme-chip" data-tp-tag="Laboratoire">🧪 Laboratoire</button>
+        <button class="theme-chip" data-tp-tag="Béton">🧱 Béton</button>
+        <button class="theme-chip" data-tp-tag="Granulats">🪨 Granulats</button>
+        <button class="theme-chip" data-tp-tag="Sols">🌍 Sols</button>
+        <button class="theme-chip" data-tp-tag="Ciment">⚗️ Ciment</button>
+        <button class="theme-chip" data-tp-tag="Structure">🏗️ Structure</button>
+      </div>
+    </div>
+
+    <!-- Sous-filtres Tutos PDF : visible quand "Tutos PDF" est actif -->
+    <div class="sujet-levels-wrap" id="tuto-subfilters" style="display:none">
+      <p class="sujet-levels-title"><i class="fas fa-layer-group"></i> Choisissez un logiciel :</p>
+      <div class="sujet-roots-grid">
+        <button class="root-card root-all active" data-tuto-tag="">
+          <div class="root-card-icon">🎯</div>
+          <div class="root-card-body">
+            <div class="root-card-name">Tous les tutos</div>
+            <div class="root-card-count" id="tc-all">—</div>
+          </div>
+        </button>
+        <button class="root-card" style="--accent:#c0392b" data-tuto-tag="Revit">
+          <div class="root-card-icon">🏗️</div>
+          <div class="root-card-body">
+            <div class="root-card-racine">Autodesk</div>
+            <div class="root-card-name">Tutos Revit</div>
+            <div class="root-card-sub">BIM & Maquette numérique</div>
+            <div class="root-card-count" id="tc-revit">—</div>
+          </div>
+        </button>
+        <button class="root-card" style="--accent:#2980b9" data-tuto-tag="Archicad">
+          <div class="root-card-icon">📐</div>
+          <div class="root-card-body">
+            <div class="root-card-racine">Graphisoft</div>
+            <div class="root-card-name">Tutos Archicad</div>
+            <div class="root-card-sub">Architecture & BIM</div>
+            <div class="root-card-count" id="tc-archicad">—</div>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sous-filtres Sujets : modules dynamiques par diplôme -->
+    <div class="sujet-levels-wrap" id="sujet-theme-filters" style="display:none">
+      <p class="sujet-levels-title"><i class="fas fa-folder-open"></i> Module :</p>
+
+      <!-- Modules communs (visible quand aucun diplôme sélectionné) -->
+      <div class="theme-chips-wrap" id="sujet-modules-all">
+        <button class="theme-chip active" data-sujet-tag="">📝 Tous</button>
+        <button class="theme-chip" data-sujet-tag="Organisation de chantier">🏗️ Organisation de chantier</button>
+        <button class="theme-chip" data-sujet-tag="Topographie">📐 Topographie</button>
+        <button class="theme-chip" data-sujet-tag="Béton armé">🧱 Béton armé</button>
+        <button class="theme-chip" data-sujet-tag="Résistance des matériaux">⚙️ RDM</button>
+        <button class="theme-chip" data-sujet-tag="Hydraulique">💧 Hydraulique</button>
+        <button class="theme-chip" data-sujet-tag="Géotechnique">🪨 Géotechnique</button>
+      </div>
+
+      <!-- Modules BAC PRO -->
+      <div class="theme-chips-wrap" id="sujet-modules-bac" style="display:none">
+        <button class="theme-chip active" data-sujet-tag="BAC PRO">📝 Tous BAC</button>
+        <button class="theme-chip" data-sujet-tag="Organisation de chantier">🏗️ Organisation de chantier</button>
+        <button class="theme-chip" data-sujet-tag="Topographie">📐 Topographie</button>
+        <button class="theme-chip" data-sujet-tag="Dessin technique">✏️ Dessin technique</button>
+        <button class="theme-chip" data-sujet-tag="Technologie">⚙️ Technologie</button>
+        <button class="theme-chip" data-sujet-tag="Lecture de plans">🗺️ Lecture de plans</button>
+      </div>
+
+      <!-- Modules BTS -->
+      <div class="theme-chips-wrap" id="sujet-modules-bts" style="display:none">
+        <button class="theme-chip active" data-sujet-tag="BTS">📝 Tous BTS</button>
+        <button class="theme-chip" data-sujet-tag="BTS Bâtiment">🏢 BTS Bâtiment</button>
+        <button class="theme-chip" data-sujet-tag="BTS Travaux Publics">🛣️ BTS Travaux Publics</button>
+        <button class="theme-chip" data-sujet-tag="Béton armé">🧱 Béton armé</button>
+        <button class="theme-chip" data-sujet-tag="Topographie">📐 Topographie</button>
+        <button class="theme-chip" data-sujet-tag="Organisation de chantier">🏗️ Organisation</button>
+        <button class="theme-chip" data-sujet-tag="Résistance des matériaux">⚙️ RDM</button>
+        <button class="theme-chip" data-sujet-tag="Dessin">✏️ Dessin</button>
+      </div>
+
+      <!-- Modules Licence -->
+      <div class="theme-chips-wrap" id="sujet-modules-lic" style="display:none">
+        <button class="theme-chip active" data-sujet-tag="Licence">📝 Tous Licence</button>
+        <button class="theme-chip" data-sujet-tag="Béton armé">🧱 Béton armé</button>
+        <button class="theme-chip" data-sujet-tag="Résistance des matériaux">⚙️ RDM</button>
+        <button class="theme-chip" data-sujet-tag="Mécanique des sols">🪨 Méca. des sols</button>
+        <button class="theme-chip" data-sujet-tag="Hydraulique">💧 Hydraulique</button>
+        <button class="theme-chip" data-sujet-tag="Topographie">📐 Topographie</button>
+        <button class="theme-chip" data-sujet-tag="Structures métalliques">🔩 Structures métalliques</button>
+        <button class="theme-chip" data-sujet-tag="Matériaux de construction">🏗️ Matériaux</button>
+      </div>
+
+      <!-- Modules Master -->
+      <div class="theme-chips-wrap" id="sujet-modules-mas" style="display:none">
+        <button class="theme-chip active" data-sujet-tag="Master">📝 Tous Master</button>
+        <button class="theme-chip" data-sujet-tag="Géotechnique">🪨 Géotechnique</button>
+        <button class="theme-chip" data-sujet-tag="Béton armé">🧱 Béton armé</button>
+        <button class="theme-chip" data-sujet-tag="Parasismique">🌍 Parasismique</button>
+        <button class="theme-chip" data-sujet-tag="Hydraulique">💧 Hydraulique</button>
+        <button class="theme-chip" data-sujet-tag="Structures">🏛️ Structures</button>
+        <button class="theme-chip" data-sujet-tag="VRD">🛣️ VRD</button>
+      </div>
+
+      <!-- Modules Ingénieur & Architecte -->
+      <div class="theme-chips-wrap" id="sujet-modules-ing" style="display:none">
+        <button class="theme-chip active" data-sujet-tag="Ingénieur">📝 Tous Ingénieur</button>
+        <button class="theme-chip" data-sujet-tag="Béton armé">🧱 Béton armé</button>
+        <button class="theme-chip" data-sujet-tag="Résistance des matériaux">⚙️ RDM</button>
+        <button class="theme-chip" data-sujet-tag="Mécanique des sols">🪨 Méca. des sols</button>
+        <button class="theme-chip" data-sujet-tag="Hydraulique">💧 Hydraulique</button>
+        <button class="theme-chip" data-sujet-tag="Parasismique">🌍 Parasismique</button>
+        <button class="theme-chip" data-sujet-tag="Structures métalliques">🔩 Structures métalliques</button>
+        <button class="theme-chip" data-sujet-tag="Béton précontraint">🔧 Béton précontraint</button>
+      </div>
+    </div>
+
+    <!-- Sélecteur de niveau : visible uniquement quand "Sujets d'examen" est actif -->
+    <div class="sujet-levels-wrap" id="sujet-level-filters" style="display:none">
+      <p class="sujet-levels-title"><i class="fas fa-layer-group"></i> Filtrer par racine de niveau :</p>
+
+      <div class="sujet-roots-grid">
+
+        <!-- Tous -->
+        <button class="root-card root-all active" data-tag="">
+          <div class="root-card-icon">📋</div>
+          <div class="root-card-body">
+            <div class="root-card-name">Tous les sujets</div>
+            <div class="root-card-count" id="lc-all">—</div>
+          </div>
+        </button>
+
+        <!-- Racine BAC -->
+        <button class="root-card root-bac" data-tag="BAC PRO">
+          <div class="root-card-icon">🎓</div>
+          <div class="root-card-body">
+            <div class="root-card-racine">Racine</div>
+            <div class="root-card-name">BAC</div>
+            <div class="root-card-sub">BAC PRO</div>
+            <div class="root-card-count" id="lc-bac">—</div>
+          </div>
+        </button>
+
+        <!-- Racine BTS -->
+        <button class="root-card root-bts" data-tag="BTS">
+          <div class="root-card-icon">📐</div>
+          <div class="root-card-body">
+            <div class="root-card-racine">Racine</div>
+            <div class="root-card-name">BTS</div>
+            <div class="root-card-sub">Brevet Technicien Supérieur</div>
+            <div class="root-card-count" id="lc-bts">—</div>
+          </div>
+        </button>
+
+        <!-- Racine Licence -->
+        <button class="root-card root-lic" data-tag="Licence">
+          <div class="root-card-icon">🏛️</div>
+          <div class="root-card-body">
+            <div class="root-card-racine">Racine</div>
+            <div class="root-card-name">Licence</div>
+            <div class="root-card-sub">Licence / Bachelor</div>
+            <div class="root-card-count" id="lc-lic">—</div>
+          </div>
+        </button>
+
+        <!-- Racine Mastère -->
+        <button class="root-card root-mas" data-tag="Master">
+          <div class="root-card-icon">🔬</div>
+          <div class="root-card-body">
+            <div class="root-card-racine">Racine</div>
+            <div class="root-card-name">Mastère</div>
+            <div class="root-card-sub">Master / Mastère spécialisé</div>
+            <div class="root-card-count" id="lc-mas">—</div>
+          </div>
+        </button>
+
+        <!-- Racine Ingénieur & Architecte -->
+        <button class="root-card root-ing" data-tag="Ingénieur">
+          <div class="root-card-icon">⚙️</div>
+          <div class="root-card-body">
+            <div class="root-card-racine">Racine</div>
+            <div class="root-card-name">Ingénieur & Architecte</div>
+            <div class="root-card-sub">École d'ingénieurs / Architecture</div>
+            <div class="root-card-count" id="lc-ing">—</div>
+          </div>
+        </button>
+
+      </div>
+    </div>
+
+    <div class="products-grid" id="products-grid">
+      <!-- Chargement dynamique depuis /api/products -->
+    </div>
+
+    <!-- Conteneur vue séparée cours / TD -->
+    <div id="split-view" style="display:none"></div>
+
+    <div style="text-align:center; margin-top:40px;">
+      <button class="btn btn-outline btn-lg" onclick="showToast('📦 Chargement de 150+ produits...','info')">
+        📦 Voir tout le catalogue (150+ ressources)
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     VIDEOS
+═══════════════════════════════════════════════ -->
+<section id="videos" class="section">
+  <div class="container">
+    <div class="section-header">
+      <span class="label" data-i18n="section_videos">Vidéothèque</span>
+      <h2 style="color:white" data-i18n="section_videos_h2">Vidéos <span>Pédagogiques</span></h2>
+      <div class="divider"></div>
+      <p style="color:rgba(255,255,255,0.6)">Cours filmés, tutoriels logiciels, démonstrations de chantier et conférences de professionnels algériens.</p>
+    </div>
+
+    <!-- Filtres par source -->
+    <div id="videos-source-filters" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px;">
+      <button class="vsrc-btn vsrc-active" data-source="" onclick="filterVideosBySource(this, '')">🎬 Toutes les sources</button>
+      <button class="vsrc-btn" data-source="TP Laboratoire CERIB" onclick="filterVideosBySource(this, 'TP Laboratoire CERIB')">🧪 TP Laboratoire</button>
+      <button class="vsrc-btn" data-source="CERIB Maison Individuelle" onclick="filterVideosBySource(this, 'CERIB Maison Individuelle')">🏠 Maison Individuelle</button>
+      <button class="vsrc-btn" data-source="Leroy Merlin" onclick="filterVideosBySource(this, 'Leroy Merlin')">🔨 Leroy Merlin</button>
+      <button class="vsrc-btn" data-source="AQC TV" onclick="filterVideosBySource(this, 'AQC TV')">🏗️ AQC TV</button>
+
+      <button class="vsrc-btn" data-source="FFB — Bâtissons TV" onclick="filterVideosBySource(this, 'FFB — Bâtissons TV')">🧱 FFB Bâtissons</button>
+
+
+
+
+
+      <button class="vsrc-btn" data-source="OPPBTP" onclick="filterVideosBySource(this, 'OPPBTP')">🦺 OPPBTP Prévention</button>
+      <button class="vsrc-btn" data-source="PERI Group" onclick="filterVideosBySource(this, 'PERI Group')">🏗️ PERI Group</button>
+      <button class="vsrc-btn" data-source="Les Tutos Placo®" onclick="filterVideosBySource(this, 'Les Tutos Placo®')">🪟 Les Tutos Placo®</button>
+      <button class="vsrc-btn" data-source="Les Tutos Weber" onclick="filterVideosBySource(this, 'Les Tutos Weber')">🏺 Les Tutos Weber</button>
+      <button class="vsrc-btn" data-source="Tutos Twinmotion" onclick="filterVideosBySource(this, 'Tutos Twinmotion')">🎬 Tutos Twinmotion</button>
+      <button class="vsrc-btn" data-source="Tutos Robot" onclick="filterVideosBySource(this, 'Tutos Robot')">🔩 Tutos Robot</button>
+      <button class="vsrc-btn" data-source="Tutos AutoCAD" onclick="filterVideosBySource(this, 'Tutos AutoCAD')">📏 Tutos AutoCAD</button>
+      <button class="vsrc-btn" data-source="Tutos ArchiCAD" onclick="filterVideosBySource(this, 'Tutos ArchiCAD')">📐 Tutos ArchiCAD</button>
+      <button class="vsrc-btn" data-source="Tutos Revit" onclick="filterVideosBySource(this, 'Tutos Revit')">🏛️ Tutos Revit</button>
+      <button class="vsrc-btn" data-source="C'est pas sorcier" onclick="filterVideosBySource(this, 'C\'est pas sorcier')">🔬 C'est pas sorcier</button>
+      <button class="vsrc-btn" data-source="Béton Décoratif" onclick="filterVideosBySource(this, 'Béton Décoratif')">🪨 Béton Décoratif</button>
+    </div>
+
+    <div class="videos-grid" id="videos-grid">
+      <!-- Chargement dynamique depuis /api/videos -->
+    </div>
+
+    <div style="text-align:center; margin-top:40px;">
+      <button id="videos-more-btn" class="btn btn-outline btn-lg"
+        style="color:white;border-color:rgba(255,255,255,0.3);display:none"
+        onclick="loadVideos(_videosCurrentFilter, true)">
+        🎥 Voir plus
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     LOGICIELS
+═══════════════════════════════════════════════ -->
+<section id="logiciels" class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <span class="label">💻 Outils professionnels</span>
+      <h2>Logiciels <span>BTP & Génie Civil</span></h2>
+      <div class="divider"></div>
+      <p>Les logiciels essentiels pour ingénieurs, architectes et géomètres — BIM, calcul de structures, topographie, rendu 3D.</p>
+    </div>
+
+    <!-- Filtres par catégorie -->
+    <div id="logiciels-cat-filters" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px;">
+      <button class="vsrc-btn vsrc-active" data-cat="" onclick="filterLogicielsByCat(this,'')">🖥️ Tous les logiciels</button>
+    </div>
+
+    <div id="logiciels-content">
+      <!-- Chargement dynamique -->
+    </div>
+
+    <div style="text-align:center; margin-top:40px;">
+      <a href="logiciels" class="btn btn-outline btn-lg">💻 Voir tous les logiciels</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     ARTICLES
+═══════════════════════════════════════════════ -->
+<section id="articles" class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <span class="label"><span aria-hidden="true">🔬</span> <span data-i18n="section_articles">SCIENTIFIQUE</span></span>
+      <h2 data-i18n="section_articles_h2">Articles & <span>Publications Scientifiques</span></h2>
+      <div class="divider"></div>
+      <p>Articles de recherche, publications académiques et études de cas de projets algériens.</p>
+    </div>
+
+    <div class="articles-grid" id="articles-grid">
+      <!-- Chargement dynamique depuis /api/articles -->
+    </div>
+
+    <div style="text-align:center;margin-top:2rem">
+      <button id="articles-more-btn" class="btn btn-outline" onclick="loadMoreArticles()" style="display:none">
+        <i class="fas fa-chevron-down"></i> Voir plus d'articles
+      </button>
+    </div>
+
+    <!-- ── Portails de Recherche Scientifique ── -->
+    <div class="portails-section">
+      <div class="portails-header">
+        <span class="portails-icon">📚</span>
+        <div>
+          <h3>Portails de Thèses &amp; Recherches</h3>
+          <p>Accédez aux bases de données scientifiques, thèses de doctorat et revues indexées en génie civil &amp; construction.</p>
+        </div>
+      </div>
+
+      <div class="portails-grid">
+
+        <!-- Thèses.fr -->
+        <a href="https://theses.fr/" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">📜</div>
+          <div class="portail-info">
+            <h4>Theses.fr</h4>
+            <p>+15 000 thèses de doctorat en génie civil — moteur officiel français</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- ASJP Algérie -->
+        <a href="http://www.asjp.cerist.dz" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge dz">Algérie</div>
+          <div class="portail-logo">🇩🇿</div>
+          <div class="portail-info">
+            <h4>ASJP — Portail Algérien</h4>
+            <p>Portail officiel des revues scientifiques algériennes — accès libre et gratuit</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- DGRSDT -->
+        <a href="https://www.dgrsdt.dz/fr/revues_A" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge dz">Algérie</div>
+          <div class="portail-logo">🏛️</div>
+          <div class="portail-info">
+            <h4>DGRSDT — Revues A &amp; B</h4>
+            <p>Revues scientifiques reconnues par le MESRS Algérie, catégories A et B</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- ResearchGate -->
+        <a href="https://www.researchgate.net/search?q=génie+civil+algérie" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge intl">International</div>
+          <div class="portail-logo">🔬</div>
+          <div class="portail-info">
+            <h4>ResearchGate</h4>
+            <p>Réseau mondial de chercheurs — articles en accès libre sur béton armé, sismique, sols</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- USTHB -->
+        <a href="https://fgc.usthb.dz" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge dz">Algérie</div>
+          <div class="portail-logo">🎓</div>
+          <div class="portail-info">
+            <h4>USTHB — Génie Civil</h4>
+            <p>Faculté de Génie Civil — publications, thèses et recherches de l'USTHB</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- CDER -->
+        <a href="http://www.cder.dz" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge dz">Algérie</div>
+          <div class="portail-logo">☀️</div>
+          <div class="portail-info">
+            <h4>CDER Algérie</h4>
+            <p>Centre de développement des énergies renouvelables — recherches solaire &amp; éolien</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- ScienceDirect -->
+        <a href="https://www.sciencedirect.com/search?query=civil+engineering+sustainable+construction" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge intl">International</div>
+          <div class="portail-logo">📗</div>
+          <div class="portail-info">
+            <h4>ScienceDirect — Elsevier</h4>
+            <p>Construction &amp; Building Materials, Engineering Structures, Energy &amp; Buildings</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- MDPI -->
+        <a href="https://www.mdpi.com/journal/buildings" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge intl">Open Access</div>
+          <div class="portail-logo">🏗️</div>
+          <div class="portail-info">
+            <h4>MDPI Buildings</h4>
+            <p>Revue open access — performance énergétique, béton durable, BIM, construction verte</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- Construction21 -->
+        <a href="https://www.construction21.org" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">🌿</div>
+          <div class="portail-info">
+            <h4>Construction21</h4>
+            <p>Dossiers construction durable, énergies renouvelables et projets bâtiments BBC</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- CNRS Énergie -->
+        <a href="https://celluleenergie.cnrs.fr/" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">⚡</div>
+          <div class="portail-info">
+            <h4>Cellule Énergie CNRS</h4>
+            <p>200+ unités de recherche sur les énergies renouvelables et l'efficacité énergétique</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- ADEME -->
+        <a href="https://www.ademe.fr/expertises/batiment/" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">🏠</div>
+          <div class="portail-info">
+            <h4>ADEME — Bâtiment</h4>
+            <p>Rapports et guides sur rénovation énergétique, RE2020, isolation et BBC</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- IEA -->
+        <a href="https://www.iea.org/topics/buildings" target="_blank" rel="noopener" class="portail-card">
+          <div class="portail-badge intl">International</div>
+          <div class="portail-logo">🌍</div>
+          <div class="portail-info">
+            <h4>IEA — Bâtiments</h4>
+            <p>Agence Internationale de l'Énergie — rapports mondiaux sur l'efficacité énergétique</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── Construction Durable & Innovation ── -->
+    <div class="portails-section">
+      <div class="portails-header">
+        <span class="portails-icon">🏗️</span>
+        <div>
+          <h3>Construction Durable &amp; Innovation</h3>
+          <p>Sites de référence sur la construction durable, la performance énergétique des bâtiments, les innovations et les normes environnementales.</p>
+        </div>
+      </div>
+
+      <div class="portails-grid">
+
+        <!-- Décarbonation 2030 -->
+        <a href="https://www.decarbonation2030.fr/10-innovations-performance-energetique-batiments/" target="_blank" rel="noopener" class="portail-card portail-card--green">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">♻️</div>
+          <div class="portail-info">
+            <h4>Décarbonation 2030</h4>
+            <p>10 innovations pour la performance énergétique des bâtiments — BIPV, isolation, smart building</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- CSTB -->
+        <a href="https://www.cstb.fr" target="_blank" rel="noopener" class="portail-card portail-card--green">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">🔭</div>
+          <div class="portail-info">
+            <h4>CSTB</h4>
+            <p>Centre Scientifique et Technique du Bâtiment — recherches, certifications et innovations construction</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- Effinergie -->
+        <a href="http://www.effinergie.org/web/" target="_blank" rel="noopener" class="portail-card portail-card--green">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">🔋</div>
+          <div class="portail-info">
+            <h4>Effinergie</h4>
+            <p>Promoteur des labels BBC, BEPOS et passif — guides techniques et bâtiments à faible consommation</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- Plan Bâtiment Durable -->
+        <a href="https://www.ecologie.gouv.fr/politiques/renovation-energetique-batiments" target="_blank" rel="noopener" class="portail-card portail-card--green">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">📋</div>
+          <div class="portail-info">
+            <h4>Ministère Écologie — Rénovation Bâtiments</h4>
+            <p>Rapports officiels sur la rénovation énergétique, RE2020 et transition écologique du bâtiment</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- BBCA -->
+        <a href="https://www.batiment-energetique.fr" target="_blank" rel="noopener" class="portail-card portail-card--green">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">🌱</div>
+          <div class="portail-info">
+            <h4>Bâtiment Énergétique</h4>
+            <p>Portail sur la construction bas carbone, labels BBC, BEPOS et réglementation thermique</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- World Green Building Council -->
+        <a href="https://worldgbc.org" target="_blank" rel="noopener" class="portail-card portail-card--green">
+          <div class="portail-badge intl">International</div>
+          <div class="portail-logo">🌍</div>
+          <div class="portail-info">
+            <h4>World GBC</h4>
+            <p>Conseil mondial du bâtiment durable — normes, certifications LEED/BREEAM et rapports</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- Batiactu -->
+        <a href="https://www.batiactu.com" target="_blank" rel="noopener" class="portail-card portail-card--green">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">📰</div>
+          <div class="portail-info">
+            <h4>Batiactu</h4>
+            <p>Actualités et innovations BTP — matériaux, techniques, réglementation et chantiers</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- Sustainable Cities -->
+        <a href="https://www.sciencedirect.com/journal/sustainable-cities-and-society" target="_blank" rel="noopener" class="portail-card portail-card--green">
+          <div class="portail-badge intl">Open Access</div>
+          <div class="portail-logo">🏙️</div>
+          <div class="portail-info">
+            <h4>Sustainable Cities &amp; Society</h4>
+            <p>Revue Elsevier sur les villes durables, smart cities et construction verte</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- CNERIB -->
+        <a href="http://www.cnerib.edu.dz" target="_blank" rel="noopener" class="portail-card portail-card--green">
+          <div class="portail-badge dz">Algérie</div>
+          <div class="portail-logo">🏛️</div>
+          <div class="portail-info">
+            <h4>CNERIB Algérie</h4>
+            <p>Centre national études bâtiment — DTR, réglementation thermique et normes de construction algériennes</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- Renewable Energy Journal -->
+        <a href="https://www.sciencedirect.com/journal/renewable-energy" target="_blank" rel="noopener" class="portail-card portail-card--green">
+          <div class="portail-badge intl">Open Access</div>
+          <div class="portail-logo">☀️</div>
+          <div class="portail-info">
+            <h4>Renewable Energy — Elsevier</h4>
+            <p>Revue internationale sur l'énergie renouvelable — solaire, éolien, géothermie et stockage</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── Énergie Renouvelable & Performance Énergétique ── -->
+    <div class="portails-section">
+      <div class="portails-header">
+        <span class="portails-icon">⚡</span>
+        <div>
+          <h3>Énergie Renouvelable &amp; Performance Énergétique</h3>
+          <p>Portails, revues et organismes spécialisés dans les énergies renouvelables, l'efficacité énergétique et la performance thermique des bâtiments.</p>
+        </div>
+      </div>
+
+      <div class="portails-grid">
+
+        <!-- IEA Buildings -->
+        <a href="https://www.iea.org/topics/buildings" target="_blank" rel="noopener" class="portail-card portail-card--energy">
+          <div class="portail-badge intl">International</div>
+          <div class="portail-logo">🌍</div>
+          <div class="portail-info">
+            <h4>IEA — Efficacité Énergétique</h4>
+            <p>Agence Internationale de l'Énergie — rapports mondiaux sur la performance énergétique des bâtiments</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- ADEME Bâtiment -->
+        <a href="https://www.ademe.fr/expertises/batiment/" target="_blank" rel="noopener" class="portail-card portail-card--energy">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">🏠</div>
+          <div class="portail-info">
+            <h4>ADEME — Bâtiment</h4>
+            <p>Agence française — publications sur rénovation énergétique, isolation, RE2020 et BBC</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- CNRS Énergie -->
+        <a href="https://celluleenergie.cnrs.fr/" target="_blank" rel="noopener" class="portail-card portail-card--energy">
+          <div class="portail-badge fr">France</div>
+          <div class="portail-logo">🔬</div>
+          <div class="portail-info">
+            <h4>Cellule Énergie CNRS</h4>
+            <p>200+ unités de recherche sur les énergies renouvelables et l'efficacité énergétique des bâtiments</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- CDER Algérie -->
+        <a href="http://www.cder.dz" target="_blank" rel="noopener" class="portail-card portail-card--energy">
+          <div class="portail-badge dz">Algérie</div>
+          <div class="portail-logo">☀️</div>
+          <div class="portail-info">
+            <h4>CDER Algérie</h4>
+            <p>Centre de développement des énergies renouvelables — solaire, éolien, géothermie en Algérie</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- APRUE Algérie -->
+        <a href="https://www.aprue.org.dz" target="_blank" rel="noopener" class="portail-card portail-card--energy">
+          <div class="portail-badge dz">Algérie</div>
+          <div class="portail-logo">💡</div>
+          <div class="portail-info">
+            <h4>APRUE Algérie</h4>
+            <p>Agence nationale pour la promotion et la rationalisation de l'utilisation de l'énergie</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- IRENA -->
+        <a href="https://www.irena.org" target="_blank" rel="noopener" class="portail-card portail-card--energy">
+          <div class="portail-badge intl">International</div>
+          <div class="portail-logo">🌞</div>
+          <div class="portail-info">
+            <h4>IRENA</h4>
+            <p>Agence internationale pour les énergies renouvelables — données, rapports et statistiques mondiales</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- Energy and Buildings -->
+        <a href="https://www.sciencedirect.com/journal/energy-and-buildings" target="_blank" rel="noopener" class="portail-card portail-card--energy">
+          <div class="portail-badge intl">Scopus</div>
+          <div class="portail-logo">🏢</div>
+          <div class="portail-info">
+            <h4>Energy and Buildings</h4>
+            <p>Revue Elsevier indexée Scopus — performance thermique, enveloppe du bâtiment, simulation énergétique</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- Renewable & Sustainable Energy Reviews -->
+        <a href="https://www.sciencedirect.com/journal/renewable-and-sustainable-energy-reviews" target="_blank" rel="noopener" class="portail-card portail-card--energy">
+          <div class="portail-badge intl">Scopus</div>
+          <div class="portail-logo">♻️</div>
+          <div class="portail-info">
+            <h4>Renewable &amp; Sustainable Energy Reviews</h4>
+            <p>Revue de référence sur les technologies d'énergie renouvelable et la durabilité énergétique</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- Passivhaus Institut -->
+        <a href="https://passivehouse.com" target="_blank" rel="noopener" class="portail-card portail-card--energy">
+          <div class="portail-badge intl">International</div>
+          <div class="portail-logo">🧊</div>
+          <div class="portail-info">
+            <h4>Passive House Institute</h4>
+            <p>Institut du bâtiment passif — isolation, ponts thermiques, ventilation double flux et étanchéité à l'air</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <!-- Solar Energy Journal -->
+        <a href="https://www.sciencedirect.com/journal/solar-energy" target="_blank" rel="noopener" class="portail-card portail-card--energy">
+          <div class="portail-badge intl">Scopus</div>
+          <div class="portail-logo">🌤️</div>
+          <div class="portail-info">
+            <h4>Solar Energy — Elsevier</h4>
+            <p>Revue internationale sur l'énergie solaire — photovoltaïque, solaire thermique et concentré</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ── Revues Scientifiques Indexées (Scopus/WoS) ── -->
+    <div class="portails-section">
+      <div class="portails-header">
+        <span class="portails-icon">🔬</span>
+        <div>
+          <h3>Revues Scientifiques Indexées — Scopus / WoS</h3>
+          <p>Les revues internationales de référence en génie civil, indexées dans Scopus et Web of Science. Liens vers <strong>Scimago</strong> (accès libre) pour consulter le classement, le facteur d'impact et les articles.</p>
+        </div>
+      </div>
+
+      <div class="portails-grid">
+
+        <a href="https://www.scimagojr.com/journalsearch.php?q=Construction+and+Building+Materials&tip=jou" target="_blank" rel="noopener" class="portail-card portail-card--scopus">
+          <div class="portail-badge intl">Scopus · Q1</div>
+          <div class="portail-logo">🧱</div>
+          <div class="portail-info">
+            <h4>Construction &amp; Building Materials</h4>
+            <p>Matériaux de construction, béton, durabilité des structures et matériaux innovants</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <a href="https://www.scimagojr.com/journalsearch.php?q=Engineering+Structures&tip=jou" target="_blank" rel="noopener" class="portail-card portail-card--scopus">
+          <div class="portail-badge intl">Scopus · Q1</div>
+          <div class="portail-logo">🏗️</div>
+          <div class="portail-info">
+            <h4>Engineering Structures</h4>
+            <p>Calcul des structures, parasismique, dynamique structurale et ingénierie du vent</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <a href="https://www.scimagojr.com/journalsearch.php?q=Energy+and+Buildings&tip=jou" target="_blank" rel="noopener" class="portail-card portail-card--scopus">
+          <div class="portail-badge intl">Scopus · Q1</div>
+          <div class="portail-logo">⚡</div>
+          <div class="portail-info">
+            <h4>Energy and Buildings</h4>
+            <p>Performance énergétique des bâtiments, simulation thermique et enveloppe du bâtiment</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <a href="https://www.scimagojr.com/journalsearch.php?q=Journal+of+Building+Engineering&tip=jou" target="_blank" rel="noopener" class="portail-card portail-card--scopus">
+          <div class="portail-badge intl">Scopus · Q1</div>
+          <div class="portail-logo">🏢</div>
+          <div class="portail-info">
+            <h4>Journal of Building Engineering</h4>
+            <p>BIM, smart buildings, matériaux et technologies innovantes pour la construction</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <a href="https://www.scimagojr.com/journalsearch.php?q=Computers+and+Structures&tip=jou" target="_blank" rel="noopener" class="portail-card portail-card--scopus">
+          <div class="portail-badge intl">Scopus · Q1</div>
+          <div class="portail-logo">💻</div>
+          <div class="portail-info">
+            <h4>Computers &amp; Structures</h4>
+            <p>Méthodes numériques, éléments finis, calcul des structures et modélisation avancée</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <a href="https://www.scimagojr.com/journalsearch.php?q=Soil+Dynamics+and+Earthquake+Engineering&tip=jou" target="_blank" rel="noopener" class="portail-card portail-card--scopus">
+          <div class="portail-badge intl">Scopus · Q1</div>
+          <div class="portail-logo">🌍</div>
+          <div class="portail-info">
+            <h4>Soil Dynamics &amp; Earthquake Engineering</h4>
+            <p>Dynamique des sols, géotechnique sismique et interaction sol-structure</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <a href="https://www.scimagojr.com/journalsearch.php?q=Tunnelling+and+Underground+Space+Technology&tip=jou" target="_blank" rel="noopener" class="portail-card portail-card--scopus">
+          <div class="portail-badge intl">Scopus · Q1</div>
+          <div class="portail-logo">🚇</div>
+          <div class="portail-info">
+            <h4>Tunnelling &amp; Underground Space Tech.</h4>
+            <p>Tunnels, galeries souterraines et ouvrages en souterrain</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <a href="https://www.mdpi.com/journal/buildings" target="_blank" rel="noopener" class="portail-card portail-card--scopus">
+          <div class="portail-badge intl">Open Access</div>
+          <div class="portail-logo">📗</div>
+          <div class="portail-info">
+            <h4>MDPI Buildings</h4>
+            <p>Revue open access — performance énergétique, béton durable, BIM et construction verte</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <a href="https://www.mdpi.com/journal/sustainability" target="_blank" rel="noopener" class="portail-card portail-card--scopus">
+          <div class="portail-badge intl">Open Access</div>
+          <div class="portail-logo">🌿</div>
+          <div class="portail-info">
+            <h4>MDPI Sustainability</h4>
+            <p>Développement durable, construction verte, smart cities et matériaux biosourcés</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+        <a href="https://www.scimagojr.com/journalsearch.php?q=Cement+and+Concrete+Research&tip=jou" target="_blank" rel="noopener" class="portail-card portail-card--scopus">
+          <div class="portail-badge intl">Scopus · Q1</div>
+          <div class="portail-logo">🪨</div>
+          <div class="portail-info">
+            <h4>Cement and Concrete Research</h4>
+            <p>Recherche sur le ciment et le béton — composition, durabilité, béton bas carbone</p>
+          </div>
+          <span class="portail-link">Accéder →</span>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PRICING
+═══════════════════════════════════════════════ -->
+<section id="pricing" class="section">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="label"><span aria-hidden="true">💎</span> <span data-i18n="section_pricing">TARIFS</span></span>
+      <h2 data-i18n="section_pricing_h2">Choisissez <span>Votre Plan</span></h2>
+      <div class="divider divider-center"></div>
+      <p>Accès illimité aux ressources selon votre budget — paiement en dinars algériens (DZD).</p>
+    </div>
+
+    <div class="pricing-toggle">
+      <span class="toggle-label active" id="toggle-monthly" data-i18n="monthly">Mensuel</span>
+      <button class="toggle-switch" id="billing-toggle" title="Changer la période" aria-label="Basculer mensuel / annuel" role="switch" aria-checked="false"></button>
+      <span class="toggle-label" id="toggle-annual" data-i18n="annual">Annuel</span>
+      <span class="save-badge">Économisez 25%</span>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- Free -->
+      <div class="pricing-card">
+        <div class="plan-icon">🎁</div>
+        <div class="plan-name">Gratuit</div>
+        <div class="plan-desc">Pour découvrir la plateforme</div>
+        <div class="plan-price">
+          <div class="price-amount">Gratuit</div>
+        </div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 5 téléchargements/mois</li>
+          <li><span class="check">✓</span> Accès aux cours gratuits</li>
+          <li><span class="check">✓</span> Articles scientifiques publics</li>
+          <li><span class="check">✓</span> 3 vidéos gratuites</li>
+          <li><span class="cross">✗</span> Ouvrages premium</li>
+          <li><span class="cross">✗</span> Normes DTR/RPA</li>
+          <li><span class="cross">✗</span> Examens corrigés</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline" onclick="openSubscriptionModal('free')">Commencer Gratuitement</button>
+      </div>
+
+      <!-- Standard — Featured -->
+      <div class="pricing-card featured">
+        <div class="popular-tag">⭐ Le plus populaire</div>
+        <div class="plan-icon">🚀</div>
+        <div class="plan-name">Standard</div>
+        <div class="plan-desc">Pour les étudiants actifs</div>
+        <div class="plan-price">
+          <div class="price-amount"><span class="dz">DZD</span><span data-plan="standard">990</span></div>
+          <div class="price-period" id="price-period-standard">/ mois</div>
+        </div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Téléchargements illimités</li>
+          <li><span class="check">✓</span> Tous les cours PDF</li>
+          <li><span class="check">✓</span> 50+ ouvrages numériques</li>
+          <li><span class="check">✓</span> Vidéos pédagogiques HD</li>
+          <li><span class="check">✓</span> Examens corrigés (10 ans)</li>
+          <li><span class="check">✓</span> Normes DTR/RPA complètes</li>
+          <li><span class="cross">✗</span> Publications scientifiques</li>
+        </ul>
+        <button class="btn-plan btn-plan-featured" onclick="openSubscriptionModal('standard')">S'abonner Maintenant</button>
+      </div>
+
+      <!-- Pro -->
+      <div class="pricing-card">
+        <div class="plan-icon">🏆</div>
+        <div class="plan-name">Pro Ingénieur</div>
+        <div class="plan-desc">Pour professionnels & master</div>
+        <div class="plan-price">
+          <div class="price-amount"><span class="dz">DZD</span><span data-plan="pro">2 490</span></div>
+          <div class="price-period" id="price-period-pro">/ mois</div>
+        </div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Tout le plan Standard</li>
+          <li><span class="check">✓</span> 200+ publications scientifiques</li>
+          <li><span class="check">✓</span> Logiciels & tutoriels avancés</li>
+          <li><span class="check">✓</span> Webinaires live mensuels</li>
+          <li><span class="check">✓</span> Modèles BIM & fichiers sources</li>
+          <li><span class="check">✓</span> Certificat de formation</li>
+          <li><span class="check">✓</span> Support prioritaire</li>
+        </ul>
+        <button class="btn-plan btn-plan-outline" onclick="openSubscriptionModal('pro')">Choisir Pro</button>
+      </div>
+
+    </div>
+
+    <p style="text-align:center;margin-top:28px;font-size:0.82rem;color:var(--text-muted)">
+      💳 Paiement sécurisé en DZD · CIB · Dahabiya · BaridiMob · CCP — Annulation à tout moment
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PAYMENT
+═══════════════════════════════════════════════ -->
+<section id="payment" class="section">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="label"><span aria-hidden="true">💳</span> <span data-i18n="section_payment">PAIEMENT</span></span>
+      <h2 style="color:white" data-i18n="section_payment_h2">Moyens de Paiement <span>Algériens</span></h2>
+      <div class="divider divider-center"></div>
+      <p style="color:rgba(255,255,255,0.6);margin:0 auto">Payez en dinars algériens avec vos moyens habituels — aucun compte international requis.</p>
+    </div>
+
+    <div class="payment-methods">
+
+      <div class="payment-card">
+        <span class="payment-icon">🏦</span>
+        <div class="payment-name">Carte CIB / Dahabiya</div>
+        <div class="payment-desc">Carte interbancaire algérienne (CIB) et carte Dahabiya de la Poste — paiement direct en ligne.</div>
+        <div class="payment-tags">
+          <span class="payment-tag">CIB</span>
+          <span class="payment-tag">Dahabiya</span>
+          <span class="payment-tag">Paiement instantané</span>
+        </div>
+      </div>
+
+      <div class="payment-card">
+        <span class="payment-icon">📱</span>
+        <div class="payment-name">BaridiMob</div>
+        <div class="payment-desc">Application mobile de la Poste Algérienne (Algérie Poste) — paiement via CCP depuis votre smartphone.</div>
+        <div class="payment-tags">
+          <span class="payment-tag">CCP</span>
+          <span class="payment-tag">BaridiMob</span>
+          <span class="payment-tag">Mobile</span>
+        </div>
+      </div>
+
+      <div class="payment-card">
+        <span class="payment-icon">🏧</span>
+        <div class="payment-name">Virement CCP</div>
+        <div class="payment-desc">Virement bancaire depuis votre compte CCP ou Baridi'net — activation du compte sous 24h.</div>
+        <div class="payment-tags">
+          <span class="payment-tag">CCP</span>
+          <span class="payment-tag">Baridi'net</span>
+          <span class="payment-tag">Virement</span>
+        </div>
+      </div>
+
+      <div class="payment-card">
+        <span class="payment-icon">💵</span>
+        <div class="payment-name">Paiement à la Livraison</div>
+        <div class="payment-desc">Payez en espèces lors de la réception de votre code d'accès par courrier — disponible dans toutes les wilayas.</div>
+        <div class="payment-tags">
+          <span class="payment-tag">Espèces</span>
+          <span class="payment-tag">48 Wilayas</span>
+        </div>
+      </div>
+
+      <div class="payment-card">
+        <span class="payment-icon">🌍</span>
+        <div class="payment-name">PayPal / Visa</div>
+        <div class="payment-desc">Pour les Algériens résidant à l'étranger (diaspora) ou possédant des cartes internationales.</div>
+        <div class="payment-tags">
+          <span class="payment-tag">PayPal</span>
+          <span class="payment-tag">Visa</span>
+          <span class="payment-tag">Mastercard</span>
+          <span class="payment-tag">Diaspora</span>
+        </div>
+      </div>
+
+      <div class="payment-card">
+        <span class="payment-icon">🔑</span>
+        <div class="payment-name">Codes Prépayés</div>
+        <div class="payment-desc">Achetez un code scratch en bureau de tabac ou épicerie partenaire dans votre wilaya — sans carte bancaire.</div>
+        <div class="payment-tags">
+          <span class="payment-tag">Sans carte</span>
+          <span class="payment-tag">Tabacs partenaires</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="payment-security">
+      <div class="security-item">
+        <span class="security-icon">🔒</span>
+        Paiement chiffré SSL 256 bits
+      </div>
+      <div class="security-item">
+        <span class="security-icon">✅</span>
+        Transactions conformes CPA/BNA
+      </div>
+      <div class="security-item">
+        <span class="security-icon">🇩🇿</span>
+        Hébergé en Algérie (CERIST)
+      </div>
+      <div class="security-item">
+        <span class="security-icon">↩️</span>
+        Remboursement 7 jours garanti
+      </div>
+      <div class="security-item">
+        <span class="security-icon">📞</span>
+        Support en arabe & français
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     TESTIMONIALS
+═══════════════════════════════════════════════ -->
+<section id="testimonials" class="section section-alt">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="label">💬 Témoignages</span>
+      <h2>Ce que disent nos <span>Étudiants</span></h2>
+      <div class="divider divider-center"></div>
+    </div>
+
+    <div class="testimonials-grid">
+
+      <div class="testimonial-card">
+        <div class="testi-header">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#1B3A6B,#2a5298)">AM</div>
+          <div class="testi-info">
+            <h4>Ahmed Mansouri</h4>
+            <p>🎓 Master Génie Civil — USTHB Alger</p>
+          </div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Le pack DTR Algeria m'a sauvé pour mon mémoire de master. Toutes les normes sont bien organisées et commentées. Le meilleur investissement de ma formation !</p>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testi-header">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#C8A142,#e6b84a)">SB</div>
+          <div class="testi-info">
+            <h4>Sara Belkhodja</h4>
+            <p>🏫 BTS Génie Civil — Oran</p>
+          </div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">J'ai trouvé tous mes cours de BTS en PDF ici. Les vidéos AutoCAD sont excellentes. J'ai payé avec BaridiMob, c'était très simple. Je recommande !</p>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testi-header">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#0d6e6e,#1aabab)">KA</div>
+          <div class="testi-info">
+            <h4>Karim Amrani</h4>
+            <p>🏗️ Ingénieur Civil — Sonatrach</p>
+          </div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">En tant que professionnel, j'utilise les articles scientifiques et les guides logiciels. La qualité est au rendez-vous. L'abonnement Pro vaut vraiment son prix.</p>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testi-header">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#4a1d8c,#7c3aed)">NB</div>
+          <div class="testi-info">
+            <h4>Nadia Brahim</h4>
+            <p>🏛️ Licence Architecture — Constantine</p>
+          </div>
+        </div>
+        <div class="testi-stars">★★★★☆</div>
+        <p class="testi-text">Les cours d'architecture sont parfaitement adaptés au programme algérien. L'ouvrage sur l'architecture islamique est une référence incontournable pour nous.</p>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testi-header">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#14532d,#16a34a)">YT</div>
+          <div class="testi-info">
+            <h4>Yacine Touati</h4>
+            <p>🎒 Bac Technique — Tizi Ouzou</p>
+          </div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Même sans carte bancaire j'ai pu accéder au contenu grâce aux codes prépayés vendus à Tizi. Les cours de dessin technique m'ont vraiment aidé pour le BAC.</p>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="testi-header">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#8B1A1A,#E63946)">LM</div>
+          <div class="testi-info">
+            <h4>Leila Mehdi</h4>
+            <p>🏗️ École d'Ingénieurs ENTP</p>
+          </div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Les examens corrigés de 10 ans m'ont permis d'avoir une excellente préparation. La plateforme est rapide, bien organisée. Fière qu'un tel outil existe en Algérie !</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     CTA BANNER
+═══════════════════════════════════════════════ -->
+<section id="cta-banner">
+  <div class="container">
+    <div class="cta-content">
+      <div class="cta-text">
+        <h2>Rejoignez 18 500+ étudiants algériens 🇩🇿</h2>
+        <p>Commencez votre parcours en génie civil & architecture avec les meilleures ressources numériques d'Algérie. Essai gratuit sans carte bancaire.</p>
+      </div>
+      <div class="cta-actions">
+        <button class="btn btn-secondary btn-lg" data-modal="auth">🚀 Créer un Compte Gratuit</button>
+        <a href="#catalog" class="btn btn-white btn-lg">📚 Voir le Catalogue</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     NEWSLETTER
+═══════════════════════════════════════════════ -->
+<section id="newsletter" class="section">
+  <div class="container">
+    <div class="newsletter-inner">
+      <div>
+        <span class="label" style="display:inline-block;background:rgba(27,58,107,0.08);color:var(--primary);padding:6px 14px;border-radius:999px;font-size:0.78rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;border:1px solid rgba(27,58,107,0.12)">📧 Newsletter</span>
+        <div class="nl-title">Restez au courant des <span style="color:var(--secondary)">dernières ressources</span></div>
+        <p class="nl-sub">Recevez chaque semaine les nouveaux cours, vidéos et articles scientifiques directement dans votre boîte mail. Gratuit.</p>
+        <div style="display:flex;gap:16px;margin-top:20px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text-muted)">✅ Sans spam</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text-muted)">✅ Désabonnement facile</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text-muted)">✅ Contenu exclusif</div>
+        </div>
+      </div>
+      <div>
+        <form class="nl-form" id="nl-form">
+          <div class="nl-input-row">
+            <input type="text" name="nl_name" class="nl-input" placeholder="Votre prénom" />
+            <input type="email" name="nl_email" class="nl-input" placeholder="votre@email.com" required />
+          </div>
+          <select class="nl-input">
+            <option value="">Votre niveau d'études</option>
+            <option>Bac Technique</option>
+            <option>BTS Génie Civil</option>
+            <option>Licence Génie Civil / Architecture</option>
+            <option>Master / Ingénieur</option>
+            <option>Professionnel</option>
+          </select>
+          <button type="submit" class="btn btn-primary btn-full btn-lg">📧 S'inscrire à la Newsletter</button>
+          <p class="nl-note">🔒 Vos données sont protégées — conformément à la loi algérienne sur la protection des données personnelles.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════ -->
+<footer id="footer" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+
+      <div class="footer-brand">
+        <div class="footer-logo-text">
+          <div class="name">Al Handassa<span>.dz</span></div>
+          <div class="footer-tagline">Génie Civil & Architecture</div>
+        </div>
+        <p class="footer-desc">La plateforme numérique de référence pour les étudiants et professionnels du génie civil et de l'architecture en Algérie. Du bac technique au doctorat.</p>
+        <div class="social-links">
+          <a href="https://facebook.com/alhandassa.dz" class="social-link" title="Facebook" target="_blank" rel="noopener">📘</a>
+          <a href="https://instagram.com/alhandassa.dz" class="social-link" title="Instagram" target="_blank" rel="noopener">📸</a>
+          <a href="https://youtube.com/@AlHandassa_DZ" class="social-link" title="YouTube" target="_blank" rel="noopener">▶️</a>
+          <a href="https://t.me/AlHandassa_DZ" class="social-link" title="Telegram" target="_blank" rel="noopener">✈️</a>
+          <a href="#" class="social-link" title="LinkedIn" onclick="showToast('💼 LinkedIn','info')">💼</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>📚 Catalogue</h4>
+        <ul class="footer-links">
+          <li><a href="#catalog">→ Ouvrages Numériques</a></li>
+          <li><a href="#catalog">→ Cours PDF</a></li>
+          <li><a href="#catalog">→ Examens Corrigés</a></li>
+          <li><a href="#catalog">→ Normes DTR / RPA</a></li>
+          <li><a href="#videos">→ Vidéos Pédagogiques</a></li>
+          <li><a href="#articles">→ Articles Scientifiques</a></li>
+          <li><a href="#catalog">→ Ressources Gratuites</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>🎓 Formations</h4>
+        <ul class="footer-links">
+          <li><a href="#levels">→ Bac Technique GC</a></li>
+          <li><a href="#levels">→ BTS Génie Civil</a></li>
+          <li><a href="#levels">→ Licence Génie Civil</a></li>
+          <li><a href="#levels">→ Licence Architecture</a></li>
+          <li><a href="#levels">→ Master Structures</a></li>
+          <li><a href="#levels">→ Master Architecture</a></li>
+          <li><a href="#levels">→ Écoles d'Ingénieurs</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col" id="contact">
+        <h4>📞 Contact</h4>
+        <ul class="footer-contact">
+          <li>
+            <span class="icon">📍</span>
+            <span>Alger, Algérie<br>Hay Salam, Birtouta</span>
+          </li>
+          <li>
+            <span class="icon">📧</span>
+            <span>contact@handassi.dz</span>
+          </li>
+          <li>
+            <span class="icon">📱</span>
+            <span>+213 (0) 7X XXX XX XX</span>
+          </li>
+          <li>
+            <span class="icon">⏰</span>
+            <span>Dim–Jeu : 8h–17h<br>Sam : 9h–12h</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-copy">
+        © 2024 <span>Al Handassa.dz</span> — Tous droits réservés · Made with ❤️ in <span>Algeria 🇩🇿</span>
+      </p>
+      <div class="footer-links-bottom">
+        <a href="about.html">À propos</a>
+        <a href="contact.html">Contact</a>
+        <a href="cgu.html">CGU</a>
+        <a href="cgu.html#confidentialite">Politique de confidentialité</a>
+        <a href="cgu.html#mentions">Mentions légales</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════
+     TOAST & BACK TO TOP
+═══════════════════════════════════════════════ -->
+<div id="toast"></div>
+<button id="back-top" title="Retour en haut">↑</button>
+
+<!-- ═══════════════════ MOBILE BOTTOM NAV ═══════════════════ -->
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+  <ul>
+    <li>
+      <a href="#hero" class="mbn-link active" data-section="hero">
+        <span class="mbn-icon">🏠</span>
+        <span>Accueil</span>
+      </a>
+    </li>
+    <li>
+      <a href="#catalog" class="mbn-link" data-section="catalog">
+        <span class="mbn-icon">📚</span>
+        <span>Catalogue</span>
+      </a>
+    </li>
+    <li>
+      <a href="#videos" class="mbn-link" data-section="videos">
+        <span class="mbn-icon">🎬</span>
+        <span>Vidéos</span>
+      </a>
+    </li>
+    <li>
+      <a href="#pricing" class="mbn-link" data-section="pricing">
+        <span class="mbn-icon">💎</span>
+        <span>Tarifs</span>
+      </a>
+    </li>
+    <li>
+      <a href="#" class="mbn-link" id="mbn-menu" onclick="document.getElementById('hamburger')?.click();return false;">
+        <span class="mbn-icon">☰</span>
+        <span>Menu</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<script src="js/api.js?v=2"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.min.js?v=31"></script>
+
+<script>
+// ── SUJETS D'EXAMEN PAR DIPLÔME ────────────────────────────────────────────
+const DIPLOMES_GROUPES = [
+  {
+    groupe: 'BAC', color: '#2563eb', icon: '🎓',
+    specialites: [
+      { tag: 'BAC Economie de la Construction',         label: 'BAC Économie de la Construction' },
+      { tag: 'BAC Geometre Topographe',                 label: 'BAC Géomètre Topographe' },
+      { tag: 'BAC Organisation de Chantier',            label: 'BAC Organisation de Chantier' },
+      { tag: 'BAC Amenagement et Finition du Batiment', label: 'BAC Aménagement et Finition du Bâtiment' },
+      { tag: 'BAC Assistant Architecte',                label: 'BAC Assistant Architecte' },
+      { tag: 'BAC PRO',                                 label: 'BAC PRO (général)' },
+    ]
+  },
+  {
+    groupe: 'BTS', color: '#16a34a', icon: '📐',
+    specialites: [
+      { tag: 'BTS Bâtiment',                            label: 'BTS Bâtiment' },
+      { tag: 'BTS Genie Civil',                         label: 'BTS Génie Civil' },
+      { tag: 'BTS Travaux Publics',                     label: 'BTS Travaux Publics' },
+      { tag: 'BTS Management de la Construction',       label: 'BTS Management de la Construction' },
+      { tag: 'BTS Topographie',                         label: 'BTS Topographie' },
+      { tag: 'BTS Enveloppe du Batiment',               label: 'BTS Enveloppe du Bâtiment' },
+      { tag: 'BTS Amenagement et Finition du Batiment', label: 'BTS Aménagement et Finition du Bâtiment' },
+    ]
+  },
+  {
+    groupe: 'Licence', color: '#9333ea', icon: '🏛️',
+    specialites: [
+      { tag: 'Licence Génie Civil',    label: 'Licence Génie Civil' },
+      { tag: 'Licence Architecture',   label: 'Licence Architecture' },
+      { tag: 'Licence Hydraulique',    label: 'Licence Hydraulique' },
+      { tag: 'Licence',               label: 'Licence (général)' },
+    ]
+  },
+  {
+    groupe: 'Master', color: '#ea580c', icon: '🔬',
+    specialites: [
+      { tag: 'Master Structures',     label: 'Master Structures' },
+      { tag: 'Master Géotechnique', label: 'Master Géotechnique' },
+      { tag: 'Master Hydraulique',    label: 'Master Hydraulique' },
+      { tag: 'Master VRD',            label: 'Master VRD & Urbanisme' },
+      { tag: 'Master',               label: 'Master (général)' },
+    ]
+  },
+  {
+    groupe: 'Ingénieur & Architecte', color: '#1B3A6B', icon: '⚙️',
+    specialites: [
+      { tag: 'Ingénieur Génie Civil',  label: 'Ingénieur Génie Civil' },
+      { tag: 'Ingénieur Hydraulique',  label: 'Ingénieur Hydraulique' },
+      { tag: 'Architecte',             label: 'Architecte DPLG' },
+      { tag: 'Ingénieur',             label: 'Ingénieur (général)' },
+    ]
+  },
+];
+
+const ALL_SPECIALITES = DIPLOMES_GROUPES.flatMap(g =>
+  g.specialites.map(s => ({ ...s, groupe: g.groupe, color: g.color, icon: g.icon }))
+);
+
+async function loadSujetDiplomes() {
+  const grid = document.getElementById('sujet-diplomes-grid');
+  if (!grid) return;
+  const BASE = 'http://localhost:5000/api';
+
+  const counts = await Promise.all(
+    ALL_SPECIALITES.map(s =>
+      fetch(`${BASE}/products?type=sujet&tag=${encodeURIComponent(s.tag)}&limit=1`)
+        .then(r => r.json()).then(j => j.pagination?.total || 0).catch(() => 0)
+    )
+  );
+
+  let html = '';
+  let idx = 0;
+  DIPLOMES_GROUPES.forEach(g => {
+    const specs = g.specialites.map(s => {
+      const n = counts[idx++] || 0;
+      const dis = n === 0 ? 'opacity:.42;pointer-events:none;' : '';
+      return `<div onclick="showSujetsDiplome('${s.tag}', this, '${g.groupe}')"
+                   data-spec-tag="${s.tag}"
+                   style="background:#fff;border:2px solid #e5e7eb;border-radius:12px;padding:16px;
+                          cursor:pointer;transition:all .2s;text-align:center;user-select:none;${dis}"
+                   onmouseover="if(this.style.pointerEvents!=='none'){this.style.borderColor='${g.color}';this.style.boxShadow='0 4px 12px rgba(0,0,0,.1)'}"
+                   onmouseout="if(!this.classList.contains('diplome-active')){this.style.borderColor='#e5e7eb';this.style.boxShadow='none'}">
+                <div style="font-size:1.6rem;margin-bottom:6px;">${g.icon}</div>
+                <div style="font-weight:700;color:#1a1a2e;font-size:.88rem;line-height:1.3">${s.label}</div>
+                <div style="color:${n>0?g.color:'#aaa'};font-size:.78rem;font-weight:600;margin-top:5px;">
+                  ${n > 0 ? n + ' sujet' + (n>1?'s':'') : 'Bientôt disponible'}
+                </div>
+                ${n > 0 ? '<div style="margin-top:8px;font-size:.75rem;color:#1B3A6B;font-weight:600">Voir les ressources →</div>' : ''}
+             </div>`;
+    }).join('');
+
+    html += `<div style="margin-bottom:2.5rem;">
+      <div style="display:flex;align-items:center;gap:.6rem;font-size:1.05rem;font-weight:700;
+                  color:${g.color};padding:.6rem 0 .9rem;border-bottom:3px solid ${g.color};margin-bottom:1.1rem;">
+        <span>${g.icon} ${g.groupe}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;">
+        ${specs}
+      </div>
+    </div>`;
+  });
+  grid.innerHTML = html;
+}
+
+async function showSujetsDiplome(tag, btn, groupe) {
+  document.querySelectorAll('[data-spec-tag]').forEach(b => {
+    b.classList.remove('diplome-active');
+    b.style.background = '#fff'; b.style.borderColor = '#e5e7eb'; b.style.boxShadow = 'none';
+  });
+  btn.classList.add('diplome-active');
+  btn.style.background = '#f0f4fa';
+  const g = DIPLOMES_GROUPES.find(x => x.groupe === groupe);
+  btn.style.borderColor = g ? g.color : '#1B3A6B';
+
+  const box = document.getElementById('sujet-diplome-results');
+  box.style.display = 'block';
+  box.innerHTML = '<div style="text-align:center;padding:40px;color:#888">⏳ Chargement…</div>';
+
+  try {
+    const BASE = 'http://localhost:5000/api';
+    const r = await fetch(`${BASE}/products?type=sujet&tag=${encodeURIComponent(tag)}&limit=50`).then(r=>r.json());
+    const items = r.data || [];
+
+    if (!items.length) {
+      box.innerHTML = `<div style="text-align:center;padding:40px;color:#888">
+        📭 Aucun sujet pour <strong>${tag}</strong>.<br>
+        <span style="font-size:.85rem;margin-top:8px;display:block">
+          Ajoutez des sujets via le panneau admin avec le tag <code>${tag}</code>
+        </span></div>`;
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
+    }
+
+    const hdr = `<div style="display:flex;align-items:center;gap:.6rem;font-size:1rem;font-weight:700;
+                              color:#1B3A6B;padding:.6rem 0 .9rem;border-bottom:3px solid #1B3A6B;margin-bottom:1.2rem;">
+                   <span>📝 ${tag} — ${items.length} sujet${items.length>1?'s':''}</span></div>`;
+
+    const cardsHtml = items.map(p => productCard(p)).join('');
+    box.innerHTML = hdr + `<div class="products-grid">${cardsHtml}</div>`;
+    if (typeof initScrollAnimations === 'function') initScrollAnimations();
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch(e) {
+    box.innerHTML = `<div style="text-align:center;padding:40px;color:#c00">⚠️ Erreur : ${e.message}</div>`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadSujetDiplomes);
+
+// activateSplitChip supprimé — les chips utilisent désormais loadProducts() via main.js
+</script>
+
+<script>
+  // Active nav on scroll (top nav + bottom mobile nav)
+  const sections = ['catalog','videos','logiciels','articles','pricing','payment'];
+  const mbnSections = ['hero','catalog','videos','pricing'];
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY + 120;
+
+    // Top navbar
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      const link = document.querySelector(`a[href="#${id}"]`);
+      if (el && link) {
+        const inView = scrollY >= el.offsetTop && scrollY < el.offsetTop + el.offsetHeight;
+        link.classList.toggle('active', inView);
+      }
+    });
+
+    // Mobile bottom nav
+    let activeMbn = 'hero';
+    mbnSections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && scrollY >= el.offsetTop) activeMbn = id;
+    });
+    document.querySelectorAll('.mbn-link[data-section]').forEach(a => {
+      a.classList.toggle('active', a.dataset.section === activeMbn);
+    });
+  }, { passive: true });
+</script>
+
+<!-- ── MODAL AVIS PRODUIT ─────────────────────────────────────────────────── -->
+<div id="review-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;
+     display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:90vh;
+              overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;
+                padding:20px 24px;border-bottom:1px solid #e5e7eb;">
+      <h3 id="review-modal-title" style="margin:0;font-size:1.1rem;color:#1a1a2e">⭐ Laisser un avis</h3>
+      <button onclick="closeReviewModal()"
+              style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#888;line-height:1">×</button>
+    </div>
+
+    <!-- Avis existants -->
+    <div id="review-list" style="padding:16px 24px;border-bottom:1px solid #f3f4f6;max-height:220px;overflow-y:auto;">
+      <div style="text-align:center;color:#aaa;font-size:.85rem">Chargement des avis…</div>
+    </div>
+
+    <!-- Formulaire -->
+    <div id="review-form-wrap" style="padding:20px 24px;">
+      <p style="font-size:.9rem;font-weight:600;color:#374151;margin:0 0 12px">Votre note :</p>
+
+      <!-- Étoiles cliquables -->
+      <div id="star-selector" style="display:flex;gap:6px;margin-bottom:16px;font-size:2rem;cursor:pointer;">
+        <span data-val="1" onclick="setReviewRating(1)">☆</span>
+        <span data-val="2" onclick="setReviewRating(2)">☆</span>
+        <span data-val="3" onclick="setReviewRating(3)">☆</span>
+        <span data-val="4" onclick="setReviewRating(4)">☆</span>
+        <span data-val="5" onclick="setReviewRating(5)">☆</span>
+      </div>
+
+      <textarea id="review-comment" placeholder="Votre commentaire (optionnel)…"
+        style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;
+               font-size:.9rem;resize:vertical;min-height:80px;box-sizing:border-box;font-family:inherit">
+      </textarea>
+
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button onclick="submitReview()"
+                style="flex:1;background:#1B3A6B;color:#fff;border:none;padding:10px;
+                       border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;">
+          ✅ Publier mon avis
+        </button>
+        <button onclick="closeReviewModal()"
+                style="background:#f3f4f6;color:#374151;border:none;padding:10px 16px;
+                       border-radius:8px;font-size:.9rem;cursor:pointer;">
+          Annuler
+        </button>
+      </div>
+
+      <p id="review-error" style="color:#E63946;font-size:.82rem;margin-top:8px;display:none"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SYSTÈME D'AVIS ────────────────────────────────────────────────────────────
+let _reviewProductId = null;
+let _reviewRating    = 0;
+
+function openReviewModal(productId, productTitle) {
+  const modal = document.getElementById('review-modal');
+  document.getElementById('review-modal-title').textContent = '⭐ Avis — ' + productTitle;
+  document.getElementById('review-comment').value = '';
+  document.getElementById('review-error').style.display = 'none';
+  _reviewProductId = productId;
+  _reviewRating = 0;
+  setReviewRating(0);
+  modal.style.display = 'flex';
+  loadReviewList(productId);
+}
+
+function closeReviewModal() {
+  document.getElementById('review-modal').style.display = 'none';
+}
+
+function setReviewRating(val) {
+  _reviewRating = val;
+  document.querySelectorAll('#star-selector span').forEach((s, i) => {
+    s.textContent = i < val ? '★' : '☆';
+    s.style.color  = i < val ? '#f59e0b' : '#9ca3af';
+  });
+}
+
+async function loadReviewList(productId) {
+  const box = document.getElementById('review-list');
+  box.innerHTML = '<div style="text-align:center;color:#aaa;font-size:.85rem;padding:10px">Chargement…</div>';
+  try {
+    const r = await fetch('http://localhost:5000/api/products/' + productId + '/reviews').then(r=>r.json());
+    const reviews = r.data || [];
+    if (!reviews.length) {
+      box.innerHTML = '<div style="text-align:center;color:#aaa;font-size:.85rem;padding:10px">Aucun avis pour le moment. Soyez le premier !</div>';
+      return;
+    }
+    box.innerHTML = reviews.map(rv => {
+      const stars = '★'.repeat(rv.rating) + '☆'.repeat(5 - rv.rating);
+      const date  = new Date(rv.created_at).toLocaleDateString('fr-FR');
+      const name  = (rv.first_name || '') + ' ' + ((rv.last_name||'').charAt(0) + '.');
+      return `<div style="padding:10px 0;border-bottom:1px solid #f3f4f6;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-weight:600;font-size:.85rem;color:#1a1a2e">${name}</span>
+          <span style="color:#f59e0b;font-size:.9rem">${stars}</span>
+        </div>
+        ${rv.comment ? `<p style="margin:0;font-size:.82rem;color:#6b7280">${rv.comment}</p>` : ''}
+        <span style="font-size:.75rem;color:#9ca3af">${date}</span>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    box.innerHTML = '<div style="color:#E63946;font-size:.82rem;padding:10px">Erreur de chargement.</div>';
+  }
+}
+
+async function submitReview() {
+  const errEl = document.getElementById('review-error');
+  errEl.style.display = 'none';
+
+  if (!_reviewRating) {
+    errEl.textContent = 'Veuillez sélectionner une note (1 à 5 étoiles).';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const token   = localStorage.getItem('token') || sessionStorage.getItem('token');
+  if (!token) {
+    errEl.textContent = 'Vous devez être connecté pour laisser un avis.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const comment = document.getElementById('review-comment').value.trim();
+
+  try {
+    const r = await fetch('http://localhost:5000/api/products/' + _reviewProductId + '/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ rating: _reviewRating, comment })
+    }).then(r => r.json());
+
+    if (r.message && !r.error) {
+      closeReviewModal();
+      if (typeof showToast === 'function') showToast('✅ ' + r.message, 'success');
+    } else {
+      errEl.textContent = r.message || r.error || 'Erreur inconnue.';
+      errEl.style.display = 'block';
+    }
+  } catch(e) {
+    errEl.textContent = 'Erreur réseau : ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+// Fermer en cliquant l'overlay
+document.getElementById('review-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeReviewModal();
+});
+</script>
+
+</body>
+</html>// ── SUJETS D’EXAMEN PAR DIPLÔME ────────────────────────────────────────────
+const DIPLOMES_GROUPES = [
+  {
+    groupe: 'BAC', color: '#2563eb', icon: '🎓',
+    specialites: [
+      { tag: 'BAC Economie de la Construction',         label: 'BAC Économie de la Construction' },
+      { tag: 'BAC Geometre Topographe',                 label: 'BAC Géomètre Topographe' },
+      { tag: 'BAC Organisation de Chantier',            label: 'BAC Organisation de Chantier' },
+      { tag: 'BAC Amenagement et Finition du Batiment', label: 'BAC Aménagement et Finition du Bâtiment' },
+      { tag: 'BAC Assistant Architecte',                label: 'BAC Assistant Architecte' },
+      { tag: 'BAC PRO',                                 label: 'BAC PRO (général)' },
+    ]
+  },
+  {
+    groupe: 'BTS', color: '#16a34a', icon: '📐',
+    specialites: [
+      { tag: 'BTS Bâtiment',                            label: 'BTS Bâtiment' },
+      { tag: 'BTS Genie Civil',                          label: 'BTS Génie Civil' },
+      { tag: 'BTS Travaux Publics',                      label: 'BTS Travaux Publics' },
+      { tag: 'BTS Management de la Construction',        label: 'BTS Management de la Construction' },
+      { tag: 'BTS Topographie',                          label: 'BTS Topographie' },
+      { tag: 'BTS Enveloppe du Batiment',                label: 'BTS Enveloppe du Bâtiment' },
+      { tag: 'BTS Amenagement et Finition du Batiment',  label: 'BTS Aménagement et Finition du Bâtiment' },
+    ]
+  },
+  {
+    groupe: 'Licence', color: '#9333ea', icon: '🏛️',
+    specialites: [
+      { tag: 'Licence Génie Civil',   label: 'Licence Génie Civil' },
+      { tag: 'Licence Architecture',        label: 'Licence Architecture' },
+      { tag: 'Licence Hydraulique',         label: 'Licence Hydraulique' },
+      { tag: 'Licence',                    label: 'Licence (général)' },
+    ]
+  },
+  {
+    groupe: 'Master', color: '#ea580c', icon: '🔬',
+    specialites: [
+      { tag: 'Master Structures',       label: 'Master Structures' },
+      { tag: 'Master Géotechnique',  label: 'Master Géotechnique' },
+      { tag: 'Master Hydraulique',       label: 'Master Hydraulique' },
+      { tag: 'Master VRD',              label: 'Master VRD & Urbanisme' },
+      { tag: 'Master',                  label: 'Master (général)' },
+    ]
+  },
+  {
+    groupe: 'Ingénieur & Architecte', color: '#1B3A6B', icon: '⚙️',
+    specialites: [
+      { tag: 'Ingénieur Génie Civil',  label: 'Ingénieur Génie Civil' },
+      { tag: 'Ingénieur Hydraulique',       label: 'Ingénieur Hydraulique' },
+      { tag: 'Architecte',                       label: 'Architecte DPLG' },
+      { tag: 'Ingénieur',                  label: 'Ingénieur (général)' },
+    ]
+  },
+];
+
+const ALL_SPECIALITES = DIPLOMES_GROUPES.flatMap(g =>
+  g.specialites.map(s => ({ ...s, groupe: g.groupe, color: g.color, icon: g.icon }))
+);
+
+async function loadSujetDiplomes() {
+  const grid = document.getElementById('sujet-diplomes-grid');
+  if (!grid) return;
+  const BASE = 'http://localhost:5000/api';
+
+  const counts = await Promise.all(
+    ALL_SPECIALITES.map(s =>
+      fetch(`${BASE}/products?type=sujet&tag=${encodeURIComponent(s.tag)}&limit=1`)
+        .then(r => r.json()).then(j => j.pagination?.total || 0).catch(() => 0)
+    )
+  );
+
+  let html = '';
+  let globalIdx = 0;
+  DIPLOMES_GROUPES.forEach(g => {
+    const specs = g.specialites.map(s => {
+      const n = counts[globalIdx++] || 0;
+      const disabled = n === 0 ? 'opacity:.42;pointer-events:none;' : '';
+      return `<div onclick="showSujetsDiplome('${s.tag}', this, '${g.groupe}')"
+                   data-spec-tag="${s.tag}"
+                   style="background:#fff;border:2px solid #e5e7eb;border-radius:12px;
+                          padding:16px;cursor:pointer;transition:all .2s;text-align:center;
+                          user-select:none;${disabled}"
+                   onmouseover="if(this.style.pointerEvents!=='none'){this.style.borderColor='${g.color}';this.style.boxShadow='0 4px 12px rgba(0,0,0,.1)'}"
+                   onmouseout="if(!this.classList.contains('diplome-active')){this.style.borderColor='#e5e7eb';this.style.boxShadow='none'}">
+                <div style="font-size:1.6rem;margin-bottom:6px;">${g.icon}</div>
+                <div style="font-weight:700;color:#1a1a2e;font-size:.88rem;line-height:1.3">${s.label}</div>
+                <div style="color:${n>0?g.color:'#aaa'};font-size:.78rem;font-weight:600;margin-top:5px;">
+                  ${n > 0 ? n + ' sujet' + (n>1?'s':'') : 'Bientôt disponible'}
+                </div>
+                ${n > 0 ? '<div style="margin-top:8px;font-size:.75rem;color:#1B3A6B;font-weight:600">Voir les ressources →</div>' : ''}
+             </div>`;
+    }).join('');
+
+    html += `<div style="margin-bottom:2.5rem;">
+      <div style="display:flex;align-items:center;gap:.6rem;font-size:1.05rem;font-weight:700;
+                  color:${g.color};padding:.6rem 0 .9rem;border-bottom:3px solid ${g.color};margin-bottom:1.1rem;">
+        <span>${g.icon} ${g.groupe}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;">
+        ${specs}
+      </div>
+    </div>`;
+  });
+
+  grid.innerHTML = html;
+}
+
+async function showSujetsDiplome(tag, btn, groupe) {
+  document.querySelectorAll('[data-spec-tag]').forEach(b => {
+    b.classList.remove('diplome-active');
+    b.style.background = '#fff';
+    b.style.borderColor = '#e5e7eb';
+    b.style.boxShadow = 'none';
+  });
+  btn.classList.add('diplome-active');
+  btn.style.background = '#f0f4fa';
+  const g = DIPLOMES_GROUPES.find(x => x.groupe === groupe);
+  btn.style.borderColor = g ? g.color : '#1B3A6B';
+
+  const box = document.getElementById('sujet-diplome-results');
+  box.style.display = 'block';
+  box.innerHTML = '<div style="text-align:center;padding:40px;color:#888">⏳ Chargement…</div>';
+
+  try {
+    const BASE = 'http://localhost:5000/api';
+    const r = await fetch(`${BASE}/products?type=sujet&tag=${encodeURIComponent(tag)}&limit=50`).then(r=>r.json());
+    const items = r.data || [];
+
+    if (!items.length) {
+      box.innerHTML = `<div style="text-align:center;padding:40px;color:#888">
+        📭 Aucun sujet pour <strong>${tag}</strong>.<br>
+        <span style="font-size:.85rem;margin-top:8px;display:block">
+          Ajoutez des sujets via le panneau admin avec le tag <code>${tag}</code>
+        </span>
+      </div>`;
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      return;
+    }
+
+    const hdr = `<div style="display:flex;align-items:center;gap:.6rem;font-size:1rem;font-weight:700;
+                              color:#1B3A6B;padding:.6rem 0 .9rem;border-bottom:3px solid #1B3A6B;margin-bottom:1.2rem;">
+                   <span>📝 ${tag} — ${items.length} sujet${items.length>1?'s':''}</span>
+                 </div>`;
+
+    const cardsHtml = items.map(p => productCard(p)).join('');
+    box.innerHTML = hdr + `<div class="products-grid">${cardsHtml}</div>`;
+    if (typeof initScrollAnimations === 'function') initScrollAnimations();
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch(e) {
+    box.innerHTML = `<div style="text-align:center;padding:40px;color:#c00">⚠️ Erreur : ${e.message}</div>`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadSujetDiplomes);
+
+// activateSplitChip supprimé — les chips utilisent désormais loadProducts() via main.js
+</script>
+
+<script>
+  // Active nav on scroll (top nav + bottom mobile nav)
+  const sections = ['catalog','videos','logiciels','articles','pricing','payment'];
+  const mbnSections = ['hero','catalog','videos','pricing'];
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY + 120;
+
+    // Top navbar
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      const link = document.querySelector(`a[href="#${id}"]`);
+      if (el && link) {
+        const inView = scrollY >= el.offsetTop && scrollY < el.offsetTop + el.offsetHeight;
+        link.classList.toggle('active', inView);
+      }
+    });
+
+    // Mobile bottom nav
+    let activeMbn = 'hero';
+    mbnSections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && scrollY >= el.offsetTop) activeMbn = id;
+    });
+    document.querySelectorAll('.mbn-link[data-section]').forEach(a => {
+      a.classList.toggle('active', a.dataset.section === activeMbn);
+    });
+  }, { passive: true });
+</script>
+
+<!-- ── MODAL AVIS PRODUIT ─────────────────────────────────────────────────── -->
+<div id="review-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;
+     display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:90vh;
+              overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;
+                padding:20px 24px;border-bottom:1px solid #e5e7eb;">
+      <h3 id="review-modal-title" style="margin:0;font-size:1.1rem;color:#1a1a2e">⭐ Laisser un avis</h3>
+      <button onclick="closeReviewModal()"
+              style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#888;line-height:1">×</button>
+    </div>
+
+    <!-- Avis existants -->
+    <div id="review-list" style="padding:16px 24px;border-bottom:1px solid #f3f4f6;max-height:220px;overflow-y:auto;">
+      <div style="text-align:center;color:#aaa;font-size:.85rem">Chargement des avis…</div>
+    </div>
+
+    <!-- Formulaire -->
+    <div id="review-form-wrap" style="padding:20px 24px;">
+      <p style="font-size:.9rem;font-weight:600;color:#374151;margin:0 0 12px">Votre note :</p>
+
+      <!-- Étoiles cliquables -->
+      <div id="star-selector" style="display:flex;gap:6px;margin-bottom:16px;font-size:2rem;cursor:pointer;">
+        <span data-val="1" onclick="setReviewRating(1)">☆</span>
+        <span data-val="2" onclick="setReviewRating(2)">☆</span>
+        <span data-val="3" onclick="setReviewRating(3)">☆</span>
+        <span data-val="4" onclick="setReviewRating(4)">☆</span>
+        <span data-val="5" onclick="setReviewRating(5)">☆</span>
+      </div>
+
+      <textarea id="review-comment" placeholder="Votre commentaire (optionnel)…"
+        style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;
+               font-size:.9rem;resize:vertical;min-height:80px;box-sizing:border-box;font-family:inherit">
+      </textarea>
+
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button onclick="submitReview()"
+                style="flex:1;background:#1B3A6B;color:#fff;border:none;padding:10px;
+                       border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;">
+          ✅ Publier mon avis
+        </button>
+        <button onclick="closeReviewModal()"
+                style="background:#f3f4f6;color:#374151;border:none;padding:10px 16px;
+                       border-radius:8px;font-size:.9rem;cursor:pointer;">
+          Annuler
+        </button>
+      </div>
+
+      <p id="review-error" style="color:#E63946;font-size:.82rem;margin-top:8px;display:none"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SYSTÈME D'AVIS ────────────────────────────────────────────────────────────
+let _reviewProductId = null;
+let _reviewRating    = 0;
+
+function openReviewModal(productId, productTitle) {
+  const modal = document.getElementById('review-modal');
+  document.getElementById('review-modal-title').textContent = '⭐ Avis — ' + productTitle;
+  document.getElementById('review-comment').value = '';
+  document.getElementById('review-error').style.display = 'none';
+  _reviewProductId = productId;
+  _reviewRating = 0;
+  setReviewRating(0);
+  modal.style.display = 'flex';
+  loadReviewList(productId);
+}
+
+function closeReviewModal() {
+  document.getElementById('review-modal').style.display = 'none';
+}
+
+function setReviewRating(val) {
+  _reviewRating = val;
+  document.querySelectorAll('#star-selector span').forEach((s, i) => {
+    s.textContent = i < val ? '★' : '☆';
+    s.style.color  = i < val ? '#f59e0b' : '#9ca3af';
+  });
+}
+
+async function loadReviewList(productId) {
+  const box = document.getElementById('review-list');
+  box.innerHTML = '<div style="text-align:center;color:#aaa;font-size:.85rem;padding:10px">Chargement…</div>';
+  try {
+    const r = await fetch('http://localhost:5000/api/products/' + productId + '/reviews').then(r=>r.json());
+    const reviews = r.data || [];
+    if (!reviews.length) {
+      box.innerHTML = '<div style="text-align:center;color:#aaa;font-size:.85rem;padding:10px">Aucun avis pour le moment. Soyez le premier !</div>';
+      return;
+    }
+    box.innerHTML = reviews.map(rv => {
+      const stars = '★'.repeat(rv.rating) + '☆'.repeat(5 - rv.rating);
+      const date  = new Date(rv.created_at).toLocaleDateString('fr-FR');
+      const name  = (rv.first_name || '') + ' ' + ((rv.last_name||'').charAt(0) + '.');
+      return `<div style="padding:10px 0;border-bottom:1px solid #f3f4f6;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-weight:600;font-size:.85rem;color:#1a1a2e">${name}</span>
+          <span style="color:#f59e0b;font-size:.9rem">${stars}</span>
+        </div>
+        ${rv.comment ? `<p style="margin:0;font-size:.82rem;color:#6b7280">${rv.comment}</p>` : ''}
+        <span style="font-size:.75rem;color:#9ca3af">${date}</span>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    box.innerHTML = '<div style="color:#E63946;font-size:.82rem;padding:10px">Erreur de chargement.</div>';
+  }
+}
+
+async function submitReview() {
+  const errEl = document.getElementById('review-error');
+  errEl.style.display = 'none';
+
+  if (!_reviewRating) {
+    errEl.textContent = 'Veuillez sélectionner une note (1 à 5 étoiles).';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const token   = localStorage.getItem('token') || sessionStorage.getItem('token');
+  if (!token) {
+    errEl.textContent = 'Vous devez être connecté pour laisser un avis.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const comment = document.getElementById('review-comment').value.trim();
+
+  try {
+    const r = await fetch('http://localhost:5000/api/products/' + _reviewProductId + '/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ rating: _reviewRating, comment })
+    }).then(r => r.json());
+
+    if (r.message && !r.error) {
+      closeReviewModal();
+      if (typeof showToast === 'function') showToast('✅ ' + r.message, 'success');
+    } else {
+      errEl.textContent = r.message || r.error || 'Erreur inconnue.';
+      errEl.style.display = 'block';
+    }
+  } catch(e) {
+    errEl.textContent = 'Erreur réseau : ' + e.message;
+    errEl.style.display = 'block';
+  }
+}
+
+// Fermer en cliquant l'overlay
+document.getElementById('review-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeReviewModal();
+});
+</script>
+<script src="js/assistant.js"></script>
+
+</body>
+</html>

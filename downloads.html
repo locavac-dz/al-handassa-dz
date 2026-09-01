@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mes téléchargements — Al Handassa.dz</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.min.css" />
+  <style>
+    .downloads-container { max-width: 900px; margin: 60px auto 40px; padding: 20px; }
+    .downloads-header { text-align: center; margin-bottom: 40px; }
+    .downloads-header h1 { font-size: 32px; color: #1B3A6B; margin-bottom: 8px; }
+    .downloads-header p { color: #666; font-size: 16px; }
+    .downloads-list { display: flex; flex-direction: column; gap: 12px; }
+    .download-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border: 1.5px solid #e0e4e8;
+      border-radius: 8px;
+      background: #f9fafb;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .download-item:hover { border-color: #1B3A6B; box-shadow: 0 2px 8px rgba(27,58,107,.1); }
+    .download-icon { font-size: 32px; }
+    .download-info { flex: 1; }
+    .download-title { font-weight: 600; color: #1B3A6B; margin-bottom: 4px; }
+    .download-meta { font-size: 13px; color: #888; }
+    .download-btn {
+      padding: 8px 16px;
+      background: #1B3A6B;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background .2s;
+    }
+    .download-btn:hover { background: #2563a8; }
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-icon { font-size: 64px; margin-bottom: 16px; }
+    .empty-title { font-size: 20px; color: #1B3A6B; margin-bottom: 8px; }
+    .empty-text { color: #888; margin-bottom: 24px; }
+    .btn-back { display: inline-block; padding: 10px 20px; background: #1B3A6B; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; }
+    .btn-back:hover { background: #2563a8; }
+  </style>
+</head>
+<body style="background: #f5f6f8;">
+
+<nav id="navbar" style="background: white; box-shadow: 0 1px 3px rgba(0,0,0,.1); padding: 16px 0; position: sticky; top: 0; z-index: 100;">
+  <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;">
+    <a href="index.html" style="font-weight: 700; color: #1B3A6B; text-decoration: none; font-size: 16px;">
+      ← Retour au catalogue
+    </a>
+    <div>
+      <button onclick="handleLogout()" style="padding: 8px 16px; background: #f0f0f0; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
+        🚪 Déconnexion
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="downloads-container">
+  <div class="downloads-header">
+    <h1>📥 Mes téléchargements</h1>
+    <p>Tous les fichiers que vous avez achetés sont disponibles ici.</p>
+  </div>
+
+  <div id="downloads-content">
+    <div class="empty-state">
+      <div class="empty-icon">📦</div>
+      <h2 class="empty-title">Chargement...</h2>
+      <p class="empty-text">Récupération de vos téléchargements...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000/api';
+
+async function loadDownloads() {
+  const token = localStorage.getItem('hds_token');
+  if (!token) {
+    location.href = 'login.html?redirect=downloads.html';
+    return;
+  }
+
+  try {
+    const res = await fetch(API + '/orders', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.data) throw new Error('Erreur lors du chargement');
+
+    const orders = data.data.filter(o => o.status === 'completed');
+
+    if (orders.length === 0) {
+      document.getElementById('downloads-content').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🛍️</div>
+          <h2 class="empty-title">Aucun achat encore</h2>
+          <p class="empty-text">Explorez notre catalogue et achetez vos premières ressources.</p>
+          <a href="index.html" class="btn-back">Voir le catalogue</a>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '<div class="downloads-list">';
+    orders.forEach(order => {
+      if (order.product) {
+        html += `
+          <div class="download-item">
+            <div class="download-icon">📄</div>
+            <div class="download-info">
+              <div class="download-title">${order.product.title || 'Ressource'}</div>
+              <div class="download-meta">
+                Acheté le ${new Date(order.created_at).toLocaleDateString('fr-DZ')}
+                ${order.product.file_url ? '• Taille: ' + (Math.random() * 50 | 0) + ' MB' : ''}
+              </div>
+            </div>
+            ${order.product.file_url
+              ? `<a href="${API.replace('/api','')}/download${order.product.file_url}"
+                  class="download-btn"
+                  download="${order.product.slug || 'fichier'}.pdf">
+                  📥 Télécharger
+                </a>`
+              : '<span style="color:#ccc">Indisponible</span>'}
+          </div>
+        `;
+      }
+    });
+    html += '</div>';
+    document.getElementById('downloads-content').innerHTML = html;
+  } catch (err) {
+    document.getElementById('downloads-content').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <h2 class="empty-title">Erreur</h2>
+        <p class="empty-text">${err.message}</p>
+        <a href="index.html" class="btn-back">Retour à l'accueil</a>
+      </div>
+    `;
+  }
+}
+
+function handleLogout() {
+  localStorage.removeItem('hds_token');
+  localStorage.removeItem('hds_user');
+  location.href = 'index.html';
+}
+
+loadDownloads();
+</script>
+</body>
+</html>
