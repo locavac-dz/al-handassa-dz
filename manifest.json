@@ -1,0 +1,86 @@
+{
+  "name": "Al Handassa.dz — Génie Civil & Architecture",
+  "short_name": "Al Handassa",
+  "description": "Plateforme numérique de référence pour le génie civil et l'architecture en Algérie",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1B3A6B",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/img/logo-full.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/logo-full.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/logo-full.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/img/og-cover.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/img/og-cover.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Catalogue",
+      "short_name": "Catalog",
+      "description": "Parcourir le catalogue complet",
+      "url": "/index.html#products",
+      "icons": [{ "src": "/img/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Rechercher",
+      "short_name": "Search",
+      "description": "Rechercher une ressource",
+      "url": "/search.html",
+      "icons": [{ "src": "/img/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mon Panier",
+      "short_name": "Cart",
+      "description": "Voir mon panier",
+      "url": "/cart.html",
+      "icons": [{ "src": "/img/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mes Favoris",
+      "short_name": "Wishlist",
+      "description": "Voir mes favoris",
+      "url": "/wishlist.html",
+      "icons": [{ "src": "/img/favicon.png", "sizes": "192x192" }]
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

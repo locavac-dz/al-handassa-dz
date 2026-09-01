@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mes Favoris — Al Handassa.dz</title>
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.min.css" />
+  <style>
+    .wishlist-container { max-width: 1200px; margin: 40px auto; padding: 20px; }
+    .wishlist-header { margin-bottom: 40px; }
+    .wishlist-title { font-size: 28px; font-weight: 700; color: #1B3A6B; margin-bottom: 10px; }
+    .wishlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+    .wishlist-card { border: 1px solid #e0e4e8; border-radius: 8px; overflow: hidden; transition: all 0.2s; cursor: pointer; }
+    .wishlist-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .wishlist-thumb { width: 100%; height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .wishlist-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .wishlist-body { padding: 12px; }
+    .wishlist-title-card { font-weight: 600; color: #1B3A6B; font-size: 14px; margin-bottom: 8px; }
+    .wishlist-price { font-weight: 700; color: #D4A017; margin-bottom: 12px; }
+    .wishlist-actions { display: flex; gap: 8px; }
+    .btn-sm { flex: 1; padding: 8px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+    .btn-add-cart { background: #1B3A6B; color: white; }
+    .btn-add-cart:hover { opacity: 0.9; }
+    .btn-remove { background: #fee2e2; color: #dc2626; }
+    .btn-remove:hover { background: #fecaca; }
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-icon { font-size: 80px; margin-bottom: 20px; }
+  </style>
+</head>
+<body style="background: #f5f6f8;">
+
+<nav style="background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 16px 0; position: sticky; top: 0; z-index: 100;">
+  <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;">
+    <a href="index.html" style="font-weight: 700; color: #1B3A6B; text-decoration: none; font-size: 16px;">← Retour</a>
+    <span style="font-weight: 700; color: #1B3A6B;">💙 Mes Favoris</span>
+  </div>
+</nav>
+
+<div class="wishlist-container">
+  <div class="wishlist-header">
+    <h1 class="wishlist-title">💙 Mes Favoris</h1>
+    <p style="color: #888;">Vous avez <span id="wishlist-count">0</span> article(s) en favoris</p>
+  </div>
+
+  <div id="wishlist-content">
+    <div class="empty-state">
+      <div class="empty-icon">💔</div>
+      <h2 style="color: #1B3A6B; margin-bottom: 10px;">Aucun favori pour l'instant</h2>
+      <p style="color: #888; margin-bottom: 20px;">Explorez le catalogue et ajoutez vos produits préférés!</p>
+      <a href="index.html" style="display: inline-block; padding: 12px 24px; background: #1B3A6B; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">Parcourir le catalogue</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/cart.js"></script>
+<script src="js/wishlist.js"></script>
+<script>
+  function renderWishlist() {
+    const count = document.getElementById('wishlist-count');
+    count.textContent = wishlist.getCount();
+
+    if (wishlist.items.length === 0) return;
+
+    const container = document.getElementById('wishlist-content');
+    container.innerHTML = '<div class="wishlist-grid"></div>';
+    const grid = container.querySelector('.wishlist-grid');
+
+    wishlist.items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'wishlist-card';
+      card.innerHTML = `
+        <div class="wishlist-thumb">
+          <img src="http://localhost:5000${item.thumbnail_url || '/img/placeholder.png'}" alt="${item.title}" onerror="this.style.display='none'">
+        </div>
+        <div class="wishlist-body">
+          <div class="wishlist-title-card">${item.title}</div>
+          <div class="wishlist-price">${item.price.toLocaleString('fr-DZ')} DA</div>
+          <div class="wishlist-actions">
+            <button class="btn-sm btn-add-cart" onclick="addToCartFromWishlist(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+              🛒 Panier
+            </button>
+            <button class="btn-sm btn-remove" onclick="removeFromWishlist(${item.id})">
+              ✕
+            </button>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function addToCartFromWishlist(item) {
+    cart.addProduct(item);
+    alert('✅ Produit ajouté au panier!');
+  }
+
+  function removeFromWishlist(productId) {
+    if (confirm('Retirer des favoris?')) {
+      wishlist.removeProduct(productId);
+      renderWishlist();
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', renderWishlist);
+</script>
+</body>
+</html>
