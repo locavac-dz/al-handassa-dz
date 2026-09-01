@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paiement échoué — Al Handassa.dz</title>
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Cairo, sans-serif; background: linear-gradient(135deg, #1B3A6B, #2563a8); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .container { background: white; border-radius: 12px; padding: 40px; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; }
+    .error-icon { font-size: 80px; margin-bottom: 20px; animation: shake 0.5s ease-in-out; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+    h1 { color: #dc2626; font-size: 32px; margin-bottom: 12px; }
+    .status-text { color: #666; font-size: 16px; margin-bottom: 30px; }
+    .error-details { background: #fef2f2; padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: left; border-left: 4px solid #dc2626; }
+    .error-code { color: #991b1b; font-weight: 600; margin-bottom: 10px; }
+    .error-message { color: #7f1d1d; font-size: 14px; }
+    .solutions { background: #f0f7ff; padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: left; border-left: 4px solid #1B3A6B; }
+    .solutions h3 { color: #1B3A6B; font-size: 14px; margin-bottom: 12px; }
+    .solutions ul { margin: 0; padding-left: 20px; }
+    .solutions li { color: #0c4a6e; font-size: 13px; margin-bottom: 8px; }
+    .button-group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn { flex: 1; min-width: 150px; padding: 12px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; font-family: Cairo, sans-serif; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .btn-primary { background: linear-gradient(135deg, #1B3A6B, #2563a8); color: white; }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(27, 58, 107, 0.3); }
+    .btn-secondary { background: #f0f0f0; color: #1B3A6B; border: 1.5px solid #d1d5db; }
+    .btn-secondary:hover { background: #e0e4e8; }
+    .support-link { color: #1B3A6B; font-weight: 600; text-decoration: none; }
+    .support-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="error-icon">❌</div>
+    <h1>Paiement échoué</h1>
+    <p class="status-text">Votre transaction n'a pas pu être complétée.</p>
+
+    <div class="error-details" id="error-details">
+      <div class="error-code">Code erreur: <span id="error-code">UNKNOWN_ERROR</span></div>
+      <div class="error-message" id="error-message">
+        Une erreur est survenue lors du traitement de votre paiement. Veuillez réessayer ou utiliser une autre méthode.
+      </div>
+    </div>
+
+    <div class="solutions">
+      <h3>💡 Solutions possibles:</h3>
+      <ul>
+        <li>✓ Vérifiez les informations de votre carte bancaire</li>
+        <li>✓ Assurez-vous que votre carte n'est pas expirée</li>
+        <li>✓ Vérifiez votre solde bancaire</li>
+        <li>✓ Contactez votre banque si le problème persiste</li>
+        <li>✓ Essayez une autre méthode de paiement</li>
+      </ul>
+    </div>
+
+    <div class="button-group">
+      <a href="checkout.html" class="btn btn-primary">🔄 Réessayer le paiement</a>
+      <a href="contact.html" class="btn btn-secondary">💬 Contacter le support</a>
+    </div>
+
+    <p style="color: #999; font-size: 12px; margin-top: 20px;">
+      Votre panier est conservé. Vous pouvez réessayer quand vous êtes prêt(e).
+    </p>
+
+    <p style="color: #999; font-size: 12px; margin-top: 10px;">
+      Questions? <a href="contact.html" class="support-link">Contactez notre équipe support</a>
+    </p>
+  </div>
+
+  <script>
+    // Récupérer les paramètres d'erreur depuis l'URL
+    function getErrorDetails() {
+      const params = new URLSearchParams(window.location.search);
+      const errorCode = params.get('error_code');
+      const errorMessage = params.get('error_message');
+
+      const errorMap = {
+        'INVALID_CARD': { message: '❌ Numéro de carte invalide' },
+        'CARD_DECLINED': { message: '❌ Votre carte a été refusée par votre banque' },
+        'EXPIRED_CARD': { message: '❌ Votre carte a expiré' },
+        'INSUFFICIENT_FUNDS': { message: '❌ Solde insuffisant sur votre compte' },
+        'TIMEOUT': { message: '❌ Délai d\'attente dépassé. Veuillez réessayer.' },
+        'CONNECTION_ERROR': { message: '❌ Erreur de connexion. Veuillez vérifier votre connexion internet.' },
+        'AUTHENTICATION_FAILED': { message: '❌ Authentification échouée. Veuillez réessayer.' }
+      };
+
+      if (errorCode && errorMap[errorCode]) {
+        document.getElementById('error-code').textContent = errorCode;
+        document.getElementById('error-message').textContent = errorMap[errorCode].message;
+      } else if (errorMessage) {
+        document.getElementById('error-message').textContent = decodeURIComponent(errorMessage);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', getErrorDetails);
+  </script>
+</body>
+</html>

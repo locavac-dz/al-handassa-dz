@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paiement réussi — Al Handassa.dz</title>
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Cairo, sans-serif; background: linear-gradient(135deg, #1B3A6B, #2563a8); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .container { background: white; border-radius: 12px; padding: 40px; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; }
+    .success-icon { font-size: 80px; margin-bottom: 20px; animation: scaleIn 0.6s ease-out; }
+    @keyframes scaleIn { from { transform: scale(0); } to { transform: scale(1); } }
+    h1 { color: #15803d; font-size: 32px; margin-bottom: 12px; }
+    .status-text { color: #666; font-size: 16px; margin-bottom: 30px; }
+    .details { background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: left; }
+    .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e0e4e8; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { font-weight: 600; color: #1B3A6B; }
+    .detail-value { color: #666; }
+    .button-group { display: flex; gap: 12px; }
+    .btn { flex: 1; padding: 12px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; font-family: Cairo, sans-serif; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .btn-primary { background: linear-gradient(135deg, #1B3A6B, #2563a8); color: white; }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(27, 58, 107, 0.3); }
+    .btn-secondary { background: #f0f0f0; color: #1B3A6B; border: 1.5px solid #d1d5db; }
+    .btn-secondary:hover { background: #e0e4e8; }
+    .info-box { background: #e0f2fe; padding: 16px; border-left: 4px solid #1B3A6B; border-radius: 4px; margin-top: 20px; text-align: left; color: #0c4a6e; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="success-icon">✅</div>
+    <h1>Paiement réussi!</h1>
+    <p class="status-text">Votre commande a été confirmée avec succès.</p>
+
+    <div class="details" id="payment-details" style="display:none;">
+      <div class="detail-row">
+        <span class="detail-label">Référence de transaction:</span>
+        <span class="detail-value" id="transaction-ref">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Montant payé:</span>
+        <span class="detail-value" id="payment-amount">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Date et heure:</span>
+        <span class="detail-value" id="payment-date">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Statut:</span>
+        <span class="detail-value" style="color: #15803d; font-weight: 600;">Confirmé ✓</span>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>📧 Prochaine étape:</strong><br>
+      Un email de confirmation avec votre lien de téléchargement a été envoyé à votre adresse email.
+    </div>
+
+    <div class="button-group">
+      <a href="downloads.html" class="btn btn-primary">📥 Mes téléchargements</a>
+      <a href="index.html" class="btn btn-secondary">🏠 Accueil</a>
+    </div>
+
+    <p style="color: #999; font-size: 12px; margin-top: 20px;">
+      Besoin d'aide? <a href="contact.html" style="color: #1B3A6B; font-weight: 600;">Contactez-nous</a>
+    </p>
+  </div>
+
+  <script>
+    // Récupérer les paramètres de paiement depuis l'URL
+    function getPaymentDetails() {
+      const params = new URLSearchParams(window.location.search);
+      const transactionRef = params.get('transaction_ref');
+      const amount = params.get('amount');
+      const timestamp = params.get('timestamp');
+
+      if (transactionRef) {
+        document.getElementById('payment-details').style.display = 'block';
+        document.getElementById('transaction-ref').textContent = transactionRef;
+        document.getElementById('payment-amount').textContent =
+          (parseInt(amount) / 100).toLocaleString('fr-DZ') + ' DA';
+        document.getElementById('payment-date').textContent =
+          new Date(parseInt(timestamp)).toLocaleString('fr-DZ');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', getPaymentDetails);
+  </script>
+</body>
+</html>
