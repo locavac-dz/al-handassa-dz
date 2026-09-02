@@ -112,6 +112,19 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 }
 
+// ── Static Files (Frontend) ──
+app.use(express.static(path.join(__dirname, '../../'), {
+  maxAge: '1h',
+  etag: true,
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour for HTML
+    } else if (path.match(/\.(js|css|woff2)$/)) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year for assets
+    }
+  }
+}));
+
 // ── Static Files (uploads) ──
 // Les miniatures sont cachées 7 jours, les autres uploads 1 heure
 app.use('/uploads/images', express.static(path.join(__dirname, '../uploads/images'), {
