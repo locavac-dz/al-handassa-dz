@@ -168,7 +168,7 @@ app.get('/', (req, res) => {
   <div class="container">
     <div class="header">
       <h1>🏗️ Al Handassa.dz</h1>
-      <p>Plateforme E-commerce Ressources Génie Civil</p>
+      <p>Plateforme E-commerce Ressources Génie Civil Algérie</p>
     </div>
 
     <div id="products" class="products">
@@ -199,6 +199,7 @@ app.get('/', (req, res) => {
   </script>
 </body>
 </html>`;
+  res.set('Content-Type', 'text/html; charset=utf-8');
   res.send(html);
 });
 
