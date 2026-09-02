@@ -113,13 +113,15 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // ── Static Files (Frontend) ──
-app.use(express.static(path.join(__dirname, '../../'), {
+// Serve all frontend files from project root
+const frontendPath = process.cwd();
+app.use(express.static(frontendPath, {
   maxAge: '1h',
   etag: true,
-  setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
       res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour for HTML
-    } else if (path.match(/\.(js|css|woff2)$/)) {
+    } else if (filePath.match(/\.(js|css|woff2)$/)) {
       res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year for assets
     }
   }
