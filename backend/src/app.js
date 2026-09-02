@@ -139,69 +139,6 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
   etag: true,
 }));
 
-// ── Root Route (Homepage) ──
-app.get('/', (req, res) => {
-  const html = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Al Handassa.dz - Plateforme E-commerce Génie Civil</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f7fa; color: #333; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-    .header { background: linear-gradient(135deg, #1B3A6B 0%, #2d5a8c 100%); color: white; padding: 60px 20px; text-align: center; margin-bottom: 40px; border-radius: 8px; }
-    .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-    .header p { font-size: 1.2em; opacity: 0.9; }
-    .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 40px 0; }
-    .product { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .product h3 { color: #1B3A6B; margin-bottom: 10px; }
-    .product .price { font-size: 1.5em; color: #27ae60; font-weight: bold; margin: 10px 0; }
-    .product .rating { color: #f39c12; }
-    .btn { display: inline-block; background: #1B3A6B; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-top: 10px; }
-    .btn:hover { background: #152d52; }
-    .loading { text-align: center; padding: 40px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>🏗️ Al Handassa.dz</h1>
-      <p>Plateforme E-commerce Ressources Génie Civil Algérie</p>
-    </div>
-
-    <div id="products" class="products">
-      <div class="loading">Chargement des produits...</div>
-    </div>
-  </div>
-
-  <script>
-    // Load products from API
-    fetch('/api/products')
-      .then(r => r.json())
-      .then(data => {
-        const html = (data.data || []).slice(0, 6).map(p => \`
-          <div class="product">
-            <h3>\${p.title || 'Produit'}</h3>
-            <p>\${p.description || ''}</p>
-            <div class="price">\${p.price || 0} DA</div>
-            <div class="rating">⭐ \${p.rating_avg || 'N/A'}</div>
-            <a href="/product.html?id=\${p.id}" class="btn">Voir plus</a>
-          </div>
-        \`).join('');
-        document.getElementById('products').innerHTML = html || '<p style="grid-column: 1/-1;">Aucun produit pour le moment.</p>';
-      })
-      .catch(e => {
-        console.error('Erreur:', e);
-        document.getElementById('products').innerHTML = '<p style="grid-column: 1/-1;">Erreur lors du chargement des produits.</p>';
-      });
-  </script>
-</body>
-</html>`;
-  res.set('Content-Type', 'text/html; charset=utf-8');
-  res.send(html);
-});
 
 // ── Health Check ──
 app.get('/health', (req, res) => {
