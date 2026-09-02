@@ -140,16 +140,18 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
 }));
 
 // ── Root Route (Serve index.html) ──
+const indexPath = path.join(__dirname, '../../index.html');
 app.get('/', (req, res) => {
-  try {
-    res.sendFile(path.join(process.cwd(), 'index.html'));
-  } catch (err) {
-    res.status(200).json({
-      message: 'Al Handassa.dz API',
-      version: '1.0.0',
-      status: 'ok'
-    });
-  }
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      res.status(200).json({
+        message: 'Al Handassa.dz - Plateforme E-commerce',
+        version: '1.0.0',
+        status: 'ok',
+        note: 'Frontend served at: /index.html'
+      });
+    }
+  });
 });
 
 // ── Health Check ──
