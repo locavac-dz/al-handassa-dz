@@ -5,7 +5,7 @@
     "buildCommand": "npm install && npm run build"
   },
   "deploy": {
-    "startCommand": "node backend/src/app.js & npx serve . --no-clipboard --listen 3000",
+    "startCommand": "node backend/src/app.js",
     "restartPolicyType": "on_failure",
     "restartPolicyMaxRetries": 5
   },
