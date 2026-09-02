@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="page-title">Chargement… — Al Handassa.dz</title>
+  <meta name="description" id="page-desc" content="Articles de génie civil et architecture — Al Handassa.dz" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" id="page-canonical" href="https://handassi.dz/article.html" />
+
+  <meta property="og:type"        content="article" />
+  <meta property="og:site_name"   content="Al Handassa.dz" />
+  <meta property="og:url"         id="og-url"   content="https://handassi.dz/article.html" />
+  <meta property="og:title"       id="og-title" content="Al Handassa.dz — Article" />
+  <meta property="og:description" id="og-desc"  content="Articles scientifiques de génie civil." />
+  <meta property="og:image"       id="og-image" content="https://handassi.dz/img/og-cover.png" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <meta name="twitter:title"      id="tw-title" content="Al Handassa.dz — Article" />
+  <meta name="twitter:description" id="tw-desc" content="Articles scientifiques de génie civil." />
+  <meta name="twitter:image"      id="tw-image" content="https://handassi.dz/img/og-cover.png" />
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/article.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<header class="header">
+  <nav class="nav container">
+    <a href="index.html" class="nav-logo">
+      <img src="/img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#products">Produits</a></li>
+      <li><a href="index.html#videos">Vidéos</a></li>
+      <li><a href="logiciels.html">💻 Logiciels</a></li>
+      <li><a href="index.html#articles">Articles</a></li>
+      <li><a href="index.html#pricing">Abonnements</a></li>
+    </ul>
+    <div id="nav-auth-actions" style="display:contents">
+      <a href="index.html#login" class="btn btn-outline btn-sm">Connexion</a>
+      <a href="index.html#register" class="btn btn-primary btn-sm">S'inscrire</a>
+    </div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<!-- ═══ SKELETON ═══ -->
+<div id="article-skeleton">
+  <div style="background:#1B3A6B;padding:52px 0 44px;">
+    <div class="article-skeleton">
+      <div class="skel-block skel-cat"></div>
+      <div class="skel-block skel-title"></div>
+      <div class="skel-block skel-sub"></div>
+      <div class="skel-block skel-meta"></div>
+    </div>
+  </div>
+  <div class="article-skeleton">
+    <div class="skel-block skel-line"></div>
+    <div class="skel-block skel-line short"></div>
+    <div class="skel-block skel-line"></div>
+    <div class="skel-block skel-line short"></div>
+    <div class="skel-block skel-line"></div>
+    <div class="skel-block skel-line short"></div>
+  </div>
+</div>
+
+<!-- ═══ ERREUR ═══ -->
+<div id="article-error" class="article-error" style="display:none">
+  <div class="err-icon">📄</div>
+  <h2>Article introuvable</h2>
+  <p>Cet article n'existe pas ou a été retiré.</p>
+  <a href="index.html#articles" class="btn btn-primary">← Retour aux articles</a>
+</div>
+
+<!-- ═══ PAGE PRINCIPALE ═══ -->
+<main id="article-main" style="display:none">
+
+  <!-- Breadcrumb -->
+  <div class="article-breadcrumb">
+    <div class="container">
+      <a href="index.html">Accueil</a>
+      <span class="sep">/</span>
+      <a href="index.html#articles">Articles</a>
+      <span class="sep">/</span>
+      <span class="current" id="bc-title"></span>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="article-hero">
+    <div class="article-hero-inner">
+      <span class="article-category-badge" id="hero-category">Article</span>
+      <h1 id="hero-title"></h1>
+      <div class="article-hero-meta">
+        <div class="meta-item" id="hero-author-wrap">
+          <div class="avatar-sm" id="hero-avatar"></div>
+          <span id="hero-author"></span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-calendar-alt"></i>
+          <span id="hero-date"></span>
+        </div>
+        <div class="meta-item" id="hero-readtime-wrap" style="display:none">
+          <i class="fas fa-clock"></i>
+          <span id="hero-readtime"></span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-eye"></i>
+          <span id="hero-views"></span>
+        </div>
+        <span id="hero-access-badge" class="article-free-badge">Gratuit</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thumbnail (si dispo) -->
+  <div class="article-thumbnail-wrap" id="article-thumb-wrap" style="display:none">
+    <div class="article-thumbnail">
+      <img id="article-thumb-img" src="" alt="" />
+    </div>
+  </div>
+
+  <!-- Contenu principal + Sidebar -->
+  <div class="article-main">
+
+    <!-- Corps de l'article -->
+    <article class="article-body">
+
+      <!-- Résumé (toujours visible) -->
+      <div class="article-excerpt-block" id="article-excerpt"></div>
+
+      <!-- Contenu complet ou aperçu + paywall -->
+      <div id="article-content-zone">
+        <!-- rempli dynamiquement -->
+      </div>
+
+      <!-- Tags -->
+      <div class="article-tags" id="article-tags"></div>
+
+      <!-- DOI -->
+      <div class="article-doi" id="article-doi" style="display:none">
+        <i class="fas fa-link"></i> DOI :
+        <a id="article-doi-link" href="#" target="_blank" rel="noopener"></a>
+      </div>
+
+      <!-- Partage -->
+      <div class="article-share">
+        <p><i class="fas fa-share-alt"></i> Partager cet article</p>
+        <div class="share-btns">
+          <button class="share-btn twitter" onclick="shareArticle('twitter')"><i class="fab fa-twitter"></i> Twitter</button>
+          <button class="share-btn linkedin" onclick="shareArticle('linkedin')"><i class="fab fa-linkedin"></i> LinkedIn</button>
+          <button class="share-btn copy" onclick="shareArticle('copy')"><i class="fas fa-copy"></i> Copier le lien</button>
+        </div>
+      </div>
+    </article>
+
+    <!-- Sidebar -->
+    <aside class="article-sidebar">
+
+      <!-- Auteur -->
+      <div class="sidebar-card author-card" id="sidebar-author" style="display:none">
+        <h4>À propos de l'auteur</h4>
+        <div class="avatar-lg" id="sidebar-avatar"></div>
+        <div class="author-nm" id="sidebar-author-name"></div>
+        <div class="author-inst" id="sidebar-author-inst"></div>
+      </div>
+
+      <!-- Infos article -->
+      <div class="sidebar-card">
+        <h4>Informations</h4>
+        <div class="info-rows">
+          <div class="info-row"><span class="label">Catégorie</span><span class="value" id="info-cat">—</span></div>
+          <div class="info-row"><span class="label">Langue</span><span class="value" id="info-lang">—</span></div>
+          <div class="info-row"><span class="label">Lecture</span><span class="value" id="info-readtime">—</span></div>
+          <div class="info-row"><span class="label">Vues</span><span class="value" id="info-views">—</span></div>
+          <div class="info-row"><span class="label">Accès</span><span class="value" id="info-access">—</span></div>
+        </div>
+      </div>
+
+      <!-- Articles récents -->
+      <div class="sidebar-card" id="sidebar-related" style="display:none">
+        <h4>Articles récents</h4>
+        <div id="related-list"></div>
+      </div>
+
+    </aside>
+  </div>
+
+</main>
+
+<!-- Toast -->
+<div id="article-toast" class="article-toast"></div>
+
+<!-- Scripts -->
+<script src="js/api.js"></script>
+<script src="js/article.js"></script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>API Test — Al Handassa.dz</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 24px; }
+    h1 { color: #1B3A6B; margin-bottom: 24px; font-size: 1.4rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+    .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .card h2 { font-size: 0.95rem; color: #1B3A6B; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+    .result { font-size: 0.82rem; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; }
+    .ok  { background: #d4edda; color: #155724; }
+    .err { background: #f8d7da; color: #721c24; }
+    .info { background: #dbeafe; color: #1d4ed8; }
+    .warn { background: #fef3c7; color: #92400e; }
+    pre { font-size: 0.75rem; background: #f8fafc; padding: 10px; border-radius: 6px; overflow: auto; max-height: 200px; margin-top: 8px; color: #374151; }
+    .btn { display: inline-block; margin-top: 10px; padding: 7px 16px; background: #1B3A6B; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.82rem; }
+    .btn:hover { background: #15305a; }
+    #token-input { width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.82rem; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h1>🔧 Al Handassa.dz — Diagnostic API</h1>
+
+  <div class="grid" id="grid"></div>
+
+<script>
+const API = 'http://localhost:5000';
+let _token = localStorage.getItem('hds_token') || '';
+
+const grid = document.getElementById('grid');
+
+function card(title, id) {
+  const c = document.createElement('div');
+  c.className = 'card';
+  c.innerHTML = `<h2>${title}</h2><div id="${id}"></div>`;
+  grid.appendChild(c);
+  return document.getElementById(id);
+}
+
+function log(el, msg, type = 'ok') {
+  const d = document.createElement('div');
+  d.className = 'result ' + type;
+  d.textContent = msg;
+  el.appendChild(d);
+}
+
+function pre(el, data) {
+  const p = document.createElement('pre');
+  p.textContent = JSON.stringify(data, null, 2).slice(0, 1000);
+  el.appendChild(p);
+}
+
+async function get(url) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (_token) headers['Authorization'] = 'Bearer ' + _token;
+  const r = await fetch(API + url, { headers });
+  const d = await r.json().catch(() => ({}));
+  return { ok: r.ok, status: r.status, data: d };
+}
+
+// ── 1. Santé serveur
+(async () => {
+  const el = card('🟢 Santé serveur', 'c1');
+  try {
+    const r = await get('/health');
+    if (r.ok) { log(el, '✓ Backend en ligne — port 5000', 'ok'); pre(el, r.data); }
+    else       { log(el, '✗ Backend KO: ' + r.status, 'err'); }
+  } catch(e)   { log(el, '✗ Connexion impossible: ' + e.message, 'err'); }
+})();
+
+// ── 2. Produits
+(async () => {
+  const el = card('📦 Produits', 'c2');
+  try {
+    const r = await get('/api/products?limit=5');
+    log(el, `✓ ${r.data.pagination?.total || '?'} produits en base`, 'ok');
+    (r.data.data || []).slice(0,3).forEach(p =>
+      log(el, `  • ${p.title} (${p.type}) — ${p.is_free ? 'Gratuit' : p.price + ' DZD'}`, 'info')
+    );
+  } catch(e) { log(el, '✗ ' + e.message, 'err'); }
+})();
+
+// ── 3. Recherche
+(async () => {
+  const el = card('🔍 Recherche produits', 'c3');
+  try {
+    const r = await get('/api/products?search=bts');
+    log(el, `✓ Recherche "bts" → ${r.data.pagination?.total || 0} résultat(s)`, 'ok');
+    const r2 = await get('/api/products?search=xxxxxxinexistant');
+    log(el, `✓ Recherche inexistante → ${r2.data.pagination?.total || 0} résultat(s)`, 'ok');
+  } catch(e) { log(el, '✗ ' + e.message, 'err'); }
+})();
+
+// ── 4. Vidéos
+(async () => {
+  const el = card('🎬 Vidéos', 'c4');
+  try {
+    const r = await get('/api/videos?limit=3');
+    log(el, `✓ ${r.data.pagination?.total || '?'} vidéos en base`, 'ok');
+    (r.data.data || []).slice(0,2).forEach(v =>
+      log(el, `  • ${v.title?.slice(0,50)}…`, 'info')
+    );
+  } catch(e) { log(el, '✗ ' + e.message, 'err'); }
+})();
+
+// ── 5. Articles
+(async () => {
+  const el = card('📰 Articles', 'c5');
+  try {
+    const r = await get('/api/articles?limit=5');
+    log(el, `✓ ${r.data.pagination?.total || '?'} article(s) en base`, 'ok');
+    (r.data.data || []).slice(0,2).forEach(a =>
+      log(el, `  • ${a.title}`, 'info')
+    );
+  } catch(e) { log(el, '✗ ' + e.message, 'err'); }
+})();
+
+// ── 6. Aperçu PDF
+(async () => {
+  const el = card('🖼️ Aperçu PDF — Sujet 2019', 'c6');
+  try {
+    const r = await get('/api/products/sujet-bts-afb-2019-1779284403612');
+    const p = r.data.data;
+    log(el, `✓ preview_url: ${p?.preview_url || 'MANQUANT'}`, p?.preview_url ? 'ok' : 'err');
+    log(el, `✓ preview_pages: ${p?.preview_pages || 'MANQUANT'}`, p?.preview_pages ? 'ok' : 'warn');
+    if (p?.preview_url && p?.preview_pages) {
+      const base = p.preview_url.replace(/^\/uploads\/previews\/preview_/, '/uploads/previews/').replace(/\.pdf$/, '');
+      const imgUrl = API + base + '_p1.jpg';
+      const img = document.createElement('img');
+      img.src = imgUrl;
+      img.style = 'max-width:100%;margin-top:8px;border-radius:6px;';
+      img.onload = () => log(el, `✓ Image p1 chargée (${img.naturalWidth}x${img.naturalHeight})`, 'ok');
+      img.onerror = () => log(el, `✗ Image p1 introuvable`, 'err');
+      el.appendChild(img);
+    }
+  } catch(e) { log(el, '✗ ' + e.message, 'err'); }
+})();
+
+// ── 7. Auth — token
+(async () => {
+  const el = card('🔐 Authentification', 'c7');
+  el.innerHTML += `<input id="token-input" placeholder="Coller votre token JWT ici…" value="${_token}">
+    <button class="btn" onclick="testToken()">Tester le token</button>
+    <div id="auth-result" style="margin-top:8px"></div>`;
+})();
+
+async function testToken() {
+  _token = document.getElementById('token-input').value.trim();
+  localStorage.setItem('hds_token', _token);
+  const el = document.getElementById('auth-result');
+  el.innerHTML = '';
+  try {
+    const r = await get('/api/auth/me');
+    if (r.ok) {
+      const u = r.data.user;
+      log(el, `✓ Connecté : ${u.first_name} ${u.last_name} (${u.email})`, 'ok');
+      log(el, `  Rôle: ${u.role} | Plan: ${u.subscription_plan}`, 'info');
+    } else {
+      log(el, `✗ Token invalide (${r.status})`, 'err');
+    }
+  } catch(e) { log(el, '✗ ' + e.message, 'err'); }
+}
+</script>
+</body>
+</html>

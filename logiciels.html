@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logiciels BTP & Génie Civil — Al Handassa.dz</title>
+  <meta name="description" content="Guide complet des logiciels pour ingénieurs et architectes en Algérie — BIM, calcul de structures, CAO, rendu 3D. Revit, AutoCAD, ETABS, SAP2000, Civil 3D et plus." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://handassi.dz/logiciels.html" />
+
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://handassi.dz/logiciels.html" />
+  <meta property="og:title"       content="Logiciels BTP & Génie Civil — Al Handassa.dz" />
+  <meta property="og:description" content="Guide des logiciels essentiels pour ingénieurs et architectes algériens." />
+  <meta property="og:image"       content="https://handassi.dz/img/og-cover.png" />
+  <meta property="og:site_name"   content="Al Handassa.dz" />
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="Logiciels BTP & Génie Civil — Al Handassa.dz" />
+  <meta name="twitter:description" content="Revit, AutoCAD, ETABS, SAP2000, Civil 3D — guide complet des logiciels pour ingénieurs et architectes algériens." />
+  <meta name="twitter:image"       content="https://handassi.dz/img/og-cover.png" />
+  <meta name="keywords"            content="logiciels génie civil algérie, Revit algérie, AutoCAD BTP, ETABS, SAP2000, Civil 3D, logiciels architecture" />
+
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/logiciels.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<header class="header" id="navbar-log">
+  <nav class="nav container">
+    <a href="index.html" class="nav-logo">
+      <img src="/img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#catalog">Catalogue</a></li>
+      <li><a href="index.html#videos">Vidéos</a></li>
+      <li><a href="logiciels" class="active">Logiciels</a></li>
+      <li><a href="index.html#articles">Articles</a></li>
+      <li><a href="index.html#pricing">Abonnements</a></li>
+    </ul>
+    <div id="nav-auth-actions" style="display:contents">
+      <a href="index.html#login" class="btn btn-outline btn-sm">Connexion</a>
+      <a href="index.html#register" class="btn btn-primary btn-sm">S'inscrire</a>
+    </div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<div class="log-hero">
+  <div class="container">
+    <div class="log-hero-inner">
+      <span class="log-hero-label">💻 Outils professionnels</span>
+      <h1>Logiciels <span>BTP & Génie Civil</span></h1>
+      <p>Les logiciels essentiels pour les ingénieurs, architectes et techniciens —<br>
+         BIM, calcul de structures, CAO, rendu 3D et infrastructures.</p>
+      <div class="log-hero-stats" id="hero-stats">
+        <div class="log-stat"><span id="stat-total">—</span> logiciels référencés</div>
+        <div class="log-stat-sep">·</div>
+        <div class="log-stat"><span id="stat-cats">—</span> catégories</div>
+        <div class="log-stat-sep">·</div>
+        <div class="log-stat">100% gratuit à consulter</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ FILTRES ═══════════════════ -->
+<div class="log-filters-bar" id="filters-bar">
+  <div class="container">
+    <div class="log-filter-scroll" id="category-filters">
+      <button class="log-filter-btn active" data-slug="">
+        <i class="fas fa-th"></i> Tous les logiciels
+      </button>
+      <!-- Généré dynamiquement -->
+    </div>
+    <div class="log-search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search-input" placeholder="Rechercher un logiciel…" autocomplete="off" />
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ CONTENU ═══════════════════ -->
+<main class="log-main container" id="log-main">
+
+  <!-- Skeleton -->
+  <div id="log-skeleton" class="log-skeleton-wrap">
+    <div class="log-skel-section">
+      <div class="log-skel-block log-skel-title"></div>
+      <div class="log-skel-grid">
+        <div class="log-skel-block log-skel-card"></div>
+        <div class="log-skel-block log-skel-card"></div>
+        <div class="log-skel-block log-skel-card"></div>
+        <div class="log-skel-block log-skel-card"></div>
+      </div>
+    </div>
+    <div class="log-skel-section">
+      <div class="log-skel-block log-skel-title"></div>
+      <div class="log-skel-grid">
+        <div class="log-skel-block log-skel-card"></div>
+        <div class="log-skel-block log-skel-card"></div>
+        <div class="log-skel-block log-skel-card"></div>
+        <div class="log-skel-block log-skel-card"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu réel -->
+  <div id="log-content" style="display:none"></div>
+
+  <!-- Vide -->
+  <div id="log-empty" class="log-empty" style="display:none">
+    <div class="log-empty-icon">🔍</div>
+    <h3>Aucun logiciel trouvé</h3>
+    <p>Essayez un autre terme de recherche ou sélectionnez une autre catégorie.</p>
+  </div>
+
+</main>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="log-footer">
+  <div class="container">
+    <div class="log-footer-inner">
+      <div>
+        <div class="log-footer-logo">⚙ Al Handassa<span>.dz</span></div>
+        <p class="log-footer-desc">Plateforme de référence pour les professionnels du BTP en Algérie.</p>
+      </div>
+      <div class="log-footer-links">
+        <a href="index.html">Accueil</a>
+        <a href="index.html#catalog">Catalogue</a>
+        <a href="index.html#videos">Vidéos</a>
+        <a href="index.html#pricing">Abonnements</a>
+      </div>
+    </div>
+    <div class="log-footer-copy">© 2026 Al Handassa.dz — Tous droits réservés</div>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/logiciels.js"></script>
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Al Handassa.dz</title>
+  <meta name="description" content="Contactez l'équipe Al Handassa.dz pour toute question sur nos ressources en génie civil et architecture. Support technique, partenariats, suggestions." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://handassi.dz/contact.html" />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://handassi.dz/contact.html" />
+  <meta property="og:title"       content="Contact — Al Handassa.dz" />
+  <meta property="og:description" content="Contactez l'équipe Al Handassa.dz pour toute question sur nos ressources en génie civil et architecture. Support, partenariats, suggestions." />
+  <meta property="og:image"       content="https://handassi.dz/img/og-cover.png" />
+  <meta property="og:site_name"   content="Al Handassa.dz" />
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="Contact — Al Handassa.dz" />
+  <meta name="twitter:description" content="Contactez l'équipe Al Handassa.dz — support, partenariats, suggestions." />
+  <meta name="twitter:image"       content="https://handassi.dz/img/og-cover.png" />
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ── Page Contact ───────────────────────────────── */
+    .contact-hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #0f2547 100%);
+      padding: 80px 0 60px;
+      text-align: center;
+      color: white;
+    }
+    .contact-hero h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 12px; }
+    .contact-hero p  { font-size: 1.1rem; color: rgba(255,255,255,0.75); max-width: 560px; margin: 0 auto; }
+
+    .contact-section { padding: 64px 0 80px; }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    /* Infos de contact */
+    .contact-info h2 {
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--text-main); margin-bottom: 8px;
+    }
+    .contact-info > p { color: var(--text-muted); font-size: .95rem; margin-bottom: 32px; line-height: 1.7; }
+
+    .info-card {
+      display: flex; align-items: flex-start; gap: 16px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; margin-bottom: 14px;
+      transition: border-color .2s;
+    }
+    .info-card:hover { border-color: var(--secondary); }
+    .info-card .ic-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), #2563eb);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .info-card .ic-body h4 { font-size: .9rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+    .info-card .ic-body p  { font-size: .88rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+    .info-card .ic-body a  { color: var(--secondary); text-decoration: none; }
+    .info-card .ic-body a:hover { text-decoration: underline; }
+
+    .social-row { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+    .social-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-radius: 50px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: .85rem; font-weight: 600;
+      text-decoration: none; transition: all .2s;
+    }
+    .social-pill:hover { border-color: var(--secondary); color: var(--secondary); background: rgba(200,161,66,.06); }
+
+    /* Formulaire */
+    .contact-form-wrap {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 40px;
+    }
+    .contact-form-wrap h2 {
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--text-main); margin-bottom: 6px;
+    }
+    .contact-form-wrap > p { color: var(--text-muted); font-size: .9rem; margin-bottom: 28px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block; font-size: .85rem; font-weight: 600;
+      color: var(--text-main); margin-bottom: 6px;
+    }
+    .form-group label span { color: var(--secondary); }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 11px 14px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 8px; color: var(--text-main);
+      font-size: .95rem; font-family: inherit;
+      transition: border-color .2s, box-shadow .2s;
+      box-sizing: border-box;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(27,58,107,.12);
+    }
+    .form-group textarea { resize: vertical; min-height: 130px; }
+
+    .form-submit {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--primary), #2563eb);
+      color: white; border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .form-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(27,58,107,.4); }
+    .form-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .form-note { font-size: .8rem; color: var(--text-muted); text-align: center; margin-top: 12px; }
+
+    /* Toast */
+    .contact-toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e293b; color: white; padding: 14px 28px;
+      border-radius: 50px; font-size: .9rem; font-weight: 600;
+      box-shadow: 0 8px 32px rgba(0,0,0,.35); z-index: 9999;
+      transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+      opacity: 0; pointer-events: none;
+    }
+    .contact-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .contact-toast.ok   { border-left: 4px solid #22c55e; }
+    .contact-toast.err  { border-left: 4px solid #ef4444; }
+
+    /* FAQ rapide */
+    .faq-section { padding: 0 0 72px; }
+    .faq-section h2 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); margin-bottom: 28px; text-align: center; }
+    .faq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+    .faq-item {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 22px;
+    }
+    .faq-item h4 { font-size: .95rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+    .faq-item p  { font-size: .88rem; color: var(--text-muted); line-height: 1.65; margin: 0; }
+
+    @media (max-width: 820px) {
+      .contact-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .contact-form-wrap { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ NAV ═══════════════ -->
+<header class="header">
+  <nav class="nav container">
+    <a href="index.html" class="nav-logo">
+      <img src="/img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#products">Produits</a></li>
+      <li><a href="index.html#videos">Vidéos</a></li>
+      <li><a href="logiciels">💻 Logiciels</a></li>
+      <li><a href="index.html#articles">Articles</a></li>
+      <li><a href="about.html">À propos</a></li>
+    </ul>
+    <div id="nav-auth-actions" style="display:contents">
+      <a href="index.html#login" class="btn btn-outline btn-sm">Connexion</a>
+      <a href="index.html#register" class="btn btn-primary btn-sm">S'inscrire</a>
+    </div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="contact-hero">
+  <div class="container">
+    <h1>📬 Contactez-nous</h1>
+    <p>Une question, une suggestion, un partenariat ? Notre équipe vous répond sous 24–48 heures.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ CONTACT ═══════════════ -->
+<section class="contact-section">
+  <div class="container">
+    <div class="contact-grid">
+
+      <!-- Infos -->
+      <div class="contact-info">
+        <h2>On est là pour vous 👋</h2>
+        <p>Al Handassa.dz est une plateforme algérienne dédiée aux étudiants et professionnels du génie civil et de l'architecture. N'hésitez pas à nous contacter pour toute question.</p>
+
+        <div class="info-card">
+          <div class="ic-icon">📧</div>
+          <div class="ic-body">
+            <h4>Email</h4>
+            <p><a href="mailto:contact@handassi.dz">contact@handassi.dz</a><br>
+            <a href="mailto:support@handassi.dz">support@handassi.dz</a> (support technique)</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="ic-icon">📍</div>
+          <div class="ic-body">
+            <h4>Localisation</h4>
+            <p>Alger, Algérie<br>Activité 100 % en ligne — livraison numérique immédiate</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="ic-icon">⏰</div>
+          <div class="ic-body">
+            <h4>Horaires de support</h4>
+            <p>Dimanche – Jeudi : 8h à 18h<br>Samedi : 9h à 13h<br>Vendredi : fermé</p>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="ic-icon">⚡</div>
+          <div class="ic-body">
+            <h4>Délai de réponse</h4>
+            <p>Questions techniques : &lt; 24 h<br>Partenariats &amp; contenu : 2–5 jours ouvrés</p>
+          </div>
+        </div>
+
+        <div class="social-row">
+          <a href="#" class="social-pill"><i class="fab fa-facebook-f"></i> Facebook</a>
+          <a href="#" class="social-pill"><i class="fab fa-instagram"></i> Instagram</a>
+          <a href="#" class="social-pill"><i class="fab fa-telegram"></i> Telegram</a>
+          <a href="#" class="social-pill"><i class="fab fa-youtube"></i> YouTube</a>
+        </div>
+      </div>
+
+      <!-- Formulaire -->
+      <div class="contact-form-wrap">
+        <h2>✉️ Envoyer un message</h2>
+        <p>Remplissez le formulaire ci-dessous et nous vous répondrons par email.</p>
+
+        <form id="contact-form" onsubmit="submitContact(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cf-name">Nom complet <span>*</span></label>
+              <input type="text" id="cf-name" placeholder="Votre nom" required />
+            </div>
+            <div class="form-group">
+              <label for="cf-email">Email <span>*</span></label>
+              <input type="email" id="cf-email" placeholder="votre@email.com" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="cf-subject">Sujet <span>*</span></label>
+            <select id="cf-subject" required>
+              <option value="">— Choisir un sujet —</option>
+              <option value="support">🔧 Support technique / problème de téléchargement</option>
+              <option value="commande">📦 Question sur une commande</option>
+              <option value="contenu">📚 Suggestion de contenu / article</option>
+              <option value="partenariat">🤝 Partenariat ou collaboration</option>
+              <option value="signalement">⚠️ Signalement d'une erreur</option>
+              <option value="autre">💬 Autre</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="cf-message">Message <span>*</span></label>
+            <textarea id="cf-message" placeholder="Décrivez votre question ou demande en détail…" required></textarea>
+          </div>
+
+          <button type="submit" class="form-submit" id="cf-submit">
+            <i class="fas fa-paper-plane"></i> Envoyer le message
+          </button>
+          <p class="form-note">🔒 Vos données ne sont jamais partagées avec des tiers.</p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FAQ RAPIDE ═══════════════ -->
+<section class="faq-section">
+  <div class="container">
+    <h2>❓ Questions fréquentes</h2>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h4>Comment télécharger un document après achat ?</h4>
+        <p>Après validation de votre paiement, rendez-vous dans votre espace personnel (icône profil en haut) → onglet "Mes téléchargements". Le lien est disponible immédiatement.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Les ressources gratuites nécessitent-elles un compte ?</h4>
+        <p>Non. Les vidéos et articles gratuits sont accessibles sans inscription. Un compte est requis uniquement pour télécharger des documents PDF ou accéder au contenu premium.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Quels modes de paiement sont acceptés ?</h4>
+        <p>Nous acceptons les paiements par CIB / Dahabiya (SATIM) et BaridiMob. Un système de paiement sécurisé par carte bancaire algérienne sera disponible prochainement.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Puis-je proposer un cours ou un document ?</h4>
+        <p>Oui ! Nous collaborons avec des enseignants et professionnels algériens. Envoyez-nous un email avec "Partenariat contenu" en objet — nous vous répondrons sous 5 jours ouvrés.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Les documents sont-ils conformes aux normes algériennes ?</h4>
+        <p>Oui. Tous nos cours, exercices et normes sont basés sur les DTR, CBA 93, RPA 99/2003 et référentiels pédagogiques du Ministère de l'Enseignement Supérieur algérien.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Politique de remboursement ?</h4>
+        <p>Si vous n'êtes pas satisfait d'un document acheté, contactez-nous dans les 7 jours suivant l'achat. Nous étudions chaque cas et procédons au remboursement si le document ne correspond pas à la description.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer id="footer">
+  <div class="container">
+    <div class="footer-bottom" style="padding:28px 0">
+      <p class="footer-copy">© 2024 <span>Al Handassa.dz</span> — Tous droits réservés · Made with ❤️ in <span>Algeria 🇩🇿</span></p>
+      <div class="footer-links-bottom">
+        <a href="index.html">Accueil</a>
+        <a href="about.html">À propos</a>
+        <a href="cgu.html">CGU</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div id="contact-toast" class="contact-toast"></div>
+
+<script src="js/api.js?v=3"></script>
+<script>
+// Nav auth
+(async () => {
+  try {
+    const me = await api.me();
+    if (me?.data?.id) {
+      const zone = document.getElementById('nav-auth-actions');
+      zone.innerHTML = `
+        <a href="account.html" class="btn btn-outline btn-sm">👤 Mon compte</a>
+        <button class="btn btn-primary btn-sm" onclick="api.logout().then(()=>location.href='index.html')">Déconnexion</button>`;
+    }
+  } catch {}
+})();
+
+// Toast
+let _toastT;
+function toast(msg, type = 'ok') {
+  const el = document.getElementById('contact-toast');
+  el.textContent = msg;
+  el.className = `contact-toast ${type} show`;
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// Soumission du formulaire
+async function submitContact(e) {
+  e.preventDefault();
+  const btn = document.getElementById('cf-submit');
+  const name    = document.getElementById('cf-name').value.trim();
+  const email   = document.getElementById('cf-email').value.trim();
+  const subject = document.getElementById('cf-subject').value;
+  const message = document.getElementById('cf-message').value.trim();
+
+  if (!name || !email || !subject || !message) {
+    toast('Veuillez remplir tous les champs obligatoires.', 'err'); return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours…';
+
+  try {
+    // Appel API backend
+    const res = await fetch(api.base + '/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, subject, message }),
+    });
+    if (res.ok) {
+      toast('✅ Message envoyé ! Nous vous répondrons sous 24–48 h.', 'ok');
+      document.getElementById('contact-form').reset();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      toast(data.message || '❌ Erreur lors de l\'envoi. Réessayez.', 'err');
+    }
+  } catch {
+    // Fallback : mailto si l'API n'est pas dispo
+    const mailto = `mailto:contact@handassi.dz?subject=${encodeURIComponent('[Al Handassa.dz] ' + subject)}&body=${encodeURIComponent('Nom : ' + name + '\nEmail : ' + email + '\n\n' + message)}`;
+    window.location.href = mailto;
+    toast('📧 Ouverture de votre client email…', 'ok');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer le message';
+  }
+}
+
+// Mobile menu
+document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+  document.querySelector('.nav-links')?.classList.toggle('open');
+});
+</script>
+</body>
+</html>

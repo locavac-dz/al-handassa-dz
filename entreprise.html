@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="page-title">Vitrine Entreprise — Al Handassa.dz</title>
+  <meta name="description"  id="page-desc"      content="" />
+  <meta name="robots"                            content="index, follow" />
+  <link rel="canonical"     id="page-canonical" href="https://handassi.dz/entreprise.html" />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"   id="og-url"         content="https://handassi.dz/entreprise.html" />
+  <meta property="og:title" id="og-title"        content="" />
+  <meta property="og:description" id="og-desc"  content="" />
+  <meta property="og:image" id="og-image"        content="https://handassi.dz/img/og-cover.png" />
+  <meta property="og:site_name"                  content="Al Handassa.dz" />
+  <meta name="twitter:card"  content="summary_large_image" />
+  <meta name="twitter:title" id="tw-title"       content="" />
+  <meta name="twitter:image" id="tw-image"       content="https://handassi.dz/img/og-cover.png" />
+
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Cover & Header ── */
+    .ent-cover { height:260px; background:linear-gradient(135deg,#1B3A6B,#2a5298); position:relative; overflow:hidden; }
+    .ent-cover img { width:100%;height:100%;object-fit:cover; }
+    .ent-cover-overlay { position:absolute;inset:0;background:rgba(0,0,0,.25); }
+
+    .ent-header { background:#fff; border-bottom:1px solid #e5e7eb; }
+    .ent-header-inner { display:flex; align-items:flex-end; gap:20px; padding:0 0 20px; position:relative; }
+    .ent-logo { width:90px;height:90px; border-radius:16px; background:#fff; border:3px solid #e5e7eb;
+                overflow:hidden; display:flex;align-items:center;justify-content:center; font-size:2.5rem;
+                margin-top:-45px; flex-shrink:0; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+    .ent-logo img { width:100%;height:100%;object-fit:cover; }
+    .ent-header-info { flex:1; }
+    .ent-header-info h1 { font-size:1.6rem; font-weight:800; color:#1e293b; margin:0 0 4px; }
+    .ent-header-info .tagline { color:#64748b; font-size:.95rem; }
+    .ent-badges { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    .ent-badge { font-size:.75rem; padding:3px 10px; border-radius:99px; font-weight:700; }
+    .ent-badge-verified { background:#d1fae5;color:#065f46; }
+    .ent-badge-premium  { background:#FEF3C7;color:#92400e; }
+    .ent-badge-spec     { background:#EFF6FF;color:#1B3A6B; }
+
+    .ent-contact-btn { background:#1B3A6B;color:#fff;border:none;padding:10px 20px;border-radius:8px;
+                       font-family:inherit;font-weight:700;font-size:.9rem;cursor:pointer;
+                       text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+                       white-space:nowrap;flex-shrink:0; }
+    .ent-contact-btn:hover { background:#2a5298; }
+
+    /* ── Layout ── */
+    .ent-layout { display:grid; grid-template-columns:1fr 300px; gap:28px; padding:28px 0 48px; }
+    @media(max-width:768px){ .ent-layout{grid-template-columns:1fr;} }
+
+    /* ── Sections ── */
+    .ent-section { background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:24px;margin-bottom:20px; }
+    .ent-section h2 { font-size:1rem;font-weight:700;color:#1e293b;margin:0 0 16px;
+                      display:flex;align-items:center;gap:8px; }
+    .ent-desc { color:#374151;line-height:1.7;font-size:.95rem;white-space:pre-line; }
+
+    /* ── Réalisations ── */
+    .proj-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px; }
+    .proj-card { border-radius:10px;overflow:hidden;background:#f8fafc;border:1px solid #e5e7eb; }
+    .proj-img  { height:130px;background:linear-gradient(135deg,#1B3A6B,#2a5298);overflow:hidden; }
+    .proj-img img { width:100%;height:100%;object-fit:cover; }
+    .proj-body { padding:10px 12px; }
+    .proj-title { font-weight:700;font-size:.85rem;color:#1e293b;margin:0 0 4px; }
+    .proj-meta  { font-size:.78rem;color:#94a3b8; }
+
+    /* ── Sidebar ── */
+    .ent-info-row { display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:.88rem; }
+    .ent-info-row:last-child { border:none; }
+    .ent-info-row i { color:#1B3A6B;width:16px;text-align:center; }
+    .ent-info-row a { color:#1B3A6B;text-decoration:none; }
+    .ent-info-row a:hover { text-decoration:underline; }
+
+    /* ── Skeleton ── */
+    .skel { background:#f1f5f9;border-radius:8px;animation:pulse 1.4s infinite; }
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    #ent-skeleton .ent-cover { background:#e2e8f0; }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb { padding:12px 0;font-size:.85rem;color:#94a3b8; }
+    .breadcrumb a { color:#1B3A6B;text-decoration:none; }
+    .breadcrumb span { margin:0 6px; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<header class="header">
+  <nav class="nav container">
+    <a href="index.html" class="nav-logo">
+      <img src="/img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#catalog">Catalogue</a></li>
+      <li><a href="logiciels.html">Logiciels</a></li>
+      <li><a href="entreprises.html" class="active">Entreprises</a></li>
+      <li><a href="index.html#articles">Articles</a></li>
+    </ul>
+    <div id="nav-auth-actions" style="display:contents">
+      <a href="index.html#login"    class="btn btn-outline btn-sm">Connexion</a>
+      <a href="index.html#register" class="btn btn-primary btn-sm">S'inscrire</a>
+    </div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<!-- ── SKELETON ── -->
+<div id="ent-skeleton">
+  <div class="ent-cover"></div>
+  <div class="ent-header" style="padding-top:0">
+    <div class="container">
+      <div class="ent-header-inner">
+        <div class="ent-logo skel"></div>
+        <div style="flex:1">
+          <div class="skel" style="height:24px;width:240px;margin-bottom:8px;border-radius:6px"></div>
+          <div class="skel" style="height:16px;width:180px;border-radius:6px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONTENU ── -->
+<div id="ent-content" style="display:none">
+  <!-- Cover -->
+  <div class="ent-cover" id="ent-cover-wrap">
+    <img id="ent-cover-img" src="" alt="" style="display:none" />
+    <div class="ent-cover-overlay"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="ent-header">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="entreprises.html">Annuaire Entreprises</a>
+        <span>›</span>
+        <span id="bc-name">—</span>
+      </div>
+      <div class="ent-header-inner">
+        <div class="ent-logo" id="ent-logo">🏢</div>
+        <div class="ent-header-info">
+          <h1 id="ent-name">—</h1>
+          <div class="tagline" id="ent-tagline"></div>
+          <div class="ent-badges" id="ent-badges"></div>
+        </div>
+        <a id="ent-contact-link" href="#" class="ent-contact-btn">
+          <i class="fas fa-envelope"></i> Contacter
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="ent-layout">
+      <!-- Colonne principale -->
+      <div>
+        <div class="ent-section" id="section-desc" style="display:none">
+          <h2><i class="fas fa-building"></i> À propos</h2>
+          <div class="ent-desc" id="ent-desc"></div>
+        </div>
+
+        <div class="ent-section" id="section-projects" style="display:none">
+          <h2><i class="fas fa-images"></i> Réalisations</h2>
+          <div class="proj-grid" id="proj-grid"></div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <div class="ent-section">
+          <h2><i class="fas fa-info-circle"></i> Informations</h2>
+          <div id="ent-info-rows"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── NOT FOUND ── -->
+<div id="ent-notfound" style="display:none;text-align:center;padding:80px 0">
+  <div style="font-size:3rem">🏗️</div>
+  <h2 style="color:#1e293b">Entreprise introuvable</h2>
+  <p style="color:#64748b">Cette vitrine n'existe pas ou a été désactivée.</p>
+  <a href="entreprises.html" class="btn btn-primary" style="margin-top:16px">Voir l'annuaire</a>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer style="background:#1e293b;color:#94a3b8;padding:24px 0;text-align:center;font-size:.85rem;">
+  <div class="container">
+    © 2026 <strong style="color:#fff">Al Handassa.dz</strong> — Tous droits réservés ·
+    <a href="index.html" style="color:#94a3b8">Accueil</a> ·
+    <a href="entreprises.html" style="color:#94a3b8">Annuaire</a> ·
+    <a href="contact.html" style="color:#94a3b8">Contact</a>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+const WILAYAS = {
+  1:'Adrar',2:'Chlef',3:'Laghouat',4:'Oum El Bouaghi',5:'Batna',6:'Béjaïa',7:'Biskra',
+  8:'Béchar',9:'Blida',10:'Bouira',11:'Tamanrasset',12:'Tébessa',13:'Tlemcen',14:'Tiaret',
+  15:'Tizi Ouzou',16:'Alger',17:'Djelfa',18:'Jijel',19:'Sétif',20:'Saïda',21:'Skikda',
+  22:'Sidi Bel Abbès',23:'Annaba',24:'Guelma',25:'Constantine',26:'Médéa',27:'Mostaganem',
+  28:"M'Sila",29:'Mascara',30:'Ouargla',31:'Oran',32:'El Bayadh',33:'Illizi',
+  34:'Bordj Bou Arréridj',35:'Boumerdès',36:'El Tarf',37:'Tindouf',38:'Tissemsilt',
+  39:'El Oued',40:'Khenchela',41:'Souk Ahras',42:'Tipaza',43:'Mila',44:'Aïn Defla',
+  45:'Naâma',46:'Aïn Témouchent',47:'Ghardaïa',48:'Relizane',49:"El M'Ghair",
+  50:'El Meniaa',51:'Ouled Djellal',52:'Bordj Badji Mokhtar',53:'Béni Abbès',
+  54:'Timimoun',55:'Touggourt',56:'Djanet',57:'In Salah',58:'In Guezzam',
+};
+
+const slug = new URLSearchParams(location.search).get('slug');
+if (!slug) { showNotFound(); } else { loadCompany(slug); }
+
+async function loadCompany(slug) {
+  try {
+    const data = await apiGet('/companies/' + slug);
+    const c = data.data;
+    render(c);
+  } catch {
+    showNotFound();
+  }
+}
+
+function render(c) {
+  // SEO
+  const title = `${c.name} — Al Handassa.dz`;
+  const desc  = (c.tagline || c.description || '').slice(0,160);
+  const url   = `https://handassi.dz/entreprise.html?slug=${c.slug}`;
+  const img   = c.cover_url ? `https://handassi.dz${c.cover_url}` : 'https://handassi.dz/img/og-cover.png';
+  document.title = title;
+  document.getElementById('page-desc').content      = desc;
+  document.getElementById('page-canonical').href    = url;
+  document.getElementById('og-url').content         = url;
+  document.getElementById('og-title').content       = title;
+  document.getElementById('og-desc').content        = desc;
+  document.getElementById('og-image').content       = img;
+  document.getElementById('tw-title').content       = title;
+  document.getElementById('tw-image').content       = img;
+
+  // Cover
+  if (c.cover_url) {
+    const img = document.getElementById('ent-cover-img');
+    img.src = c.cover_url; img.style.display = 'block';
+  }
+
+  // Logo
+  const logoEl = document.getElementById('ent-logo');
+  logoEl.innerHTML = c.logo_url ? `<img src="${c.logo_url}" alt="${c.name}" />` : '🏢';
+
+  // Nom & tagline
+  document.getElementById('ent-name').textContent    = c.name;
+  document.getElementById('bc-name').textContent     = c.name;
+  document.getElementById('ent-tagline').textContent = c.tagline || '';
+
+  // Badges
+  const badges = [];
+  if (c.is_verified) badges.push('<span class="ent-badge ent-badge-verified">✓ Vérifié</span>');
+  if (c.is_premium)  badges.push('<span class="ent-badge ent-badge-premium">⭐ Premium</span>');
+  (c.specialties||[]).slice(0,4).forEach(s => badges.push(`<span class="ent-badge ent-badge-spec">${s}</span>`));
+  document.getElementById('ent-badges').innerHTML = badges.join('');
+
+  // Contact
+  const contactLink = document.getElementById('ent-contact-link');
+  if (c.email) { contactLink.href = `mailto:${c.email}`; }
+  else if (c.phone) { contactLink.href = `tel:${c.phone}`; }
+  else { contactLink.style.display = 'none'; }
+
+  // Description
+  if (c.description) {
+    document.getElementById('ent-desc').textContent = c.description;
+    document.getElementById('section-desc').style.display = 'block';
+  }
+
+  // Réalisations
+  if (c.projects && c.projects.length) {
+    document.getElementById('proj-grid').innerHTML = c.projects.map(p => `
+      <div class="proj-card">
+        <div class="proj-img">${p.image_url ? `<img src="${p.image_url}" alt="${p.title}" loading="lazy"/>` : ''}</div>
+        <div class="proj-body">
+          <div class="proj-title">${p.title}</div>
+          <div class="proj-meta">${[p.location, p.year, p.category].filter(Boolean).join(' · ')}</div>
+        </div>
+      </div>`).join('');
+    document.getElementById('section-projects').style.display = 'block';
+  }
+
+  // Sidebar infos
+  const infoRows = [];
+  if (c.wilaya_siege) infoRows.push(['fa-map-marker-alt', WILAYAS[c.wilaya_siege] || `Wilaya ${c.wilaya_siege}`]);
+  if (c.founded_year) infoRows.push(['fa-calendar-alt', `Fondée en ${c.founded_year}`]);
+  if (c.size_range)   infoRows.push(['fa-users', `${c.size_range} employés`]);
+  if (c.agrement)     infoRows.push(['fa-certificate', `Agrément : ${c.agrement}`]);
+  if (c.address)      infoRows.push(['fa-map', c.address]);
+  if (c.phone)        infoRows.push(['fa-phone', `<a href="tel:${c.phone}">${c.phone}</a>`]);
+  if (c.email)        infoRows.push(['fa-envelope', `<a href="mailto:${c.email}">${c.email}</a>`]);
+  if (c.website)      infoRows.push(['fa-globe', `<a href="${c.website}" target="_blank" rel="noopener">${c.website.replace(/^https?:\/\//,'')}</a>`]);
+  if ((c.wilayas||[]).length > 1) infoRows.push(['fa-map-signs', 'Zones : ' + c.wilayas.map(w=>WILAYAS[w]||w).join(', ')]);
+
+  document.getElementById('ent-info-rows').innerHTML = infoRows.map(([icon, val]) =>
+    `<div class="ent-info-row"><i class="fas ${icon}"></i><span>${val}</span></div>`
+  ).join('');
+
+  // JSON-LD
+  const ld = { '@context':'https://schema.org', '@type':'Organization',
+    name: c.name, url: url,
+    ...(c.logo_url ? { logo: `https://handassi.dz${c.logo_url}` } : {}),
+    ...(c.description ? { description: c.description } : {}),
+    ...(c.email ? { email: c.email } : {}),
+    ...(c.phone ? { telephone: c.phone } : {}),
+    ...(c.website ? { sameAs: [c.website] } : {}),
+  };
+  const s = document.createElement('script');
+  s.type = 'application/ld+json'; s.textContent = JSON.stringify(ld);
+  document.head.appendChild(s);
+
+  // Afficher
+  document.getElementById('ent-skeleton').style.display = 'none';
+  document.getElementById('ent-content').style.display  = 'block';
+}
+
+function showNotFound() {
+  document.getElementById('ent-skeleton').style.display  = 'none';
+  document.getElementById('ent-notfound').style.display  = 'block';
+}
+</script>
+</body>
+</html>

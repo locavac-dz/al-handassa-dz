@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Test aperçu</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f0f2f5; }
+    .result { margin: 10px 0; padding: 10px; border-radius: 6px; }
+    .ok  { background: #d4edda; color: #155724; }
+    .err { background: #f8d7da; color: #721c24; }
+    .img-wrap { margin: 10px 0; background: white; padding: 4px; border-radius: 4px; }
+    img { max-width: 100%; display: block; }
+  </style>
+</head>
+<body>
+  <h2>Diagnostic aperçu BTS AFB 2019</h2>
+  <div id="log"></div>
+  <div id="images"></div>
+
+<script>
+const SERVER = 'http://localhost:5000';
+const log = document.getElementById('log');
+const imgs = document.getElementById('images');
+
+function addLog(msg, ok) {
+  const d = document.createElement('div');
+  d.className = 'result ' + (ok ? 'ok' : 'err');
+  d.textContent = msg;
+  log.appendChild(d);
+}
+
+// 1. Test API produit
+fetch(SERVER + '/api/products/sujet-bts-afb-2019-1779284403612')
+  .then(r => r.json())
+  .then(data => {
+    const p = data.data;
+    addLog('✓ API OK — preview_url: ' + p.preview_url + ' | preview_pages: ' + p.preview_pages, true);
+
+    // 2. Construire les URLs images
+    const base = p.preview_url
+      .replace(/^\/uploads\/previews\/preview_/, '/uploads/previews/')
+      .replace(/\.pdf$/, '');
+    const pages = parseInt(p.preview_pages, 10);
+
+    addLog('Base URL images: ' + SERVER + base + '_p1.jpg', true);
+    addLog('Nombre de pages: ' + pages, pages > 0);
+
+    if (!pages) { addLog('✗ preview_pages manquant ou nul !', false); return; }
+
+    // 3. Charger les 3 premières images pour tester
+    for (let i = 1; i <= Math.min(3, pages); i++) {
+      const src = SERVER + base + '_p' + i + '.jpg';
+      const wrap = document.createElement('div');
+      wrap.className = 'img-wrap';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = 'Page ' + i;
+      img.onload = () => addLog('✓ Image p' + i + ' chargée (' + img.naturalWidth + 'x' + img.naturalHeight + ')', true);
+      img.onerror = () => addLog('✗ Image p' + i + ' ERREUR: ' + src, false);
+      wrap.appendChild(img);
+      imgs.appendChild(wrap);
+    }
+  })
+  .catch(e => addLog('✗ API ERREUR: ' + e.message, false));
+</script>
+</body>
+</html>

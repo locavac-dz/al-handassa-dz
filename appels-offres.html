@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appels d'offres BTP Algérie — Al Handassa.dz</title>
+  <meta name="description" content="Appels d'offres en génie civil, BTP et travaux publics en Algérie. Marchés publics et privés, gros œuvre, routes, hydraulique, par wilaya." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://handassi.dz/appels-offres.html" />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://handassi.dz/appels-offres.html" />
+  <meta property="og:title"       content="Appels d'offres BTP Algérie — Al Handassa.dz" />
+  <meta property="og:description" content="Marchés publics et privés BTP en Algérie — génie civil, routes, hydraulique." />
+  <meta property="og:image"       content="https://handassi.dz/img/og-cover.png" />
+  <meta property="og:site_name"   content="Al Handassa.dz" />
+  <meta name="twitter:card"  content="summary_large_image" />
+  <meta name="twitter:title" content="Appels d'offres BTP Algérie — Al Handassa.dz" />
+  <meta name="twitter:image" content="https://handassi.dz/img/og-cover.png" />
+
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Hero ── */
+    .ao-hero { background:linear-gradient(135deg,#0f2647 0%,#1B3A6B 60%,#1a4a3a 100%); color:#fff; padding:56px 0 36px; }
+    .ao-hero h1 { font-size:2rem; font-weight:800; margin:0 0 8px; }
+    .ao-hero h1 span { color:#34d399; }
+    .ao-hero p  { opacity:.85; margin:0 0 24px; }
+    .ao-hero-stats { display:flex; gap:28px; flex-wrap:wrap; }
+    .ao-stat strong { font-size:1.3rem; display:block; color:#34d399; }
+    .ao-stat { font-size:.88rem; opacity:.9; }
+
+    /* ── Filtres ── */
+    .ao-filters { background:#fff; border-bottom:1px solid #e5e7eb; padding:14px 0; position:sticky; top:0; z-index:50; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+    .ao-filters-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .ao-search { flex:1; min-width:200px; position:relative; }
+    .ao-search i { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:.85rem; }
+    .ao-search input { width:100%; padding:8px 11px 8px 32px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:.88rem; outline:none; }
+    .ao-search input:focus { border-color:#1B3A6B; }
+    .ao-sel { padding:8px 11px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:.88rem; background:#fff; outline:none; cursor:pointer; }
+    .ao-sel:focus { border-color:#1B3A6B; }
+
+    /* ── Layout ── */
+    .ao-layout { display:grid; grid-template-columns:1fr 300px; gap:24px; padding:28px 0 48px; }
+    @media(max-width:900px){ .ao-layout{grid-template-columns:1fr;} .ao-sidebar{order:-1;} }
+
+    /* ── Carte AO ── */
+    .ao-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:20px; margin-bottom:14px;
+               cursor:pointer; transition:box-shadow .2s,border-color .2s; }
+    .ao-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.08); border-color:#1B3A6B; }
+    .ao-card.featured { border-color:#34d399; background:linear-gradient(to right,#f0fdf4,#fff); }
+    .ao-card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px; }
+    .ao-card-ref  { font-size:.75rem; color:#94a3b8; font-family:monospace; }
+    .ao-status { font-size:.72rem; padding:3px 10px; border-radius:99px; font-weight:700; }
+    .status-open      { background:#d1fae5; color:#065f46; }
+    .status-closed    { background:#fee2e2; color:#991b1b; }
+    .status-awarded   { background:#dbeafe; color:#1e40af; }
+    .status-cancelled { background:#f3f4f6; color:#6b7280; }
+    .ao-title   { font-weight:700; font-size:1rem; color:#1e293b; margin:0 0 4px; }
+    .ao-owner   { font-size:.85rem; color:#1B3A6B; font-weight:600; margin-bottom:10px; }
+    .ao-chips   { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+    .ao-chip    { font-size:.75rem; padding:2px 10px; border-radius:99px; font-weight:600; }
+    .chip-sector  { background:#EFF6FF; color:#1B3A6B; }
+    .chip-type    { background:#F0FDF4; color:#065f46; }
+    .chip-loc     { background:#FEF3C7; color:#92400e; }
+    .chip-lot     { background:#f5f3ff; color:#5b21b6; }
+    .ao-footer  { display:flex; align-items:center; justify-content:space-between; font-size:.78rem; color:#94a3b8; margin-top:8px; padding-top:8px; border-top:1px solid #f1f5f9; }
+    .ao-deadline { color:#ef4444; font-weight:600; font-size:.82rem; }
+    .ao-deadline.soon { animation: blink .8s infinite alternate; }
+    @keyframes blink { to { opacity:.5; } }
+
+    /* ── Sidebar ── */
+    .ao-sidebar .widget { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:18px; margin-bottom:16px; }
+    .ao-sidebar .widget h3 { font-size:.9rem; font-weight:700; color:#1e293b; margin:0 0 12px; display:flex; align-items:center; gap:7px; }
+    .stat-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:.85rem; }
+    .stat-row:last-child { border:none; }
+    .stat-count { background:#EFF6FF; color:#1B3A6B; font-weight:700; font-size:.75rem; padding:1px 8px; border-radius:99px; }
+    .ao-cta { background:linear-gradient(135deg,#064e3b,#065f46); color:#fff; border-radius:12px; padding:24px; text-align:center; }
+    .ao-cta h3 { margin:0 0 8px; font-size:1rem; }
+    .ao-cta p  { opacity:.85; font-size:.85rem; margin:0 0 14px; }
+    .ao-cta-btn { background:#34d399; color:#064e3b; border:none; padding:9px 20px; border-radius:8px; font-weight:700; font-size:.88rem; cursor:pointer; font-family:inherit; text-decoration:none; display:inline-block; }
+
+    /* ── Skeleton / vide ── */
+    .ao-skel { background:#f1f5f9; border-radius:12px; height:120px; margin-bottom:14px; animation:pulse 1.4s infinite; }
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .ao-empty { text-align:center; padding:60px 0; color:#94a3b8; }
+
+    /* ── Modal ── */
+    .ao-modal-section { margin-bottom:18px; }
+    .ao-modal-section h4 { font-size:.88rem; font-weight:700; color:#1B3A6B; margin:0 0 6px;
+                           border-bottom:2px solid #EFF6FF; padding-bottom:5px; }
+    .ao-modal-section p  { font-size:.9rem; color:#374151; line-height:1.7; white-space:pre-line; margin:0; }
+    .ao-modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .ao-info-cell { background:#f8fafc; border-radius:8px; padding:10px 14px; }
+    .ao-info-cell label { font-size:.75rem; color:#94a3b8; display:block; margin-bottom:3px; }
+    .ao-info-cell span  { font-size:.88rem; color:#1e293b; font-weight:600; }
+    .ao-apply-btn { background:#065f46; color:#fff; border:none; padding:11px 24px; border-radius:8px;
+                    font-weight:700; font-size:.9rem; cursor:pointer; font-family:inherit;
+                    text-decoration:none; display:inline-block; }
+    .ao-apply-btn:hover { background:#047857; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<header class="header">
+  <nav class="nav container">
+    <a href="index.html" class="nav-logo">
+      <img src="/img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#catalog">Catalogue</a></li>
+      <li><a href="logiciels.html">Logiciels</a></li>
+      <li><a href="entreprises.html">Entreprises</a></li>
+      <li><a href="recrutement.html">Recrutement</a></li>
+      <li><a href="appels-offres.html" class="active">Appels d'offres</a></li>
+    </ul>
+    <div id="nav-auth-actions" style="display:contents">
+      <a href="index.html#login"    class="btn btn-outline btn-sm">Connexion</a>
+      <a href="index.html#register" class="btn btn-primary btn-sm">S'inscrire</a>
+    </div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<!-- ── HERO ── -->
+<div class="ao-hero">
+  <div class="container">
+    <h1>📋 Appels d'offres <span>BTP Algérie</span></h1>
+    <p>Marchés publics et privés en génie civil, bâtiment et travaux publics</p>
+    <div class="ao-hero-stats">
+      <div class="ao-stat"><strong id="stat-total">—</strong>AO actifs</div>
+      <div class="ao-stat"><strong id="stat-open">—</strong>Ouverts</div>
+      <div class="ao-stat"><strong>58</strong>Wilayas</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FILTRES ── -->
+<div class="ao-filters">
+  <div class="container">
+    <div class="ao-filters-row">
+      <div class="ao-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" placeholder="Titre, référence, maître d'ouvrage…" autocomplete="off" />
+      </div>
+      <select class="ao-sel" id="f-sector">
+        <option value="">Tous secteurs</option>
+        <option>Bâtiment</option>
+        <option>Routes & VRD</option>
+        <option>Hydraulique</option>
+        <option>Génie Civil</option>
+        <option>Électricité & CVC</option>
+        <option>Terrassement</option>
+        <option>Environnement</option>
+        <option>Études & Conseil</option>
+      </select>
+      <select class="ao-sel" id="f-owner">
+        <option value="">Tous maîtres d'ouvrage</option>
+        <option value="Public">Public</option>
+        <option value="Privé">Privé</option>
+        <option value="Semi-public">Semi-public</option>
+      </select>
+      <select class="ao-sel" id="f-status">
+        <option value="">Tous statuts</option>
+        <option value="open">Ouvert</option>
+        <option value="closed">Clôturé</option>
+        <option value="awarded">Attribué</option>
+      </select>
+      <select class="ao-sel" id="f-wilaya">
+        <option value="">Toutes wilayas</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONTENU ── -->
+<div class="container">
+  <div class="ao-layout">
+    <!-- Liste AO -->
+    <div>
+      <div id="ao-skeleton">
+        <div class="ao-skel"></div><div class="ao-skel"></div>
+        <div class="ao-skel"></div><div class="ao-skel"></div>
+      </div>
+      <div id="ao-list"></div>
+      <div class="ao-empty" id="ao-empty" style="display:none">
+        <div style="font-size:3rem">📋</div>
+        <h3>Aucun appel d'offres trouvé</h3>
+        <p>Essayez d'autres filtres ou revenez prochainement.</p>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="ao-sidebar">
+      <div class="widget">
+        <h3><i class="fas fa-chart-pie"></i> Par secteur</h3>
+        <div id="stats-sectors"></div>
+      </div>
+      <div class="widget">
+        <h3><i class="fas fa-map-marker-alt"></i> Wilayas actives</h3>
+        <div id="stats-wilayas"></div>
+      </div>
+      <div class="ao-cta widget">
+        <h3>📢 Publiez votre AO</h3>
+        <p>Touchez les entreprises BTP qualifiées à travers toute l'Algérie.</p>
+        <a href="mailto:contact@handassi.dz?subject=Publication appel d'offres" class="ao-cta-btn">Publier un AO</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL DÉTAIL ── -->
+<div id="ao-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto">
+  <div style="max-width:700px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden">
+    <div style="background:#065f46;padding:20px 24px;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#fff;font-weight:700;font-size:1rem">Détail de l'appel d'offres</span>
+      <button onclick="closeAoModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
+    </div>
+    <div id="ao-modal-body" style="padding:24px"></div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer style="background:#1e293b;color:#94a3b8;padding:24px 0;text-align:center;font-size:.85rem;">
+  <div class="container">
+    © 2026 <strong style="color:#fff">Al Handassa.dz</strong> — Tous droits réservés ·
+    <a href="index.html" style="color:#94a3b8">Accueil</a> ·
+    <a href="entreprises.html" style="color:#94a3b8">Entreprises</a> ·
+    <a href="contact.html" style="color:#94a3b8">Contact</a>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+const WILAYAS = {
+  1:'Adrar',2:'Chlef',3:'Laghouat',4:'Oum El Bouaghi',5:'Batna',6:'Béjaïa',7:'Biskra',
+  8:'Béchar',9:'Blida',10:'Bouira',11:'Tamanrasset',12:'Tébessa',13:'Tlemcen',14:'Tiaret',
+  15:'Tizi Ouzou',16:'Alger',17:'Djelfa',18:'Jijel',19:'Sétif',20:'Saïda',21:'Skikda',
+  22:'Sidi Bel Abbès',23:'Annaba',24:'Guelma',25:'Constantine',26:'Médéa',27:'Mostaganem',
+  28:"M'Sila",29:'Mascara',30:'Ouargla',31:'Oran',32:'El Bayadh',33:'Illizi',
+  34:'Bordj Bou Arréridj',35:'Boumerdès',36:'El Tarf',37:'Tindouf',38:'Tissemsilt',
+  39:'El Oued',40:'Khenchela',41:'Souk Ahras',42:'Tipaza',43:'Mila',44:'Aïn Defla',
+  45:'Naâma',46:'Aïn Témouchent',47:'Ghardaïa',48:'Relizane',49:"El M'Ghair",
+  50:'El Meniaa',51:'Ouled Djellal',52:'Bordj Badji Mokhtar',53:'Béni Abbès',
+  54:'Timimoun',55:'Touggourt',56:'Djanet',57:'In Salah',58:'In Guezzam',
+};
+
+const STATUS_LABELS = { open:'Ouvert', closed:'Clôturé', awarded:'Attribué', cancelled:'Annulé' };
+const STATUS_CLASS  = { open:'status-open', closed:'status-closed', awarded:'status-awarded', cancelled:'status-cancelled' };
+
+// Wilayas select
+const selW = document.getElementById('f-wilaya');
+Object.entries(WILAYAS).forEach(([code,name]) => {
+  const o = document.createElement('option'); o.value=code; o.textContent=`${code} — ${name}`; selW.appendChild(o);
+});
+
+let allTenders = [], debounce;
+const p = { search:'', sector:'', owner_type:'', status:'', wilaya:'' };
+
+function daysUntil(d) {
+  return Math.ceil((new Date(d) - Date.now()) / 86400000);
+}
+
+function fmtDate(d) {
+  return d ? new Date(d).toLocaleDateString('fr-DZ',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+}
+
+async function loadTenders() {
+  const qs = new URLSearchParams();
+  if (p.search)     qs.set('search',     p.search);
+  if (p.sector)     qs.set('sector',     p.sector);
+  if (p.owner_type) qs.set('owner_type', p.owner_type);
+  if (p.status)     qs.set('status',     p.status);
+  if (p.wilaya)     qs.set('wilaya',     p.wilaya);
+
+  try {
+    const data = await get('/tenders?' + qs.toString());
+    allTenders = data.data || [];
+    document.getElementById('stat-total').textContent = data.total || allTenders.length;
+    document.getElementById('stat-open').textContent  = allTenders.filter(t=>t.status==='open').length;
+
+    renderSidebarStats(allTenders);
+
+    document.getElementById('ao-skeleton').style.display = 'none';
+    const list = document.getElementById('ao-list');
+
+    if (!allTenders.length) {
+      list.innerHTML = '';
+      document.getElementById('ao-empty').style.display = 'block';
+      return;
+    }
+    document.getElementById('ao-empty').style.display = 'none';
+    list.innerHTML = allTenders.map(cardHTML).join('');
+  } catch {
+    document.getElementById('ao-skeleton').style.display = 'none';
+    document.getElementById('ao-empty').style.display = 'block';
+  }
+}
+
+function cardHTML(t) {
+  const owner = t.company_name || t.owner_name || 'Maître d\'ouvrage confidentiel';
+  const loc   = [t.city, t.wilaya ? WILAYAS[t.wilaya] : null].filter(Boolean).join(', ');
+  const days  = t.deadline_at ? daysUntil(t.deadline_at) : null;
+  const deadlineStr = t.deadline_at
+    ? `<span class="ao-deadline${days!==null&&days<=7?' soon':''}">⏰ ${days!==null&&days>=0?`${days} j restants`:'Clôturé'} — ${fmtDate(t.deadline_at)}</span>`
+    : '';
+
+  return `<div class="ao-card${t.is_featured?' featured':''}" onclick="openAoModal('${t.slug}')">
+    <div class="ao-card-top">
+      <div>
+        <div class="ao-card-ref">${t.is_featured?'⭐ ':''}${t.reference||'Réf. non précisée'}</div>
+        <div class="ao-title">${t.title}</div>
+        <div class="ao-owner"><i class="fas fa-landmark"></i> ${owner} ${t.company_verified?'✓':''} · ${t.owner_type||''}</div>
+      </div>
+      <span class="ao-status ${STATUS_CLASS[t.status]||'status-open'}">${STATUS_LABELS[t.status]||t.status}</span>
+    </div>
+    <div class="ao-chips">
+      ${t.sector?`<span class="ao-chip chip-sector">${t.sector}</span>`:''}
+      ${t.lot?`<span class="ao-chip chip-lot">📦 ${t.lot}</span>`:''}
+      ${loc?`<span class="ao-chip chip-loc"><i class="fas fa-map-marker-alt"></i> ${loc}</span>`:''}
+      ${t.budget_range?`<span class="ao-chip chip-type">💰 ${t.budget_range}</span>`:''}
+    </div>
+    <div class="ao-footer">
+      <span>Publié le ${fmtDate(t.published_at)}</span>
+      ${deadlineStr}
+    </div>
+  </div>`;
+}
+
+function renderSidebarStats(tenders) {
+  const sectors = {}, wilayas = {};
+  tenders.forEach(t => {
+    if (t.sector) sectors[t.sector] = (sectors[t.sector]||0)+1;
+    if (t.wilaya) wilayas[t.wilaya] = (wilayas[t.wilaya]||0)+1;
+  });
+
+  document.getElementById('stats-sectors').innerHTML =
+    Object.entries(sectors).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>
+      `<div class="stat-row"><span>${k}</span><span class="stat-count">${v}</span></div>`).join('')
+    || '<p style="color:#94a3b8;font-size:.85rem">—</p>';
+
+  document.getElementById('stats-wilayas').innerHTML =
+    Object.entries(wilayas).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>
+      `<div class="stat-row"><span>${WILAYAS[k]||k}</span><span class="stat-count">${v}</span></div>`).join('')
+    || '<p style="color:#94a3b8;font-size:.85rem">—</p>';
+}
+
+async function openAoModal(slug) {
+  document.getElementById('ao-modal').style.display = 'block';
+  document.getElementById('ao-modal-body').innerHTML =
+    '<div style="text-align:center;padding:40px;color:#94a3b8"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+  document.body.style.overflow = 'hidden';
+
+  try {
+    const data = await get('/tenders/' + slug);
+    const t = data.data;
+    const owner  = t.company_name || t.owner_name || 'Confidentiel';
+    const loc    = [t.city, t.wilaya ? WILAYAS[t.wilaya] : null].filter(Boolean).join(', ');
+    const days   = t.deadline_at ? daysUntil(t.deadline_at) : null;
+    const contact = t.contact_email || t.contact_phone;
+
+    document.getElementById('ao-modal-body').innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:12px">
+        <div>
+          <div style="font-size:.8rem;color:#94a3b8;font-family:monospace">${t.reference||''}</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#1e293b;margin:4px 0">${t.title}</div>
+          <div style="font-size:.88rem;color:#1B3A6B;font-weight:600"><i class="fas fa-landmark"></i> ${owner}</div>
+        </div>
+        <span class="ao-status ${STATUS_CLASS[t.status]||'status-open'}" style="flex-shrink:0">${STATUS_LABELS[t.status]||t.status}</span>
+      </div>
+
+      <div class="ao-modal-grid" style="margin-bottom:18px">
+        ${t.sector?`<div class="ao-info-cell"><label>Secteur</label><span>${t.sector}</span></div>`:''}
+        ${t.owner_type?`<div class="ao-info-cell"><label>Type maître d'ouvrage</label><span>${t.owner_type}</span></div>`:''}
+        ${loc?`<div class="ao-info-cell"><label>Localisation</label><span>${loc}</span></div>`:''}
+        ${t.lot?`<div class="ao-info-cell"><label>Lot</label><span>${t.lot}</span></div>`:''}
+        ${t.budget_range?`<div class="ao-info-cell"><label>Budget estimé</label><span>${t.budget_range}</span></div>`:''}
+        <div class="ao-info-cell"><label>Date de publication</label><span>${fmtDate(t.published_at)}</span></div>
+        ${t.deadline_at?`<div class="ao-info-cell"><label>Date limite de soumission</label>
+          <span style="${days!==null&&days<=7?'color:#ef4444;font-weight:700':''}">${fmtDate(t.deadline_at)}${days!==null?` (${days>=0?days+' j':' dépassé'})`:''}
+          </span></div>`:''}
+        ${t.opening_at?`<div class="ao-info-cell"><label>Ouverture des plis</label><span>${fmtDate(t.opening_at)}</span></div>`:''}
+      </div>
+
+      ${t.description?`<div class="ao-modal-section"><h4>📋 Description</h4><p>${t.description}</p></div>`:''}
+
+      ${contact||t.cahier_url?`
+      <div class="ao-modal-section">
+        <h4>📞 Contact & Documents</h4>
+        ${t.contact_name?`<p style="font-weight:600;margin-bottom:6px">${t.contact_name}</p>`:''}
+        ${t.contact_address?`<p style="color:#64748b;font-size:.85rem;margin-bottom:6px">${t.contact_address}</p>`:''}
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px">
+          ${t.contact_email?`<a href="mailto:${t.contact_email}" class="ao-apply-btn" style="font-size:.85rem;padding:8px 16px">
+            <i class="fas fa-envelope"></i> ${t.contact_email}</a>`:''}
+          ${t.contact_phone?`<a href="tel:${t.contact_phone}" class="ao-apply-btn" style="background:#1B3A6B;font-size:.85rem;padding:8px 16px">
+            <i class="fas fa-phone"></i> ${t.contact_phone}</a>`:''}
+          ${t.cahier_url?`<a href="${t.cahier_url}" target="_blank" class="ao-apply-btn" style="background:#7c3aed;font-size:.85rem;padding:8px 16px">
+            <i class="fas fa-file-pdf"></i> Cahier des charges</a>`:''}
+        </div>
+      </div>`:''}`;
+  } catch {
+    document.getElementById('ao-modal-body').innerHTML =
+      '<p style="text-align:center;color:#ef4444">Erreur de chargement.</p>';
+  }
+}
+
+function closeAoModal() {
+  document.getElementById('ao-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('ao-modal').addEventListener('click', e => {
+  if (e.target===e.currentTarget) closeAoModal();
+});
+
+// Filtres
+document.getElementById('search-input').addEventListener('input', e => {
+  clearTimeout(debounce); p.search=e.target.value.trim();
+  debounce=setTimeout(loadTenders,350);
+});
+document.getElementById('f-sector') .addEventListener('change', e=>{ p.sector=e.target.value;     loadTenders(); });
+document.getElementById('f-owner')  .addEventListener('change', e=>{ p.owner_type=e.target.value; loadTenders(); });
+document.getElementById('f-status') .addEventListener('change', e=>{ p.status=e.target.value;     loadTenders(); });
+document.getElementById('f-wilaya') .addEventListener('change', e=>{ p.wilaya=e.target.value;     loadTenders(); });
+
+loadTenders();
+</script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annuaire Professionnel BTP Algérie — Al Handassa.dz</title>
+  <meta name="description" content="Annuaire des ingénieurs, architectes, bureaux d'études et consultants BTP en Algérie. Trouvez des experts en génie civil par spécialité et wilaya." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://handassi.dz/annuaire.html" />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://handassi.dz/annuaire.html" />
+  <meta property="og:title"       content="Annuaire Professionnel BTP Algérie — Al Handassa.dz" />
+  <meta property="og:description" content="Ingénieurs, architectes et consultants BTP en Algérie." />
+  <meta property="og:image"       content="https://handassi.dz/img/og-cover.png" />
+  <meta property="og:site_name"   content="Al Handassa.dz" />
+  <meta name="twitter:card"  content="summary_large_image" />
+  <meta name="twitter:title" content="Annuaire Professionnel BTP Algérie — Al Handassa.dz" />
+  <meta name="twitter:image" content="https://handassi.dz/img/og-cover.png" />
+
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Hero ── */
+    .ann-hero { background:linear-gradient(135deg,#0f2647 0%,#1B3A6B 50%,#4a1d96 100%); color:#fff; padding:56px 0 36px; }
+    .ann-hero h1 { font-size:2rem; font-weight:800; margin:0 0 8px; }
+    .ann-hero h1 span { color:#a78bfa; }
+    .ann-hero p { opacity:.85; margin:0 0 24px; }
+    .ann-hero-stats { display:flex; gap:28px; flex-wrap:wrap; }
+    .ann-stat strong { font-size:1.3rem; display:block; color:#a78bfa; }
+    .ann-stat { font-size:.88rem; opacity:.9; }
+
+    /* ── Filtres ── */
+    .ann-filters { background:#fff; border-bottom:1px solid #e5e7eb; padding:14px 0; position:sticky; top:0; z-index:50; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+    .ann-filters-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .ann-search { flex:1; min-width:200px; position:relative; }
+    .ann-search i { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:.85rem; }
+    .ann-search input { width:100%; padding:8px 11px 8px 32px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:.88rem; outline:none; }
+    .ann-search input:focus { border-color:#1B3A6B; }
+    .ann-sel { padding:8px 11px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:.88rem; background:#fff; outline:none; cursor:pointer; }
+    .ann-sel:focus { border-color:#1B3A6B; }
+
+    /* ── Grille ── */
+    .ann-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px; padding:28px 0 48px; }
+
+    /* ── Carte profil ── */
+    .pro-card { background:#fff; border:1px solid #e5e7eb; border-radius:14px; padding:22px 18px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; cursor:pointer; transition:transform .2s,box-shadow .2s; }
+    .pro-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.09); }
+    .pro-card.premium { border-color:#a78bfa; background:linear-gradient(to bottom,#faf5ff,#fff); }
+    .pro-avatar { width:72px; height:72px; border-radius:50%; overflow:hidden; background:linear-gradient(135deg,#1B3A6B,#4a1d96); display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:#fff; font-weight:800; flex-shrink:0; border:3px solid #e5e7eb; }
+    .pro-avatar img { width:100%; height:100%; object-fit:cover; }
+    .pro-name  { font-weight:800; font-size:1rem; color:#1e293b; }
+    .pro-title { font-size:.82rem; color:#64748b; line-height:1.4; }
+    .pro-badges { display:flex; gap:5px; justify-content:center; flex-wrap:wrap; }
+    .pro-badge { font-size:.7rem; padding:2px 8px; border-radius:99px; font-weight:700; }
+    .badge-verified { background:#d1fae5; color:#065f46; }
+    .badge-premium  { background:#ede9fe; color:#5b21b6; }
+    .badge-avail    { background:#dbeafe; color:#1e40af; }
+    .pro-specs { display:flex; flex-wrap:wrap; gap:4px; justify-content:center; }
+    .pro-spec { background:#EFF6FF; color:#1B3A6B; font-size:.7rem; padding:2px 8px; border-radius:99px; font-weight:600; }
+    .pro-loc { font-size:.78rem; color:#94a3b8; }
+    .pro-exp { font-size:.78rem; color:#64748b; }
+
+    /* ── Skeleton ── */
+    .pro-skel { background:#f1f5f9; border-radius:14px; height:220px; animation:pulse 1.4s infinite; }
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .ann-empty { text-align:center; padding:60px 0; color:#94a3b8; }
+
+    /* ── Modal profil ── */
+    .pro-modal-top { display:flex; gap:20px; align-items:center; margin-bottom:20px; }
+    .pro-modal-avatar { width:80px; height:80px; border-radius:50%; overflow:hidden; background:linear-gradient(135deg,#1B3A6B,#4a1d96); display:flex; align-items:center; justify-content:center; font-size:2rem; color:#fff; font-weight:800; flex-shrink:0; }
+    .pro-modal-avatar img { width:100%; height:100%; object-fit:cover; }
+    .pro-modal-section { margin-bottom:16px; }
+    .pro-modal-section h4 { font-size:.88rem; font-weight:700; color:#4a1d96; margin:0 0 8px; border-bottom:2px solid #ede9fe; padding-bottom:5px; }
+    .pro-modal-section p  { font-size:.9rem; color:#374151; line-height:1.7; white-space:pre-line; margin:0; }
+    .pro-tags-wrap { display:flex; flex-wrap:wrap; gap:6px; }
+    .pro-tag { font-size:.78rem; padding:3px 10px; border-radius:99px; font-weight:600; }
+    .tag-spec { background:#EFF6FF; color:#1B3A6B; }
+    .tag-skill{ background:#f5f3ff; color:#5b21b6; }
+    .tag-lang { background:#FEF3C7; color:#92400e; }
+    .pro-contact-btn { background:#1B3A6B; color:#fff; border:none; padding:9px 18px; border-radius:8px; font-weight:700; font-size:.85rem; cursor:pointer; font-family:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:7px; }
+    .pro-contact-btn.linkedin { background:#0A66C2; }
+    .pro-contact-btn.portfolio { background:#4a1d96; }
+
+    /* ── CTA s'inscrire ── */
+    .ann-cta { background:linear-gradient(135deg,#1B3A6B,#4a1d96); color:#fff; border-radius:16px; padding:40px; text-align:center; margin:0 0 48px; }
+    .ann-cta h2 { margin:0 0 10px; font-size:1.3rem; }
+    .ann-cta p  { opacity:.85; margin:0 0 18px; font-size:.9rem; }
+    .ann-cta-btn { background:#a78bfa; color:#fff; border:none; padding:11px 26px; border-radius:8px; font-weight:700; font-size:.95rem; cursor:pointer; font-family:inherit; text-decoration:none; display:inline-block; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<header class="header">
+  <nav class="nav container">
+    <a href="index.html" class="nav-logo">
+      <img src="/img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#catalog">Catalogue</a></li>
+      <li><a href="logiciels.html">Logiciels</a></li>
+      <li><a href="entreprises.html">Entreprises</a></li>
+      <li><a href="recrutement.html">Recrutement</a></li>
+      <li><a href="appels-offres.html">Appels d'offres</a></li>
+      <li><a href="annuaire.html" class="active">Annuaire</a></li>
+    </ul>
+    <div id="nav-auth-actions" style="display:contents">
+      <a href="index.html#login"    class="btn btn-outline btn-sm">Connexion</a>
+      <a href="index.html#register" class="btn btn-primary btn-sm">S'inscrire</a>
+    </div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<!-- ── HERO ── -->
+<div class="ann-hero">
+  <div class="container">
+    <h1>👷 Annuaire <span>Professionnel BTP</span></h1>
+    <p>Ingénieurs, architectes, consultants et bureaux d'études en Algérie</p>
+    <div class="ann-hero-stats">
+      <div class="ann-stat"><strong id="stat-total">—</strong>Profils référencés</div>
+      <div class="ann-stat"><strong id="stat-available">—</strong>Disponibles</div>
+      <div class="ann-stat"><strong>58</strong>Wilayas</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FILTRES ── -->
+<div class="ann-filters">
+  <div class="container">
+    <div class="ann-filters-row">
+      <div class="ann-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" placeholder="Nom, titre, spécialité, compétence…" autocomplete="off" />
+      </div>
+      <select class="ann-sel" id="f-specialty">
+        <option value="">Toutes spécialités</option>
+        <option>Structures & Béton armé</option>
+        <option>Géotechnique & Fondations</option>
+        <option>Routes & VRD</option>
+        <option>Hydraulique</option>
+        <option>Architecture</option>
+        <option>BIM & Topographie</option>
+        <option>Électricité & CVC</option>
+        <option>Gestion de projet</option>
+        <option>Parasismique</option>
+        <option>Études de prix</option>
+        <option>Environnement</option>
+      </select>
+      <select class="ann-sel" id="f-availability">
+        <option value="">Toute disponibilité</option>
+        <option value="Disponible">Disponible</option>
+        <option value="Freelance">Freelance</option>
+        <option value="Ouvert aux opportunités">Ouvert aux opportunités</option>
+        <option value="En poste">En poste</option>
+      </select>
+      <select class="ann-sel" id="f-wilaya">
+        <option value="">Toutes wilayas</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ── GRILLE ── -->
+<main class="container">
+  <div class="ann-grid" id="ann-skeleton">
+    <div class="pro-skel"></div><div class="pro-skel"></div>
+    <div class="pro-skel"></div><div class="pro-skel"></div>
+    <div class="pro-skel"></div><div class="pro-skel"></div>
+  </div>
+  <div class="ann-grid" id="ann-grid" style="display:none"></div>
+  <div class="ann-empty" id="ann-empty" style="display:none">
+    <div style="font-size:3rem">👷</div>
+    <h3>Aucun profil trouvé</h3>
+    <p>Essayez d'autres filtres ou revenez prochainement.</p>
+  </div>
+
+  <div class="ann-cta">
+    <h2>👷 Vous êtes ingénieur ou consultant BTP ?</h2>
+    <p>Créez votre profil gratuitement et gagnez en visibilité auprès des entreprises et maîtres d'ouvrage algériens.</p>
+    <a href="mailto:contact@handassi.dz?subject=Inscription annuaire professionnel" class="ann-cta-btn">Créer mon profil</a>
+  </div>
+</main>
+
+<!-- ── MODAL PROFIL ── -->
+<div id="pro-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto">
+  <div style="max-width:640px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden">
+    <div style="background:linear-gradient(135deg,#1B3A6B,#4a1d96);padding:20px 24px;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#fff;font-weight:700;font-size:1rem">Profil professionnel</span>
+      <button onclick="closeProModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
+    </div>
+    <div id="pro-modal-body" style="padding:24px"></div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer style="background:#1e293b;color:#94a3b8;padding:24px 0;text-align:center;font-size:.85rem;">
+  <div class="container">
+    © 2026 <strong style="color:#fff">Al Handassa.dz</strong> — Tous droits réservés ·
+    <a href="index.html" style="color:#94a3b8">Accueil</a> ·
+    <a href="entreprises.html" style="color:#94a3b8">Entreprises</a> ·
+    <a href="recrutement.html" style="color:#94a3b8">Recrutement</a>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+const WILAYAS = {
+  1:'Adrar',2:'Chlef',3:'Laghouat',4:'Oum El Bouaghi',5:'Batna',6:'Béjaïa',7:'Biskra',
+  8:'Béchar',9:'Blida',10:'Bouira',11:'Tamanrasset',12:'Tébessa',13:'Tlemcen',14:'Tiaret',
+  15:'Tizi Ouzou',16:'Alger',17:'Djelfa',18:'Jijel',19:'Sétif',20:'Saïda',21:'Skikda',
+  22:'Sidi Bel Abbès',23:'Annaba',24:'Guelma',25:'Constantine',26:'Médéa',27:'Mostaganem',
+  28:"M'Sila",29:'Mascara',30:'Ouargla',31:'Oran',32:'El Bayadh',33:'Illizi',
+  34:'Bordj Bou Arréridj',35:'Boumerdès',36:'El Tarf',37:'Tindouf',38:'Tissemsilt',
+  39:'El Oued',40:'Khenchela',41:'Souk Ahras',42:'Tipaza',43:'Mila',44:'Aïn Defla',
+  45:'Naâma',46:'Aïn Témouchent',47:'Ghardaïa',48:'Relizane',49:"El M'Ghair",
+  50:'El Meniaa',51:'Ouled Djellal',52:'Bordj Badji Mokhtar',53:'Béni Abbès',
+  54:'Timimoun',55:'Touggourt',56:'Djanet',57:'In Salah',58:'In Guezzam',
+};
+
+const AVAIL_COLOR = {
+  'Disponible':             { bg:'#d1fae5', color:'#065f46' },
+  'Freelance':              { bg:'#dbeafe', color:'#1e40af' },
+  'Ouvert aux opportunités':{ bg:'#fef9c3', color:'#713f12' },
+  'En poste':               { bg:'#f3f4f6', color:'#6b7280' },
+};
+
+// Populate wilaya select
+const selW = document.getElementById('f-wilaya');
+Object.entries(WILAYAS).forEach(([c,n]) => {
+  const o=document.createElement('option'); o.value=c; o.textContent=`${c} — ${n}`; selW.appendChild(o);
+});
+
+let debounce;
+const p = { search:'', specialty:'', availability:'', wilaya:'' };
+
+function initials(fn, ln) {
+  return ((fn||'?')[0]+(ln||'?')[0]).toUpperCase();
+}
+
+async function loadPros() {
+  const qs = new URLSearchParams();
+  if (p.search)       qs.set('search',       p.search);
+  if (p.specialty)    qs.set('specialty',    p.specialty);
+  if (p.availability) qs.set('availability', p.availability);
+  if (p.wilaya)       qs.set('wilaya',       p.wilaya);
+
+  try {
+    const data = await get('/professionals?' + qs.toString());
+    const pros  = data.data || [];
+    document.getElementById('stat-total').textContent     = data.total || pros.length;
+    document.getElementById('stat-available').textContent = pros.filter(pr=>pr.availability==='Disponible'||pr.availability==='Freelance').length;
+
+    document.getElementById('ann-skeleton').style.display = 'none';
+    const grid = document.getElementById('ann-grid');
+
+    if (!pros.length) {
+      grid.style.display = 'none';
+      document.getElementById('ann-empty').style.display = 'block';
+      return;
+    }
+    document.getElementById('ann-empty').style.display = 'none';
+    grid.style.display = 'grid';
+    grid.innerHTML = pros.map(cardHTML).join('');
+  } catch {
+    document.getElementById('ann-skeleton').style.display = 'none';
+    document.getElementById('ann-empty').style.display = 'block';
+  }
+}
+
+function cardHTML(pr) {
+  const avatar = pr.photo_url
+    ? `<img src="${pr.photo_url}" alt="${pr.first_name} ${pr.last_name}" loading="lazy" />`
+    : initials(pr.first_name, pr.last_name);
+  const loc = [pr.city, pr.wilaya ? WILAYAS[pr.wilaya] : null].filter(Boolean).join(', ');
+  const avColor = AVAIL_COLOR[pr.availability] || {};
+  const specs = (pr.specialties||[]).slice(0,3).map(s=>`<span class="pro-spec">${s}</span>`).join('');
+  const badges = [
+    pr.is_verified ? '<span class="pro-badge badge-verified">✓ Vérifié</span>' : '',
+    pr.is_premium  ? '<span class="pro-badge badge-premium">⭐ Premium</span>'  : '',
+    pr.availability ? `<span class="pro-badge" style="background:${avColor.bg||'#f3f4f6'};color:${avColor.color||'#6b7280'}">${pr.availability}</span>` : '',
+  ].filter(Boolean).join('');
+
+  return `<div class="pro-card${pr.is_premium?' premium':''}" onclick="openProModal('${pr.slug}')">
+    <div class="pro-avatar">${avatar}</div>
+    <div class="pro-name">${pr.first_name} ${pr.last_name}</div>
+    ${pr.title?`<div class="pro-title">${pr.title}</div>`:''}
+    <div class="pro-badges">${badges}</div>
+    <div class="pro-specs">${specs}</div>
+    ${loc?`<div class="pro-loc"><i class="fas fa-map-marker-alt"></i> ${loc}</div>`:''}
+    ${pr.experience_years?`<div class="pro-exp"><i class="fas fa-clock"></i> ${pr.experience_years} ans d'expérience</div>`:''}
+  </div>`;
+}
+
+async function openProModal(slug) {
+  document.getElementById('pro-modal').style.display = 'block';
+  document.getElementById('pro-modal-body').innerHTML =
+    '<div style="text-align:center;padding:40px;color:#94a3b8"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+  document.body.style.overflow = 'hidden';
+
+  try {
+    const data = await get('/professionals/' + slug);
+    const pr = data.data;
+    const avatar = pr.photo_url
+      ? `<img src="${pr.photo_url}" alt="${pr.first_name} ${pr.last_name}" />`
+      : initials(pr.first_name, pr.last_name);
+    const loc = [pr.city, pr.wilaya ? WILAYAS[pr.wilaya] : null].filter(Boolean).join(', ');
+    const avColor = AVAIL_COLOR[pr.availability] || {};
+
+    document.getElementById('pro-modal-body').innerHTML = `
+      <div class="pro-modal-top">
+        <div class="pro-modal-avatar">${avatar}</div>
+        <div>
+          <div style="font-size:1.2rem;font-weight:800;color:#1e293b">${pr.first_name} ${pr.last_name}</div>
+          ${pr.title?`<div style="color:#4a1d96;font-weight:600;font-size:.9rem">${pr.title}</div>`:''}
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+            ${pr.is_verified?'<span class="pro-badge badge-verified">✓ Vérifié</span>':''}
+            ${pr.is_premium?'<span class="pro-badge badge-premium">⭐ Premium</span>':''}
+            ${pr.availability?`<span class="pro-badge" style="background:${avColor.bg||'#f3f4f6'};color:${avColor.color||'#6b7280'}">${pr.availability}</span>`:''}
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+        ${loc?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Localisation</div><div style="font-size:.88rem;font-weight:600">${loc}</div></div>`:''}
+        ${pr.experience_years?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Expérience</div><div style="font-size:.88rem;font-weight:600">${pr.experience_years} ans</div></div>`:''}
+        ${pr.education?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Formation</div><div style="font-size:.88rem;font-weight:600">${pr.education}</div></div>`:''}
+        ${pr.institution?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Établissement</div><div style="font-size:.88rem;font-weight:600">${pr.institution}</div></div>`:''}
+        ${pr.contract_pref?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Préférence contrat</div><div style="font-size:.88rem;font-weight:600">${pr.contract_pref}</div></div>`:''}
+      </div>
+
+      ${pr.tagline?`<div class="pro-modal-section"><p style="color:#4a1d96;font-style:italic;font-size:.95rem">"${pr.tagline}"</p></div>`:''}
+      ${pr.bio?`<div class="pro-modal-section"><h4>👤 À propos</h4><p>${pr.bio}</p></div>`:''}
+
+      ${(pr.specialties||[]).length?`
+      <div class="pro-modal-section">
+        <h4>🎯 Spécialités</h4>
+        <div class="pro-tags-wrap">${pr.specialties.map(s=>`<span class="pro-tag tag-spec">${s}</span>`).join('')}</div>
+      </div>`:''}
+
+      ${(pr.skills||[]).length?`
+      <div class="pro-modal-section">
+        <h4>🛠️ Compétences techniques</h4>
+        <div class="pro-tags-wrap">${pr.skills.map(s=>`<span class="pro-tag tag-skill">${s}</span>`).join('')}</div>
+      </div>`:''}
+
+      ${(pr.languages||[]).length?`
+      <div class="pro-modal-section">
+        <h4>🌐 Langues</h4>
+        <div class="pro-tags-wrap">${pr.languages.map(l=>`<span class="pro-tag tag-lang">${l}</span>`).join('')}</div>
+      </div>`:''}
+
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">
+        ${pr.email?`<a href="mailto:${pr.email}" class="pro-contact-btn"><i class="fas fa-envelope"></i> Contacter</a>`:''}
+        ${pr.phone?`<a href="tel:${pr.phone}" class="pro-contact-btn" style="background:#065f46"><i class="fas fa-phone"></i> ${pr.phone}</a>`:''}
+        ${pr.linkedin_url?`<a href="${pr.linkedin_url}" target="_blank" rel="noopener" class="pro-contact-btn linkedin"><i class="fab fa-linkedin"></i> LinkedIn</a>`:''}
+        ${pr.portfolio_url?`<a href="${pr.portfolio_url}" target="_blank" rel="noopener" class="pro-contact-btn portfolio"><i class="fas fa-globe"></i> Portfolio</a>`:''}
+      </div>`;
+  } catch {
+    document.getElementById('pro-modal-body').innerHTML =
+      '<p style="text-align:center;color:#ef4444">Erreur de chargement.</p>';
+  }
+}
+
+function closeProModal() {
+  document.getElementById('pro-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('pro-modal').addEventListener('click', e => {
+  if (e.target===e.currentTarget) closeProModal();
+});
+
+// Filtres
+document.getElementById('search-input').addEventListener('input', e => {
+  clearTimeout(debounce); p.search=e.target.value.trim();
+  debounce=setTimeout(loadPros,350);
+});
+document.getElementById('f-specialty')   .addEventListener('change',e=>{ p.specialty=e.target.value;    loadPros(); });
+document.getElementById('f-availability').addEventListener('change',e=>{ p.availability=e.target.value; loadPros(); });
+document.getElementById('f-wilaya')      .addEventListener('change',e=>{ p.wilaya=e.target.value;       loadPros(); });
+
+loadPros();
+</script>
+</body>
+</html>

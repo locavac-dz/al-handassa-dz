@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offres d'emploi BTP Algérie — Al Handassa.dz</title>
+  <meta name="description" content="Offres d'emploi en génie civil, BTP et architecture en Algérie. CDI, CDD, stages pour ingénieurs, techniciens et conducteurs de travaux." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://handassi.dz/recrutement.html" />
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://handassi.dz/recrutement.html" />
+  <meta property="og:title"       content="Offres d'emploi BTP Algérie — Al Handassa.dz" />
+  <meta property="og:description" content="CDI, CDD, stages pour ingénieurs et techniciens BTP en Algérie." />
+  <meta property="og:image"       content="https://handassi.dz/img/og-cover.png" />
+  <meta property="og:site_name"   content="Al Handassa.dz" />
+  <meta name="twitter:card"  content="summary_large_image" />
+  <meta name="twitter:title" content="Offres d'emploi BTP Algérie — Al Handassa.dz" />
+  <meta name="twitter:image" content="https://handassi.dz/img/og-cover.png" />
+
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Hero ── */
+    .rec-hero { background:linear-gradient(135deg,#0f2647 0%,#1B3A6B 60%,#2a5298 100%); color:#fff; padding:56px 0 36px; }
+    .rec-hero h1 { font-size:2rem; font-weight:800; margin:0 0 8px; }
+    .rec-hero h1 span { color:#F5A623; }
+    .rec-hero p { opacity:.85; margin:0 0 24px; }
+    .rec-hero-stats { display:flex; gap:28px; flex-wrap:wrap; }
+    .rec-stat strong { font-size:1.3rem; display:block; color:#F5A623; }
+    .rec-stat { font-size:.88rem; opacity:.9; }
+
+    /* ── Filtres ── */
+    .rec-filters { background:#fff; border-bottom:1px solid #e5e7eb; padding:14px 0; position:sticky; top:0; z-index:50; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+    .rec-filters-row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .rec-search { flex:1; min-width:200px; position:relative; }
+    .rec-search i { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:.85rem; }
+    .rec-search input { width:100%; padding:8px 11px 8px 32px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:.88rem; outline:none; }
+    .rec-search input:focus { border-color:#1B3A6B; }
+    .rec-sel { padding:8px 11px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:.88rem; background:#fff; outline:none; cursor:pointer; }
+    .rec-sel:focus { border-color:#1B3A6B; }
+
+    /* ── Layout ── */
+    .rec-layout { display:grid; grid-template-columns:1fr 320px; gap:24px; padding:28px 0 48px; }
+    @media(max-width:900px){ .rec-layout{grid-template-columns:1fr;} .rec-sidebar{order:-1;} }
+
+    /* ── Cartes offres ── */
+    .job-card { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:20px; margin-bottom:14px;
+                display:flex; gap:16px; cursor:pointer; transition:box-shadow .2s,border-color .2s;
+                text-decoration:none; color:inherit; }
+    .job-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.08); border-color:#1B3A6B; }
+    .job-card.featured { border-color:#F5A623; background:linear-gradient(to right,#fffbeb,#fff); }
+    .job-logo { width:52px; height:52px; border-radius:10px; border:1px solid #e5e7eb; overflow:hidden;
+                display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; background:#f8fafc; }
+    .job-logo img { width:100%; height:100%; object-fit:cover; }
+    .job-body { flex:1; min-width:0; }
+    .job-title { font-weight:700; font-size:1rem; color:#1e293b; margin:0 0 3px; }
+    .job-company { font-size:.85rem; color:#1B3A6B; font-weight:600; margin-bottom:8px; }
+    .job-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+    .job-chip { font-size:.75rem; padding:2px 10px; border-radius:99px; font-weight:600; }
+    .chip-contract { background:#EFF6FF; color:#1B3A6B; }
+    .chip-level    { background:#F0FDF4; color:#065f46; }
+    .chip-loc      { background:#FEF3C7; color:#92400e; }
+    .chip-featured { background:#FEF3C7; color:#92400e; }
+    .job-footer { display:flex; align-items:center; justify-content:space-between; font-size:.78rem; color:#94a3b8; }
+    .job-salary { color:#1B3A6B; font-weight:600; font-size:.82rem; }
+
+    /* ── Sidebar stats/filtres ── */
+    .rec-sidebar .widget { background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:18px; margin-bottom:16px; }
+    .rec-sidebar .widget h3 { font-size:.9rem; font-weight:700; color:#1e293b; margin:0 0 12px; display:flex; align-items:center; gap:7px; }
+    .stat-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid #f1f5f9; font-size:.85rem; }
+    .stat-row:last-child { border:none; }
+    .stat-count { background:#EFF6FF; color:#1B3A6B; font-weight:700; font-size:.75rem; padding:1px 8px; border-radius:99px; }
+
+    /* ── CTA poster ── */
+    .rec-cta { background:linear-gradient(135deg,#1B3A6B,#2a5298); color:#fff; border-radius:12px; padding:24px; text-align:center; }
+    .rec-cta h3 { margin:0 0 8px; font-size:1rem; }
+    .rec-cta p  { opacity:.85; font-size:.85rem; margin:0 0 14px; }
+    .rec-cta-btn { background:#F5A623; color:#1B3A6B; border:none; padding:9px 20px; border-radius:8px; font-weight:700; font-size:.88rem; cursor:pointer; font-family:inherit; text-decoration:none; display:inline-block; }
+
+    /* ── Skeleton / vide ── */
+    .job-skel { background:#f1f5f9; border-radius:12px; height:110px; margin-bottom:14px; animation:pulse 1.4s infinite; }
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .rec-empty { text-align:center; padding:60px 0; color:#94a3b8; }
+
+    /* ── Modal détail offre ── */
+    .job-modal-header { display:flex; gap:16px; align-items:flex-start; margin-bottom:20px; }
+    .job-modal-logo { width:64px; height:64px; border-radius:12px; border:1px solid #e5e7eb; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:2rem; flex-shrink:0; }
+    .job-modal-logo img { width:100%; height:100%; object-fit:cover; }
+    .job-modal-meta { font-size:.85rem; color:#64748b; margin-top:4px; }
+    .job-section { margin-bottom:20px; }
+    .job-section h4 { font-size:.9rem; font-weight:700; color:#1B3A6B; margin:0 0 8px; border-bottom:2px solid #EFF6FF; padding-bottom:6px; }
+    .job-section p  { font-size:.9rem; color:#374151; line-height:1.7; white-space:pre-line; margin:0; }
+    .job-apply-btn { background:#1B3A6B; color:#fff; border:none; padding:12px 28px; border-radius:8px; font-weight:700; font-size:.95rem; cursor:pointer; font-family:inherit; text-decoration:none; display:inline-block; }
+    .job-apply-btn:hover { background:#2a5298; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<header class="header">
+  <nav class="nav container">
+    <a href="index.html" class="nav-logo">
+      <img src="/img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#catalog">Catalogue</a></li>
+      <li><a href="logiciels.html">Logiciels</a></li>
+      <li><a href="entreprises.html">Entreprises</a></li>
+      <li><a href="recrutement.html" class="active">Recrutement</a></li>
+      <li><a href="index.html#articles">Articles</a></li>
+    </ul>
+    <div id="nav-auth-actions" style="display:contents">
+      <a href="index.html#login"    class="btn btn-outline btn-sm">Connexion</a>
+      <a href="index.html#register" class="btn btn-primary btn-sm">S'inscrire</a>
+    </div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<!-- ── HERO ── -->
+<div class="rec-hero">
+  <div class="container">
+    <h1>💼 Recrutement <span>BTP Algérie</span></h1>
+    <p>Les meilleures offres d'emploi en génie civil, architecture et BTP</p>
+    <div class="rec-hero-stats">
+      <div class="rec-stat"><strong id="stat-total">—</strong>Offres actives</div>
+      <div class="rec-stat"><strong id="stat-companies">—</strong>Entreprises recruteuses</div>
+      <div class="rec-stat"><strong>58</strong>Wilayas</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FILTRES ── -->
+<div class="rec-filters">
+  <div class="container">
+    <div class="rec-filters-row">
+      <div class="rec-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" placeholder="Poste, entreprise, spécialité…" autocomplete="off" />
+      </div>
+      <select class="rec-sel" id="f-contract">
+        <option value="">Tout type</option>
+        <option>CDI</option><option>CDD</option><option>Stage</option>
+        <option>Freelance</option><option>Alternance</option>
+      </select>
+      <select class="rec-sel" id="f-specialty">
+        <option value="">Toutes spécialités</option>
+        <option>Gros Œuvre</option><option>Second Œuvre</option>
+        <option>Routes & VRD</option><option>Hydraulique</option>
+        <option>Géotechnique</option><option>Bureau d'études</option>
+        <option>BIM & Topographie</option><option>Électricité & CVC</option>
+        <option>Charpente Métallique</option><option>Terrassement</option>
+      </select>
+      <select class="rec-sel" id="f-level">
+        <option value="">Tous niveaux</option>
+        <option>Junior</option><option>Confirmé</option>
+        <option>Senior</option><option>Chef de projet</option>
+      </select>
+      <select class="rec-sel" id="f-wilaya">
+        <option value="">Toutes wilayas</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONTENU ── -->
+<div class="container">
+  <div class="rec-layout">
+    <!-- Liste offres -->
+    <div>
+      <div id="rec-skeleton">
+        <div class="job-skel"></div><div class="job-skel"></div>
+        <div class="job-skel"></div><div class="job-skel"></div>
+      </div>
+      <div id="rec-list"></div>
+      <div class="rec-empty" id="rec-empty" style="display:none">
+        <div style="font-size:3rem">💼</div>
+        <h3>Aucune offre trouvée</h3>
+        <p>Essayez d'autres filtres ou revenez plus tard.</p>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="rec-sidebar">
+      <div class="widget">
+        <h3><i class="fas fa-chart-bar"></i> Par type de contrat</h3>
+        <div id="stats-contracts"></div>
+      </div>
+      <div class="widget">
+        <h3><i class="fas fa-map-marker-alt"></i> Wilayas actives</h3>
+        <div id="stats-wilayas"></div>
+      </div>
+      <div class="rec-cta widget">
+        <h3>📢 Recrutez un ingénieur</h3>
+        <p>Publiez votre offre gratuitement et touchez les professionnels BTP algériens.</p>
+        <a href="mailto:contact@handassi.dz?subject=Publication offre emploi" class="rec-cta-btn">Publier une offre</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL DÉTAIL ── -->
+<div id="job-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);overflow-y:auto">
+  <div style="max-width:680px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden">
+    <div style="background:#1B3A6B;padding:20px 24px;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#fff;font-weight:700;font-size:1rem">Détail de l'offre</span>
+      <button onclick="closeJobModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
+    </div>
+    <div id="job-modal-body" style="padding:24px"></div>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer style="background:#1e293b;color:#94a3b8;padding:24px 0;text-align:center;font-size:.85rem;">
+  <div class="container">
+    © 2026 <strong style="color:#fff">Al Handassa.dz</strong> — Tous droits réservés ·
+    <a href="index.html" style="color:#94a3b8">Accueil</a> ·
+    <a href="entreprises.html" style="color:#94a3b8">Entreprises</a> ·
+    <a href="contact.html" style="color:#94a3b8">Contact</a>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+const WILAYAS = {
+  1:'Adrar',2:'Chlef',3:'Laghouat',4:'Oum El Bouaghi',5:'Batna',6:'Béjaïa',7:'Biskra',
+  8:'Béchar',9:'Blida',10:'Bouira',11:'Tamanrasset',12:'Tébessa',13:'Tlemcen',14:'Tiaret',
+  15:'Tizi Ouzou',16:'Alger',17:'Djelfa',18:'Jijel',19:'Sétif',20:'Saïda',21:'Skikda',
+  22:'Sidi Bel Abbès',23:'Annaba',24:'Guelma',25:'Constantine',26:'Médéa',27:'Mostaganem',
+  28:"M'Sila",29:'Mascara',30:'Ouargla',31:'Oran',32:'El Bayadh',33:'Illizi',
+  34:'Bordj Bou Arréridj',35:'Boumerdès',36:'El Tarf',37:'Tindouf',38:'Tissemsilt',
+  39:'El Oued',40:'Khenchela',41:'Souk Ahras',42:'Tipaza',43:'Mila',44:'Aïn Defla',
+  45:'Naâma',46:'Aïn Témouchent',47:'Ghardaïa',48:'Relizane',49:"El M'Ghair",
+  50:'El Meniaa',51:'Ouled Djellal',52:'Bordj Badji Mokhtar',53:'Béni Abbès',
+  54:'Timimoun',55:'Touggourt',56:'Djanet',57:'In Salah',58:'In Guezzam',
+};
+
+// Populate wilaya select
+const selW = document.getElementById('f-wilaya');
+Object.entries(WILAYAS).forEach(([code,name]) => {
+  const o = document.createElement('option'); o.value=code; o.textContent=`${code} — ${name}`; selW.appendChild(o);
+});
+
+let allJobs = [], debounce;
+const p = { search:'', contract:'', specialty:'', level:'', wilaya:'' };
+
+function timeAgo(d) {
+  const days = Math.floor((Date.now()-new Date(d))/(86400000));
+  if (days===0) return "Aujourd'hui";
+  if (days===1) return 'Hier';
+  if (days<7)   return `Il y a ${days} jours`;
+  if (days<30)  return `Il y a ${Math.floor(days/7)} sem.`;
+  return `Il y a ${Math.floor(days/30)} mois`;
+}
+
+async function loadJobs() {
+  const qs = new URLSearchParams();
+  if (p.search)    qs.set('search',    p.search);
+  if (p.contract)  qs.set('contract_type', p.contract);
+  if (p.specialty) qs.set('specialty', p.specialty);
+  if (p.level)     qs.set('level',     p.level);
+  if (p.wilaya)    qs.set('wilaya',    p.wilaya);
+
+  try {
+    const data = await get('/jobs?' + qs.toString());
+    allJobs = data.data || [];
+    document.getElementById('stat-total').textContent = data.total || allJobs.length;
+
+    // sidebar stats
+    renderSidebarStats(allJobs);
+
+    document.getElementById('rec-skeleton').style.display = 'none';
+    const list = document.getElementById('rec-list');
+
+    if (!allJobs.length) {
+      list.innerHTML = '';
+      document.getElementById('rec-empty').style.display = 'block';
+      return;
+    }
+    document.getElementById('rec-empty').style.display = 'none';
+    list.innerHTML = allJobs.map(cardHTML).join('');
+  } catch {
+    document.getElementById('rec-skeleton').style.display = 'none';
+    document.getElementById('rec-empty').style.display = 'block';
+  }
+}
+
+function cardHTML(j) {
+  const logo = j.company_logo
+    ? `<img src="${j.company_logo}" alt="${j.company_name||''}" loading="lazy" />`
+    : '💼';
+  const loc = [j.city, j.wilaya ? WILAYAS[j.wilaya] : null].filter(Boolean).join(', ');
+  const expire = j.expires_at ? `· Expire le ${new Date(j.expires_at).toLocaleDateString('fr-DZ')}` : '';
+
+  return `<a class="job-card${j.is_featured?' featured':''}" onclick="openJobModal('${j.slug}'); return false;" href="#">
+    <div class="job-logo">${logo}</div>
+    <div class="job-body">
+      <div class="job-title">${j.is_featured?'⭐ ':''}${j.title}</div>
+      <div class="job-company">${j.company_name||'Entreprise confidentielle'}${j.company_verified?' ✓':''}</div>
+      <div class="job-chips">
+        ${j.contract_type?`<span class="job-chip chip-contract">${j.contract_type}</span>`:''}
+        ${j.level?`<span class="job-chip chip-level">${j.level}</span>`:''}
+        ${loc?`<span class="job-chip chip-loc"><i class="fas fa-map-marker-alt"></i> ${loc}</span>`:''}
+        ${j.specialty?`<span class="job-chip chip-contract">${j.specialty}</span>`:''}
+      </div>
+      <div class="job-footer">
+        <span>${timeAgo(j.created_at)} ${expire}</span>
+        ${j.salary_range?`<span class="job-salary">💰 ${j.salary_range}</span>`:''}
+      </div>
+    </div>
+  </a>`;
+}
+
+function renderSidebarStats(jobs) {
+  // Contrats
+  const contracts = {};
+  jobs.forEach(j => { if(j.contract_type) contracts[j.contract_type]=(contracts[j.contract_type]||0)+1; });
+  document.getElementById('stats-contracts').innerHTML =
+    Object.entries(contracts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>
+      `<div class="stat-row"><span>${k}</span><span class="stat-count">${v}</span></div>`).join('') || '<p style="color:#94a3b8;font-size:.85rem">—</p>';
+
+  // Wilayas
+  const wilayas = {};
+  jobs.forEach(j => { if(j.wilaya) wilayas[j.wilaya]=(wilayas[j.wilaya]||0)+1; });
+  document.getElementById('stats-wilayas').innerHTML =
+    Object.entries(wilayas).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>
+      `<div class="stat-row"><span>${WILAYAS[k]||k}</span><span class="stat-count">${v}</span></div>`).join('') || '<p style="color:#94a3b8;font-size:.85rem">—</p>';
+
+  document.getElementById('stat-companies').textContent =
+    new Set(jobs.filter(j=>j.company_name).map(j=>j.company_name)).size;
+}
+
+async function openJobModal(slug) {
+  document.getElementById('job-modal').style.display = 'block';
+  document.getElementById('job-modal-body').innerHTML =
+    '<div style="text-align:center;padding:40px;color:#94a3b8"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
+  document.body.style.overflow = 'hidden';
+
+  try {
+    const data = await get('/jobs/' + slug);
+    const j = data.data;
+    const loc = [j.city, j.wilaya ? WILAYAS[j.wilaya] : null].filter(Boolean).join(', ');
+    const logo = j.company_logo
+      ? `<img src="${j.company_logo}" alt="${j.company_name||''}" />`
+      : '💼';
+
+    const contact = j.contact_email || j.contact_phone;
+    const applyHref = j.contact_email
+      ? `mailto:${j.contact_email}?subject=Candidature — ${j.title}`
+      : (j.contact_phone ? `tel:${j.contact_phone}` : '#');
+
+    document.getElementById('job-modal-body').innerHTML = `
+      <div class="job-modal-header">
+        <div class="job-modal-logo">${logo}</div>
+        <div>
+          <div style="font-size:1.1rem;font-weight:800;color:#1e293b">${j.title}</div>
+          <div style="color:#1B3A6B;font-weight:600;font-size:.9rem">${j.company_name||'Confidentiel'}</div>
+          <div class="job-modal-meta">
+            ${[j.contract_type,j.level,loc,j.specialty].filter(Boolean).join(' · ')}
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+        ${j.contract_type?`<span class="job-chip chip-contract" style="font-size:.82rem">${j.contract_type}</span>`:''}
+        ${j.level?`<span class="job-chip chip-level" style="font-size:.82rem">${j.level}</span>`:''}
+        ${j.education?`<span class="job-chip chip-loc" style="font-size:.82rem">🎓 ${j.education}</span>`:''}
+        ${j.experience?`<span class="job-chip chip-loc" style="font-size:.82rem">⏱ ${j.experience}</span>`:''}
+        ${j.salary_range?`<span class="job-chip" style="font-size:.82rem;background:#F0FDF4;color:#065f46">💰 ${j.salary_range}</span>`:''}
+      </div>
+
+      ${j.description?`<div class="job-section"><h4>📋 Description du poste</h4><p>${j.description}</p></div>`:''}
+      ${j.missions?`<div class="job-section"><h4>🎯 Missions</h4><p>${j.missions}</p></div>`:''}
+      ${j.profile?`<div class="job-section"><h4>👤 Profil recherché</h4><p>${j.profile}</p></div>`:''}
+
+      ${contact?`
+      <div style="text-align:center;margin-top:8px">
+        <a href="${applyHref}" class="job-apply-btn">
+          <i class="fas fa-paper-plane"></i> Postuler maintenant
+        </a>
+        ${j.contact_phone?`<p style="margin:10px 0 0;font-size:.85rem;color:#64748b">📞 ${j.contact_phone}</p>`:''}
+      </div>`:''}`;
+  } catch {
+    document.getElementById('job-modal-body').innerHTML =
+      '<p style="text-align:center;color:#ef4444">Erreur de chargement.</p>';
+  }
+}
+
+function closeJobModal() {
+  document.getElementById('job-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.getElementById('job-modal').addEventListener('click', e => {
+  if (e.target===e.currentTarget) closeJobModal();
+});
+
+// Filtres
+document.getElementById('search-input').addEventListener('input', e => {
+  clearTimeout(debounce); p.search=e.target.value.trim();
+  debounce=setTimeout(loadJobs,350);
+});
+document.getElementById('f-contract') .addEventListener('change', e=>{ p.contract=e.target.value;  loadJobs(); });
+document.getElementById('f-specialty').addEventListener('change', e=>{ p.specialty=e.target.value; loadJobs(); });
+document.getElementById('f-level')    .addEventListener('change', e=>{ p.level=e.target.value;     loadJobs(); });
+document.getElementById('f-wilaya')   .addEventListener('change', e=>{ p.wilaya=e.target.value;    loadJobs(); });
+
+loadJobs();
+</script>
+</body>
+</html>

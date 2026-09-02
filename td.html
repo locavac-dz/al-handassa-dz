@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TD & Exercices PDF — Al Handassa.dz</title>
+  <meta name="description" content="Travaux dirigés et exercices corrigés en génie civil — topographie, béton armé, structures, hydraulique. Téléchargement gratuit." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://handassi.dz/td.html" />
+
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://handassi.dz/td.html" />
+  <meta property="og:title"       content="TD & Exercices PDF — Al Handassa.dz" />
+  <meta property="og:description" content="Travaux dirigés et exercices corrigés en génie civil." />
+  <meta property="og:image"       content="https://handassi.dz/img/og-cover.png" />
+
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/td.css" />
+</head>
+<body>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<header class="header" id="navbar">
+  <nav class="nav container">
+    <a href="index.html" class="nav-logo">
+      <img src="/img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#catalog">Catalogue</a></li>
+      <li><a href="index.html#videos">Vidéos</a></li>
+      <li><a href="logiciels.html">Logiciels</a></li>
+      <li><a href="td.html" class="active">TD / Exercices</a></li>
+      <li><a href="index.html#articles">Articles</a></li>
+    </ul>
+    <div id="nav-auth-actions" style="display:contents">
+      <a href="index.html#login" class="btn btn-outline btn-sm">Connexion</a>
+      <a href="index.html#register" class="btn btn-primary btn-sm">S'inscrire</a>
+    </div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<div class="td-hero">
+  <div class="container">
+    <div class="td-hero-inner">
+      <span class="td-hero-label">📝 Pratique & Exercices</span>
+      <h1>TD & Exercices <span>Génie Civil</span></h1>
+      <p>Travaux dirigés, exercices et corrigés détaillés par thème —<br>
+         topographie, béton armé, structures et plus. Téléchargement gratuit.</p>
+      <div class="td-hero-stats">
+        <div class="td-stat"><span id="stat-total">—</span> ressources</div>
+        <div class="td-stat-sep">·</div>
+        <div class="td-stat"><span id="stat-themes">—</span> thèmes</div>
+        <div class="td-stat-sep">·</div>
+        <div class="td-stat">Accès gratuit</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ FILTRES ═══════════════════ -->
+<div class="td-filters-bar" id="filters-bar">
+  <div class="container">
+    <div class="td-filter-scroll" id="theme-filters">
+      <button class="td-filter-btn active" data-theme="">
+        <i class="fas fa-th"></i> Tous les thèmes
+      </button>
+      <!-- généré dynamiquement -->
+    </div>
+    <div class="td-search-wrap">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search-input" placeholder="Rechercher un TD…" autocomplete="off" />
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ CONTENU ═══════════════════ -->
+<main class="td-main container" id="td-main">
+
+  <!-- Skeleton -->
+  <div id="td-skeleton" class="td-skeleton-wrap">
+    <div class="td-skel-section">
+      <div class="td-skel-block td-skel-title"></div>
+      <div class="td-skel-grid">
+        <div class="td-skel-block td-skel-card"></div>
+        <div class="td-skel-block td-skel-card"></div>
+        <div class="td-skel-block td-skel-card"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu réel -->
+  <div id="td-content" style="display:none"></div>
+
+  <!-- Vide -->
+  <div id="td-empty" class="td-empty" style="display:none">
+    <div class="td-empty-icon">🔍</div>
+    <h3>Aucun TD trouvé</h3>
+    <p>Essayez un autre terme ou sélectionnez un autre thème.</p>
+  </div>
+
+</main>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer class="td-footer">
+  <div class="container">
+    <div class="td-footer-inner">
+      <div>
+        <div class="td-footer-logo">⚙ Al Handassa<span>.dz</span></div>
+        <p class="td-footer-desc">Plateforme de référence pour les professionnels du BTP en Algérie.</p>
+      </div>
+      <div class="td-footer-links">
+        <a href="index.html">Accueil</a>
+        <a href="index.html#catalog">Catalogue</a>
+        <a href="logiciels.html">Logiciels</a>
+        <a href="index.html#pricing">Abonnements</a>
+      </div>
+    </div>
+    <div class="td-footer-copy">© 2026 Al Handassa.dz — Tous droits réservés</div>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/td.js"></script>
+</body>
+</html>

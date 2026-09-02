@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vérification email — Al Handassa.dz</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background:#f4f6fb; display:flex; flex-direction:column; min-height:100vh; }
+
+    .ve-wrap {
+      flex:1; display:flex; align-items:center;
+      justify-content:center; padding:40px 16px;
+    }
+    .ve-card {
+      background:#fff; border-radius:16px;
+      box-shadow:0 4px 32px rgba(27,58,107,.10);
+      padding:52px 44px; width:100%; max-width:460px; text-align:center;
+    }
+    .ve-logo {
+      font-size:22px; font-weight:800; color:#1B3A6B;
+      margin-bottom:36px; display:block; text-decoration:none;
+    }
+    .ve-logo span { color:#C8A142; }
+    .ve-icon { font-size:56px; margin-bottom:16px; line-height:1; }
+    .ve-card h1 { font-size:22px; color:#1B3A6B; margin:0 0 10px; }
+    .ve-card p  { color:#64748b; font-size:14px; margin:0 0 28px; line-height:1.7; }
+
+    .ve-btn {
+      display:inline-block; padding:13px 28px;
+      background:#1B3A6B; color:#fff; border-radius:8px;
+      text-decoration:none; font-weight:600; font-size:15px;
+      transition:background .2s;
+    }
+    .ve-btn:hover { background:#142d54; }
+    .ve-btn.green { background:#059669; }
+    .ve-btn.green:hover { background:#047857; }
+
+    .ve-spinner {
+      width:44px; height:44px; border:4px solid #e2e8f0;
+      border-top-color:#1B3A6B; border-radius:50%;
+      animation:spin .8s linear infinite; margin:0 auto 20px;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .ve-countdown {
+      display:inline-block; width:36px; height:36px; line-height:36px;
+      background:#f0f7ff; border-radius:50%; font-weight:700;
+      color:#1B3A6B; font-size:16px; margin-left:6px;
+    }
+
+    footer {
+      text-align:center; padding:20px;
+      font-size:12px; color:#94a3b8;
+    }
+    footer a { color:#1B3A6B; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+<div class="ve-wrap">
+  <div class="ve-card">
+    <a href="index.html" class="ve-logo">⚙ Al Handassa<span>.dz</span></a>
+
+    <!-- État : vérification en cours -->
+    <div id="ve-loading">
+      <div class="ve-spinner"></div>
+      <h1>Vérification en cours…</h1>
+      <p>Validation de votre lien, veuillez patienter.</p>
+    </div>
+
+    <!-- État : succès -->
+    <div id="ve-success" style="display:none">
+      <div class="ve-icon">✅</div>
+      <h1>Email vérifié !</h1>
+      <p>
+        Votre adresse email a été confirmée avec succès.<br>
+        Bienvenue sur <strong>Al Handassa.dz</strong> !<br><br>
+        Redirection dans<span class="ve-countdown" id="ve-countdown">3</span>s…
+      </p>
+      <a href="index.html" class="ve-btn green">🏗️ Accéder à la plateforme</a>
+    </div>
+
+    <!-- État : déjà vérifié -->
+    <div id="ve-already" style="display:none">
+      <div class="ve-icon">🔵</div>
+      <h1>Email déjà vérifié</h1>
+      <p>Votre adresse email est déjà confirmée.<br>Vous pouvez accéder normalement à votre espace.</p>
+      <a href="account.html" class="ve-btn">Mon espace</a>
+    </div>
+
+    <!-- État : erreur / lien invalide -->
+    <div id="ve-error" style="display:none">
+      <div class="ve-icon">⚠️</div>
+      <h1 id="ve-error-title">Lien invalide</h1>
+      <p id="ve-error-msg">Ce lien de vérification est invalide ou a déjà été utilisé.<br>
+        Connectez-vous et demandez un nouveau lien depuis votre espace.</p>
+      <a href="account.html" class="ve-btn" style="margin-right:8px">Mon compte</a>
+      <a href="index.html" class="ve-btn" style="background:#6b7280">Accueil</a>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <a href="index.html">← Retour à l'accueil</a>
+  &nbsp;·&nbsp;
+  <a href="mailto:contact@handassi.dz">contact@handassi.dz</a>
+</footer>
+
+<script>
+(function () {
+  const API_BASE = (window.API_BASE || 'http://localhost:5000/api');
+  const params = new URLSearchParams(location.search);
+  const token  = params.get('token') || '';
+
+  function show(id) {
+    ['ve-loading','ve-success','ve-already','ve-error'].forEach(s => {
+      document.getElementById(s).style.display = s === id ? 'block' : 'none';
+    });
+  }
+
+  async function verify() {
+    if (!token) {
+      document.getElementById('ve-error-title').textContent = 'Token manquant';
+      document.getElementById('ve-error-msg').textContent =
+        'Le lien de vérification est incomplet. Vérifiez que vous avez copié l\'URL complète depuis l\'email.';
+      show('ve-error');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/auth/verify-email?token=${encodeURIComponent(token)}`);
+      const data = await res.json();
+
+      if (res.ok) {
+        show('ve-success');
+        startCountdown();
+      } else if (res.status === 400 && data.message?.toLowerCase().includes('déjà')) {
+        show('ve-already');
+      } else {
+        document.getElementById('ve-error-title').textContent = 'Lien invalide ou expiré';
+        document.getElementById('ve-error-msg').textContent =
+          data.message || 'Ce lien n\'est plus valide. Connectez-vous pour en demander un nouveau.';
+        show('ve-error');
+      }
+    } catch {
+      document.getElementById('ve-error-title').textContent = 'Erreur de connexion';
+      document.getElementById('ve-error-msg').textContent =
+        'Impossible de contacter le serveur. Vérifiez votre connexion et réessayez.';
+      show('ve-error');
+    }
+  }
+
+  function startCountdown() {
+    let n = 3;
+    const el = document.getElementById('ve-countdown');
+    const iv = setInterval(() => {
+      n--;
+      if (el) el.textContent = n;
+      if (n <= 0) { clearInterval(iv); location.href = 'index.html'; }
+    }, 1000);
+  }
+
+  verify();
+})();
+</script>
+</body>
+</html>

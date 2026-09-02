@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annuaire Entreprises BTP Algérie — Al Handassa.dz</title>
+  <meta name="description" content="Annuaire des entreprises BTP et bureaux d'études en Algérie. Trouvez des prestataires en génie civil, gros œuvre, second œuvre, routes et hydraulique." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://handassi.dz/entreprises.html" />
+
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://handassi.dz/entreprises.html" />
+  <meta property="og:title"       content="Annuaire Entreprises BTP Algérie — Al Handassa.dz" />
+  <meta property="og:description" content="Annuaire des entreprises BTP et bureaux d'études en Algérie." />
+  <meta property="og:image"       content="https://handassi.dz/img/og-cover.png" />
+  <meta property="og:site_name"   content="Al Handassa.dz" />
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="Annuaire Entreprises BTP Algérie — Al Handassa.dz" />
+  <meta name="twitter:description" content="Trouvez des entreprises BTP et bureaux d'études en Algérie." />
+  <meta name="twitter:image"       content="https://handassi.dz/img/og-cover.png" />
+
+  <link rel="icon" href="/img/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Page entreprises ── */
+    .ent-hero { background: linear-gradient(135deg,#1B3A6B 0%,#2a5298 100%); color:#fff; padding:60px 0 40px; }
+    .ent-hero h1 { font-size:2rem; font-weight:800; margin:0 0 10px; }
+    .ent-hero h1 span { color:#F5A623; }
+    .ent-hero p { opacity:.85; font-size:1rem; margin:0 0 24px; }
+    .ent-hero-stats { display:flex; gap:32px; flex-wrap:wrap; }
+    .ent-stat { font-size:.9rem; opacity:.9; }
+    .ent-stat strong { font-size:1.4rem; display:block; color:#F5A623; }
+
+    /* ── Filtres ── */
+    .ent-filters { background:#fff; border-bottom:1px solid #e5e7eb; padding:16px 0; position:sticky; top:0; z-index:50; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+    .ent-filters-inner { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .ent-search { flex:1; min-width:220px; position:relative; }
+    .ent-search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; }
+    .ent-search input { width:100%; padding:9px 12px 9px 36px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:.9rem; outline:none; }
+    .ent-search input:focus { border-color:#1B3A6B; }
+    .ent-select { padding:9px 12px; border:1px solid #e2e8f0; border-radius:8px; font-family:inherit; font-size:.9rem; background:#fff; cursor:pointer; outline:none; }
+    .ent-select:focus { border-color:#1B3A6B; }
+
+    /* ── Grille ── */
+    .ent-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; padding:32px 0; }
+    .ent-card { background:#fff; border-radius:12px; border:1px solid #e5e7eb; overflow:hidden; transition:transform .2s,box-shadow .2s; cursor:pointer; text-decoration:none; color:inherit; display:flex; flex-direction:column; }
+    .ent-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.1); }
+    .ent-card-cover { height:90px; background:linear-gradient(135deg,#1B3A6B,#2a5298); position:relative; overflow:hidden; }
+    .ent-card-cover img { width:100%; height:100%; object-fit:cover; }
+    .ent-card-logo { position:absolute; bottom:-20px; left:16px; width:52px; height:52px; border-radius:10px; background:#fff; border:2px solid #e5e7eb; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+    .ent-card-logo img { width:100%; height:100%; object-fit:cover; }
+    .ent-card-body { padding:28px 16px 16px; flex:1; display:flex; flex-direction:column; gap:6px; }
+    .ent-card-name { font-weight:700; font-size:1rem; color:#1e293b; }
+    .ent-card-tagline { font-size:.82rem; color:#64748b; line-height:1.4; }
+    .ent-card-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
+    .ent-tag { background:#EFF6FF; color:#1B3A6B; font-size:.72rem; padding:2px 8px; border-radius:99px; font-weight:600; }
+    .ent-card-footer { padding:10px 16px; border-top:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; font-size:.78rem; color:#94a3b8; }
+    .ent-badge-verified { background:#d1fae5; color:#065f46; font-size:.72rem; padding:2px 8px; border-radius:99px; font-weight:700; }
+    .ent-badge-premium  { background:#FEF3C7; color:#92400e; font-size:.72rem; padding:2px 8px; border-radius:99px; font-weight:700; }
+
+    /* ── Skeleton ── */
+    .ent-skel { background:#f1f5f9; border-radius:12px; height:210px; animation:pulse 1.4s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+    /* ── Vide ── */
+    .ent-empty { text-align:center; padding:80px 0; color:#94a3b8; }
+    .ent-empty-icon { font-size:3rem; margin-bottom:12px; }
+
+    /* ── CTA inscription ── */
+    .ent-cta { background:linear-gradient(135deg,#1B3A6B,#2a5298); color:#fff; border-radius:16px; padding:40px; text-align:center; margin:16px 0 40px; }
+    .ent-cta h2 { margin:0 0 10px; font-size:1.4rem; }
+    .ent-cta p  { opacity:.85; margin:0 0 20px; }
+    .ent-cta-btn { background:#F5A623; color:#1B3A6B; border:none; padding:12px 28px; border-radius:8px; font-weight:700; font-size:1rem; cursor:pointer; font-family:inherit; text-decoration:none; display:inline-block; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<header class="header">
+  <nav class="nav container">
+    <a href="index.html" class="nav-logo">
+      <img src="/img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#catalog">Catalogue</a></li>
+      <li><a href="logiciels.html">Logiciels</a></li>
+      <li><a href="entreprises.html" class="active">Entreprises</a></li>
+      <li><a href="index.html#articles">Articles</a></li>
+    </ul>
+    <div id="nav-auth-actions" style="display:contents">
+      <a href="index.html#login"    class="btn btn-outline btn-sm">Connexion</a>
+      <a href="index.html#register" class="btn btn-primary btn-sm">S'inscrire</a>
+    </div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<!-- ── HERO ── -->
+<div class="ent-hero">
+  <div class="container">
+    <h1>Annuaire <span>Entreprises BTP</span></h1>
+    <p>Trouvez des entreprises, bureaux d'études et prestataires en génie civil en Algérie</p>
+    <div class="ent-hero-stats">
+      <div class="ent-stat"><strong id="stat-companies">—</strong>Entreprises référencées</div>
+      <div class="ent-stat"><strong>58</strong>Wilayas couvertes</div>
+      <div class="ent-stat"><strong>100%</strong>Gratuit à consulter</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FILTRES ── -->
+<div class="ent-filters">
+  <div class="container">
+    <div class="ent-filters-inner">
+      <div class="ent-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" placeholder="Rechercher une entreprise…" autocomplete="off" />
+      </div>
+      <select class="ent-select" id="filter-specialty">
+        <option value="">Toutes spécialités</option>
+        <option value="Gros Œuvre">Gros Œuvre</option>
+        <option value="Second Œuvre">Second Œuvre</option>
+        <option value="Routes & VRD">Routes & VRD</option>
+        <option value="Hydraulique">Hydraulique</option>
+        <option value="Géotechnique">Géotechnique</option>
+        <option value="Bureau d'études">Bureau d'études</option>
+        <option value="BIM & Topographie">BIM & Topographie</option>
+        <option value="Électricité & CVC">Électricité & CVC</option>
+      </select>
+      <select class="ent-select" id="filter-wilaya">
+        <option value="">Toutes les wilayas</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- ── GRILLE ── -->
+<main class="container">
+  <div class="ent-grid" id="ent-skeleton">
+    <div class="ent-skel"></div><div class="ent-skel"></div>
+    <div class="ent-skel"></div><div class="ent-skel"></div>
+    <div class="ent-skel"></div><div class="ent-skel"></div>
+  </div>
+  <div class="ent-grid" id="ent-grid" style="display:none"></div>
+  <div class="ent-empty" id="ent-empty" style="display:none">
+    <div class="ent-empty-icon">🏗️</div>
+    <h3>Aucune entreprise trouvée</h3>
+    <p>Essayez d'autres filtres ou termes de recherche.</p>
+  </div>
+
+  <!-- CTA inscription entreprise -->
+  <div class="ent-cta">
+    <h2>🏢 Votre entreprise n'est pas encore référencée ?</h2>
+    <p>Créez gratuitement votre vitrine et gagnez en visibilité auprès des ingénieurs et maîtres d'ouvrage algériens.</p>
+    <a href="mailto:contact@handassi.dz?subject=Référencement entreprise" class="ent-cta-btn">Référencer mon entreprise</a>
+  </div>
+</main>
+
+<!-- ── FOOTER ── -->
+<footer style="background:#1e293b;color:#94a3b8;padding:24px 0;text-align:center;font-size:.85rem;">
+  <div class="container">
+    © 2026 <strong style="color:#fff">Al Handassa.dz</strong> — Tous droits réservés ·
+    <a href="index.html" style="color:#94a3b8">Accueil</a> ·
+    <a href="contact.html" style="color:#94a3b8">Contact</a>
+  </div>
+</footer>
+
+<script src="js/api.js"></script>
+<script>
+const WILAYAS = [
+  [1,'Adrar'],[2,'Chlef'],[3,'Laghouat'],[4,'Oum El Bouaghi'],[5,'Batna'],
+  [6,'Béjaïa'],[7,'Biskra'],[8,'Béchar'],[9,'Blida'],[10,'Bouira'],
+  [11,'Tamanrasset'],[12,'Tébessa'],[13,'Tlemcen'],[14,'Tiaret'],[15,'Tizi Ouzou'],
+  [16,'Alger'],[17,'Djelfa'],[18,'Jijel'],[19,'Sétif'],[20,'Saïda'],
+  [21,'Skikda'],[22,'Sidi Bel Abbès'],[23,'Annaba'],[24,'Guelma'],[25,'Constantine'],
+  [26,'Médéa'],[27,'Mostaganem'],[28,'M\'Sila'],[29,'Mascara'],[30,'Ouargla'],
+  [31,'Oran'],[32,'El Bayadh'],[33,'Illizi'],[34,'Bordj Bou Arréridj'],[35,'Boumerdès'],
+  [36,'El Tarf'],[37,'Tindouf'],[38,'Tissemsilt'],[39,'El Oued'],[40,'Khenchela'],
+  [41,'Souk Ahras'],[42,'Tipaza'],[43,'Mila'],[44,'Aïn Defla'],[45,'Naâma'],
+  [46,'Aïn Témouchent'],[47,'Ghardaïa'],[48,'Relizane'],[49,'El M\'Ghair'],
+  [50,'El Meniaa'],[51,'Ouled Djellal'],[52,'Bordj Badji Mokhtar'],[53,'Béni Abbès'],
+  [54,'Timimoun'],[55,'Touggourt'],[56,'Djanet'],[57,'In Salah'],[58,'In Guezzam'],
+];
+
+// Remplir select wilayas
+const selWilaya = document.getElementById('filter-wilaya');
+WILAYAS.forEach(([code,name]) => {
+  const o = document.createElement('option');
+  o.value = code; o.textContent = `${code} — ${name}`;
+  selWilaya.appendChild(o);
+});
+
+let debounceTimer;
+const params = { search:'', specialty:'', wilaya:'' };
+
+async function loadCompanies() {
+  document.getElementById('ent-skeleton').style.display = 'grid';
+  document.getElementById('ent-grid').style.display     = 'none';
+  document.getElementById('ent-empty').style.display    = 'none';
+
+  const qs = new URLSearchParams();
+  if (params.search)    qs.set('search', params.search);
+  if (params.specialty) qs.set('specialty', params.specialty);
+  if (params.wilaya)    qs.set('wilaya', params.wilaya);
+
+  try {
+    const data = await get('/companies?' + qs.toString());
+    const companies = data.data || [];
+    document.getElementById('stat-companies').textContent = data.total || companies.length;
+
+    document.getElementById('ent-skeleton').style.display = 'none';
+
+    if (!companies.length) {
+      document.getElementById('ent-empty').style.display = 'block';
+      return;
+    }
+
+    const grid = document.getElementById('ent-grid');
+    grid.style.display = 'grid';
+    grid.innerHTML = companies.map(c => cardHTML(c)).join('');
+  } catch {
+    document.getElementById('ent-skeleton').style.display = 'none';
+    document.getElementById('ent-empty').style.display = 'block';
+  }
+}
+
+function cardHTML(c) {
+  const logo = c.logo_url
+    ? `<img src="${c.logo_url}" alt="${c.name}" loading="lazy" />`
+    : `🏢`;
+  const cover = c.cover_url
+    ? `<img src="${c.cover_url}" alt="" loading="lazy" />`
+    : '';
+  const tags = (c.specialties || []).slice(0,3).map(s => `<span class="ent-tag">${s}</span>`).join('');
+  const wilayaName = c.wilaya_siege ? (WILAYAS.find(w=>w[0]==c.wilaya_siege)||['',''])[1] : '';
+  const badges = [
+    c.is_verified ? '<span class="ent-badge-verified">✓ Vérifié</span>' : '',
+    c.is_premium  ? '<span class="ent-badge-premium">⭐ Premium</span>'  : '',
+  ].filter(Boolean).join('');
+
+  return `<a class="ent-card" href="entreprise.html?slug=${c.slug}">
+    <div class="ent-card-cover">${cover}<div class="ent-card-logo">${logo}</div></div>
+    <div class="ent-card-body">
+      <div class="ent-card-name">${c.name}</div>
+      ${c.tagline ? `<div class="ent-card-tagline">${c.tagline}</div>` : ''}
+      <div class="ent-card-tags">${tags}</div>
+    </div>
+    <div class="ent-card-footer">
+      <span>${wilayaName || '—'} ${c.founded_year ? '· '+c.founded_year : ''}</span>
+      <span>${badges || (c.projects_count > 0 ? c.projects_count+' réalisations' : '')}</span>
+    </div>
+  </a>`;
+}
+
+// Événements filtres
+document.getElementById('search-input').addEventListener('input', e => {
+  clearTimeout(debounceTimer);
+  params.search = e.target.value.trim();
+  debounceTimer = setTimeout(loadCompanies, 350);
+});
+document.getElementById('filter-specialty').addEventListener('change', e => {
+  params.specialty = e.target.value; loadCompanies();
+});
+document.getElementById('filter-wilaya').addEventListener('change', e => {
+  params.wilaya = e.target.value; loadCompanies();
+});
+
+loadCompanies();
+</script>
+</body>
+</html>

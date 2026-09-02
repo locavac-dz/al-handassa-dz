@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Allow: /uploads/images/
+Allow: /uploads/images/thumbs/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /uploads/products/
+Disallow: /account.html
+Disallow: /reset-password.html
+Disallow: /verify-email.html
+Disallow: /api-test.html
+
+# Sitemap
+Sitemap: https://handassi.dz/sitemap.xml

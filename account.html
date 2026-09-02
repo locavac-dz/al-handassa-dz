@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mon compte — Al Handassa.dz</title>
+  <meta name="description" content="Gérez vos téléchargements, commandes, abonnement et profil sur Al Handassa.dz." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/account.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<header class="header">
+  <nav class="nav container">
+    <a href="index.html" class="nav-logo">
+      <img src="/img/logo-full.png" alt="Al Handassa.dz" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#products">Produits</a></li>
+      <li><a href="index.html#videos">Vidéos</a></li>
+      <li><a href="index.html#articles">Articles</a></li>
+      <li><a href="index.html#pricing">Abonnements</a></li>
+    </ul>
+    <div id="nav-auth-zone" style="display:contents"></div>
+    <button class="mobile-menu-btn" aria-label="Menu">☰</button>
+  </nav>
+</header>
+
+<!-- ── AUTH GUARD (caché si connecté) ── -->
+<div id="auth-guard" style="display:none" class="auth-guard-page">
+  <div class="auth-guard-box">
+    <div class="guard-icon">🔐</div>
+    <h2>Connexion requise</h2>
+    <p>Accédez à votre espace personnel en vous connectant.</p>
+    <a href="index.html#login" class="btn btn-primary btn-lg">Se connecter</a>
+    <a href="index.html#register" class="btn btn-outline" style="margin-top:10px">Créer un compte</a>
+  </div>
+</div>
+
+<!-- ═══════════════════ PAGE COMPTE ═══════════════════ -->
+<div id="account-page" style="display:none">
+
+  <!-- Hero utilisateur -->
+  <div class="account-hero">
+    <div class="container">
+      <div class="account-hero-inner">
+        <div class="account-avatar" id="hero-avatar">?</div>
+        <div class="account-hero-info">
+          <h1 id="hero-name">Chargement…</h1>
+          <p id="hero-email" class="hero-email"></p>
+          <div class="hero-badges-row">
+            <span class="plan-badge" id="hero-plan"></span>
+            <span class="member-since" id="hero-since"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layout sidebar + contenu -->
+  <div class="account-layout container">
+
+    <!-- Sidebar nav -->
+    <aside class="account-sidebar">
+      <nav class="acc-nav">
+        <a class="acc-nav-item active" href="#downloads" data-section="sec-downloads">
+          <i class="fas fa-download"></i>
+          <span>Mes téléchargements</span>
+          <span class="acc-nav-count" id="cnt-downloads" style="display:none"></span>
+        </a>
+        <a class="acc-nav-item" href="#orders" data-section="sec-orders">
+          <i class="fas fa-receipt"></i>
+          <span>Mes commandes</span>
+          <span class="acc-nav-count" id="cnt-orders" style="display:none"></span>
+        </a>
+        <a class="acc-nav-item" href="#wishlist" data-section="sec-wishlist">
+          <i class="fas fa-heart"></i>
+          <span>Mes favoris</span>
+          <span class="acc-nav-count" id="cnt-wishlist" style="display:none"></span>
+        </a>
+        <a class="acc-nav-item" href="#subscription" data-section="sec-subscription">
+          <i class="fas fa-crown"></i>
+          <span>Abonnement</span>
+        </a>
+        <a class="acc-nav-item" href="#profile" data-section="sec-profile">
+          <i class="fas fa-user-edit"></i>
+          <span>Mon profil</span>
+        </a>
+        <hr class="acc-nav-sep" />
+        <a class="acc-nav-item acc-nav-logout" href="#" id="logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Déconnexion</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="account-content">
+
+      <!-- ─── SECTION : Téléchargements ─────────────────────── -->
+      <section id="sec-downloads" class="acc-section active">
+        <div class="sec-header">
+          <h2><i class="fas fa-download"></i> Mes téléchargements</h2>
+          <p class="sec-subtitle">Tous les documents que vous avez achetés ou déverrouillés.</p>
+        </div>
+        <div id="downloads-grid" class="downloads-grid">
+          <div class="acc-loading"><i class="fas fa-spinner fa-spin"></i> Chargement…</div>
+        </div>
+      </section>
+
+      <!-- ─── SECTION : Commandes ───────────────────────────── -->
+      <section id="sec-orders" class="acc-section">
+        <div class="sec-header">
+          <h2><i class="fas fa-receipt"></i> Mes commandes</h2>
+          <p class="sec-subtitle">Historique de vos achats et statut des paiements.</p>
+        </div>
+        <div id="orders-list" class="orders-list">
+          <div class="acc-loading"><i class="fas fa-spinner fa-spin"></i> Chargement…</div>
+        </div>
+        <div id="orders-pagination" class="acc-pagination"></div>
+      </section>
+
+      <!-- ─── SECTION : Favoris ─────────────────────────────── -->
+      <section id="sec-wishlist" class="acc-section">
+        <div class="sec-header">
+          <h2><i class="fas fa-heart"></i> Mes favoris</h2>
+          <p class="sec-subtitle">Produits et vidéos sauvegardés pour plus tard.</p>
+        </div>
+        <div id="wishlist-grid" class="wishlist-grid">
+          <div class="acc-loading"><i class="fas fa-spinner fa-spin"></i> Chargement…</div>
+        </div>
+      </section>
+
+      <!-- ─── SECTION : Abonnement ──────────────────────────── -->
+      <section id="sec-subscription" class="acc-section">
+        <div class="sec-header">
+          <h2><i class="fas fa-crown"></i> Mon abonnement</h2>
+        </div>
+        <div id="subscription-content">
+          <div class="acc-loading"><i class="fas fa-spinner fa-spin"></i> Chargement…</div>
+        </div>
+      </section>
+
+      <!-- ─── SECTION : Profil ──────────────────────────────── -->
+      <section id="sec-profile" class="acc-section">
+        <div class="sec-header">
+          <h2><i class="fas fa-user-edit"></i> Mon profil</h2>
+          <p class="sec-subtitle">Modifiez vos informations personnelles.</p>
+        </div>
+
+        <div class="profile-grid">
+          <!-- Infos personnelles -->
+          <div class="acc-card">
+            <div class="acc-card-header">
+              <h3><i class="fas fa-id-card"></i> Informations personnelles</h3>
+            </div>
+            <form id="profile-form" class="acc-form" novalidate>
+              <div class="form-row-2">
+                <div class="acc-field">
+                  <label>Prénom</label>
+                  <input type="text" id="pf-first" placeholder="Votre prénom" />
+                </div>
+                <div class="acc-field">
+                  <label>Nom</label>
+                  <input type="text" id="pf-last" placeholder="Votre nom" />
+                </div>
+              </div>
+              <div class="acc-field">
+                <label>Téléphone</label>
+                <input type="tel" id="pf-phone" placeholder="+213 6XX XXX XXX" />
+              </div>
+              <div class="form-row-2">
+                <div class="acc-field">
+                  <label>Niveau d'études</label>
+                  <select id="pf-level">
+                    <option value="">— Sélectionner —</option>
+                    <option value="bac_technique">Bac technique</option>
+                    <option value="bts">BTS / DUT</option>
+                    <option value="licence">Licence</option>
+                    <option value="master">Master</option>
+                    <option value="ingenieur">Ingénieur</option>
+                    <option value="professionnel">Professionnel</option>
+                  </select>
+                </div>
+                <div class="acc-field">
+                  <label>Université / Établissement</label>
+                  <input type="text" id="pf-university" placeholder="Ex: USTHB Alger" />
+                </div>
+              </div>
+              <div id="profile-msg" class="acc-msg" style="display:none"></div>
+              <button type="submit" class="btn btn-primary" id="profile-save-btn">
+                <i class="fas fa-save"></i> Enregistrer
+              </button>
+            </form>
+          </div>
+
+          <!-- Changer mot de passe -->
+          <div class="acc-card">
+            <div class="acc-card-header">
+              <h3><i class="fas fa-lock"></i> Changer le mot de passe</h3>
+            </div>
+            <form id="password-form" class="acc-form" novalidate>
+              <div class="acc-field">
+                <label>Mot de passe actuel</label>
+                <input type="password" id="pw-current" placeholder="••••••••" autocomplete="current-password" />
+              </div>
+              <div class="acc-field">
+                <label>Nouveau mot de passe</label>
+                <input type="password" id="pw-new" placeholder="Min. 8 caractères" autocomplete="new-password" />
+              </div>
+              <div class="acc-field">
+                <label>Confirmer</label>
+                <input type="password" id="pw-confirm" placeholder="Répéter le nouveau mot de passe" autocomplete="new-password" />
+              </div>
+              <div id="password-msg" class="acc-msg" style="display:none"></div>
+              <button type="submit" class="btn btn-primary" id="password-save-btn">
+                <i class="fas fa-key"></i> Changer le mot de passe
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div id="acc-toast" class="acc-toast" role="alert"></div>
+
+<script src="js/api.js"></script>
+<script src="js/account.js"></script>
+</body>
+</html>
