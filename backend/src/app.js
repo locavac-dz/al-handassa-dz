@@ -139,6 +139,19 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
   etag: true,
 }));
 
+// ── Root Route (Serve index.html) ──
+app.get('/', (req, res) => {
+  try {
+    res.sendFile(path.join(process.cwd(), 'index.html'));
+  } catch (err) {
+    res.status(200).json({
+      message: 'Al Handassa.dz API',
+      version: '1.0.0',
+      status: 'ok'
+    });
+  }
+});
+
 // ── Health Check ──
 app.get('/health', (req, res) => {
   res.json({
