@@ -64,6 +64,7 @@ function badge(status) {
 function fmt(n)  { return Number(n||0).toLocaleString('fr-DZ'); }
 function date(d) { return d ? new Date(d).toLocaleDateString('fr-DZ',{day:'2-digit',month:'short',year:'numeric'}) : '—'; }
 function time(d) { return d ? new Date(d).toLocaleTimeString('fr-DZ',{hour:'2-digit',minute:'2-digit'}) : ''; }
+function esc(s)  { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // APPLICATION
@@ -229,7 +230,7 @@ const adminApp = {
             <thead><tr><th>Client</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead>
             <tbody>${(s.recent_orders||[]).map(o=>`
               <tr>
-                <td><strong>${o.first_name} ${o.last_name}</strong><br><small style="color:#94a3b8">${o.email}</small></td>
+                <td><strong>${esc(o.first_name)} ${esc(o.last_name)}</strong><br><small style="color:#94a3b8">${esc(o.email)}</small></td>
                 <td><strong>${fmt(o.total_amount)} DZD</strong></td>
                 <td>${badge(o.status)}</td>
                 <td>${date(o.created_at)}<br><small style="color:#94a3b8">${time(o.created_at)}</small></td>
@@ -248,7 +249,7 @@ const adminApp = {
             <thead><tr><th>Nom</th><th>Rôle</th><th>Inscription</th></tr></thead>
             <tbody>${(s.recent_users||[]).map(u=>`
               <tr>
-                <td><strong>${u.first_name} ${u.last_name}</strong><br><small style="color:#94a3b8">${u.email}</small></td>
+                <td><strong>${esc(u.first_name)} ${esc(u.last_name)}</strong><br><small style="color:#94a3b8">${esc(u.email)}</small></td>
                 <td>${badge(u.role)}</td>
                 <td>${date(u.created_at)}</td>
               </tr>`).join('') || '<tr><td colspan="3" class="no-data">Aucun utilisateur</td></tr>'}
@@ -288,17 +289,17 @@ const adminApp = {
               payments.map(p => `
               <tr id="pay-row-${p.id}">
                 <td>
-                  <strong>${p.first_name} ${p.last_name}</strong><br>
-                  <small style="color:#94a3b8">${p.email}</small><br>
-                  <small style="color:#94a3b8">Cmd : ${p.order_number||'—'}</small>
+                  <strong>${esc(p.first_name)} ${esc(p.last_name)}</strong><br>
+                  <small style="color:#94a3b8">${esc(p.email)}</small><br>
+                  <small style="color:#94a3b8">Cmd : ${esc(p.order_number||'—')}</small>
                 </td>
-                <td><span style="font-weight:700">${p.method?.toUpperCase()||'—'}</span></td>
+                <td><span style="font-weight:700">${esc(p.method?.toUpperCase()||'—')}</span></td>
                 <td><strong style="color:#1B3A6B">${fmt(p.amount)} DZD</strong></td>
                 <td>
                   <code style="font-size:0.78rem;background:#f0f4fa;padding:2px 8px;border-radius:6px">
-                    ${p.reference || p.baridimob_ref || '—'}
+                    ${esc(p.reference || p.baridimob_ref || '—')}
                   </code>
-                  ${p.proof_note ? `<br><small style="color:#64748b">${p.proof_note}</small>` : ''}
+                  ${p.proof_note ? `<br><small style="color:#64748b">${esc(p.proof_note)}</small>` : ''}
                 </td>
                 <td>${date(p.initiated_at)}<br><small style="color:#94a3b8">${time(p.initiated_at)}</small></td>
                 <td>
@@ -341,10 +342,10 @@ const adminApp = {
           <thead><tr><th>Client</th><th>Méthode</th><th>Montant</th><th>Commande</th><th>Validé le</th></tr></thead>
           <tbody>${pays.map(p=>`
             <tr>
-              <td><strong>${p.first_name} ${p.last_name}</strong><br><small style="color:#94a3b8">${p.email}</small></td>
-              <td>${p.method?.toUpperCase()||'—'}</td>
+              <td><strong>${esc(p.first_name)} ${esc(p.last_name)}</strong><br><small style="color:#94a3b8">${esc(p.email)}</small></td>
+              <td>${esc(p.method?.toUpperCase()||'—')}</td>
               <td><strong style="color:#16a34a">${fmt(p.amount)} DZD</strong></td>
-              <td><code style="font-size:0.78rem">${p.order_number||'—'}</code></td>
+              <td><code style="font-size:0.78rem">${esc(p.order_number||'—')}</code></td>
               <td>${date(p.completed_at)}</td>
             </tr>`).join('') || '<tr><td colspan="5" class="no-data">Aucun paiement validé</td></tr>'}
           </tbody>
@@ -393,12 +394,12 @@ const adminApp = {
         <table class="adm-table" id="orders-table">
           <thead><tr><th>Client</th><th>Méthode</th><th>Montant</th><th>Statut</th><th>Date</th><th>Action</th></tr></thead>
           <tbody>${pays.map(p=>`
-            <tr data-status="${p.status}" data-search="${(p.first_name+' '+p.last_name+' '+p.email).toLowerCase()}">
+            <tr data-status="${esc(p.status)}" data-search="${esc((p.first_name+' '+p.last_name+' '+p.email).toLowerCase())}">
               <td>
-                <strong>${p.first_name} ${p.last_name}</strong><br>
-                <small style="color:#94a3b8">${p.email}</small>
+                <strong>${esc(p.first_name)} ${esc(p.last_name)}</strong><br>
+                <small style="color:#94a3b8">${esc(p.email)}</small>
               </td>
-              <td>${p.method?.toUpperCase()||'—'}</td>
+              <td>${esc(p.method?.toUpperCase()||'—')}</td>
               <td><strong>${fmt(p.amount)} DZD</strong></td>
               <td>${badge(p.status)}</td>
               <td>${date(p.initiated_at)}</td>
@@ -449,12 +450,12 @@ const adminApp = {
         <table class="adm-table" id="prod-table">
           <thead><tr><th>Titre</th><th>Type</th><th>Prix</th><th>Télécharg.</th><th>Actif</th><th>Actions</th></tr></thead>
           <tbody>${products.map(p=>`
-            <tr data-type="${p.type}" data-search="${p.title.toLowerCase()}">
+            <tr data-type="${esc(p.type)}" data-search="${esc(p.title.toLowerCase())}">
               <td>
-                <strong>${p.title}</strong><br>
-                <small style="color:#94a3b8">${p.slug}</small>
+                <strong>${esc(p.title)}</strong><br>
+                <small style="color:#94a3b8">${esc(p.slug)}</small>
               </td>
-              <td><span style="font-size:0.72rem;font-weight:700;background:#f0f4fa;padding:2px 8px;border-radius:20px">${p.type}</span></td>
+              <td><span style="font-size:0.72rem;font-weight:700;background:#f0f4fa;padding:2px 8px;border-radius:20px">${esc(p.type)}</span></td>
               <td>${p.is_free ? badge('free') : `<strong>${fmt(p.price)} DZD</strong>`}</td>
               <td>${fmt(p.downloads_count)}</td>
               <td>
@@ -553,11 +554,11 @@ const adminApp = {
         <table class="adm-table" id="users-table">
           <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Abonnement</th><th>Inscription</th></tr></thead>
           <tbody>${users.map(u=>`
-            <tr data-search="${(u.first_name+' '+u.last_name+' '+u.email).toLowerCase()}" data-role="${u.role}">
-              <td><strong>${u.first_name} ${u.last_name}</strong></td>
-              <td>${u.email}</td>
+            <tr data-search="${esc((u.first_name+' '+u.last_name+' '+u.email).toLowerCase())}" data-role="${esc(u.role)}">
+              <td><strong>${esc(u.first_name)} ${esc(u.last_name)}</strong></td>
+              <td>${esc(u.email)}</td>
               <td>${badge(u.role)}</td>
-              <td>${u.subscription_plan||'free'}</td>
+              <td>${esc(u.subscription_plan||'free')}</td>
               <td>${date(u.created_at)}</td>
             </tr>`).join('') || '<tr><td colspan="5" class="no-data">Aucun utilisateur</td></tr>'}
           </tbody>
@@ -596,12 +597,12 @@ const adminApp = {
         <table class="adm-table" id="vid-table">
           <thead><tr><th>Titre</th><th>Source</th><th>Durée</th><th>Actif</th><th>Actions</th></tr></thead>
           <tbody>${videos.map(v=>`
-            <tr data-search="${v.title.toLowerCase()}">
+            <tr data-search="${esc(v.title.toLowerCase())}">
               <td>
-                <strong>${v.title}</strong><br>
-                <small style="color:#94a3b8">${v.youtube_id||''}</small>
+                <strong>${esc(v.title)}</strong><br>
+                <small style="color:#94a3b8">${esc(v.youtube_id||'')}</small>
               </td>
-              <td>${v.source||'—'}</td>
+              <td>${esc(v.source||'—')}</td>
               <td>${v.duration_sec ? Math.floor(v.duration_sec/60)+'min' : '—'}</td>
               <td>
                 <label class="toggle">
@@ -710,9 +711,9 @@ const adminApp = {
         <table class="adm-table" id="art-table">
           <thead><tr><th>Titre</th><th>Catégorie</th><th>Publié</th><th>Date</th><th>Actions</th></tr></thead>
           <tbody>${articles.map(a=>`
-            <tr data-search="${a.title.toLowerCase()}">
-              <td><strong>${a.title}</strong></td>
-              <td>${a.category||'—'}</td>
+            <tr data-search="${esc(a.title.toLowerCase())}">
+              <td><strong>${esc(a.title)}</strong></td>
+              <td>${esc(a.category||'—')}</td>
               <td>
                 <label class="toggle">
                   <input type="checkbox" ${a.is_published?'checked':''} onchange="adminApp.toggleArticle('${a.id}',this.checked)">
