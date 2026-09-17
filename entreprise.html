@@ -216,6 +216,7 @@ const WILAYAS = {
 
 const slug = new URLSearchParams(location.search).get('slug');
 if (!slug) { showNotFound(); } else { loadCompany(slug); }
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 async function loadCompany(slug) {
   try {
@@ -251,7 +252,7 @@ function render(c) {
 
   // Logo
   const logoEl = document.getElementById('ent-logo');
-  logoEl.innerHTML = c.logo_url ? `<img src="${c.logo_url}" alt="${c.name}" />` : '🏢';
+  logoEl.innerHTML = c.logo_url ? `<img src="${esc(c.logo_url)}" alt="${esc(c.name)}" />` : '🏢';
 
   // Nom & tagline
   document.getElementById('ent-name').textContent    = c.name;
@@ -262,7 +263,7 @@ function render(c) {
   const badges = [];
   if (c.is_verified) badges.push('<span class="ent-badge ent-badge-verified">✓ Vérifié</span>');
   if (c.is_premium)  badges.push('<span class="ent-badge ent-badge-premium">⭐ Premium</span>');
-  (c.specialties||[]).slice(0,4).forEach(s => badges.push(`<span class="ent-badge ent-badge-spec">${s}</span>`));
+  (c.specialties||[]).slice(0,4).forEach(s => badges.push(`<span class="ent-badge ent-badge-spec">${esc(s)}</span>`));
   document.getElementById('ent-badges').innerHTML = badges.join('');
 
   // Contact
@@ -281,10 +282,10 @@ function render(c) {
   if (c.projects && c.projects.length) {
     document.getElementById('proj-grid').innerHTML = c.projects.map(p => `
       <div class="proj-card">
-        <div class="proj-img">${p.image_url ? `<img src="${p.image_url}" alt="${p.title}" loading="lazy"/>` : ''}</div>
+        <div class="proj-img">${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.title)}" loading="lazy"/>` : ''}</div>
         <div class="proj-body">
-          <div class="proj-title">${p.title}</div>
-          <div class="proj-meta">${[p.location, p.year, p.category].filter(Boolean).join(' · ')}</div>
+          <div class="proj-title">${esc(p.title)}</div>
+          <div class="proj-meta">${[p.location, p.year, p.category].filter(Boolean).map(esc).join(' · ')}</div>
         </div>
       </div>`).join('');
     document.getElementById('section-projects').style.display = 'block';
@@ -292,15 +293,15 @@ function render(c) {
 
   // Sidebar infos
   const infoRows = [];
-  if (c.wilaya_siege) infoRows.push(['fa-map-marker-alt', WILAYAS[c.wilaya_siege] || `Wilaya ${c.wilaya_siege}`]);
-  if (c.founded_year) infoRows.push(['fa-calendar-alt', `Fondée en ${c.founded_year}`]);
-  if (c.size_range)   infoRows.push(['fa-users', `${c.size_range} employés`]);
-  if (c.agrement)     infoRows.push(['fa-certificate', `Agrément : ${c.agrement}`]);
-  if (c.address)      infoRows.push(['fa-map', c.address]);
-  if (c.phone)        infoRows.push(['fa-phone', `<a href="tel:${c.phone}">${c.phone}</a>`]);
-  if (c.email)        infoRows.push(['fa-envelope', `<a href="mailto:${c.email}">${c.email}</a>`]);
-  if (c.website)      infoRows.push(['fa-globe', `<a href="${c.website}" target="_blank" rel="noopener">${c.website.replace(/^https?:\/\//,'')}</a>`]);
-  if ((c.wilayas||[]).length > 1) infoRows.push(['fa-map-signs', 'Zones : ' + c.wilayas.map(w=>WILAYAS[w]||w).join(', ')]);
+  if (c.wilaya_siege) infoRows.push(['fa-map-marker-alt', esc(WILAYAS[c.wilaya_siege] || `Wilaya ${c.wilaya_siege}`)]);
+  if (c.founded_year) infoRows.push(['fa-calendar-alt', `Fondée en ${esc(c.founded_year)}`]);
+  if (c.size_range)   infoRows.push(['fa-users', `${esc(c.size_range)} employés`]);
+  if (c.agrement)     infoRows.push(['fa-certificate', `Agrément : ${esc(c.agrement)}`]);
+  if (c.address)      infoRows.push(['fa-map', esc(c.address)]);
+  if (c.phone)        infoRows.push(['fa-phone', `<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>`]);
+  if (c.email)        infoRows.push(['fa-envelope', `<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`]);
+  if (c.website)      infoRows.push(['fa-globe', `<a href="${esc(c.website)}" target="_blank" rel="noopener">${esc(c.website.replace(/^https?:\/\//,''))}</a>`]);
+  if ((c.wilayas||[]).length > 1) infoRows.push(['fa-map-signs', 'Zones : ' + esc(c.wilayas.map(w=>WILAYAS[w]||w).join(', '))]);
 
   document.getElementById('ent-info-rows').innerHTML = infoRows.map(([icon, val]) =>
     `<div class="ent-info-row"><i class="fas ${icon}"></i><span>${val}</span></div>`

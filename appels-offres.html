@@ -260,6 +260,7 @@ Object.entries(WILAYAS).forEach(([code,name]) => {
 
 let allTenders = [], debounce;
 const p = { search:'', sector:'', owner_type:'', status:'', wilaya:'' };
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function daysUntil(d) {
   return Math.ceil((new Date(d) - Date.now()) / 86400000);
@@ -302,27 +303,27 @@ async function loadTenders() {
 }
 
 function cardHTML(t) {
-  const owner = t.company_name || t.owner_name || 'Maître d\'ouvrage confidentiel';
-  const loc   = [t.city, t.wilaya ? WILAYAS[t.wilaya] : null].filter(Boolean).join(', ');
+  const owner = esc(t.company_name || t.owner_name || 'Maître d\'ouvrage confidentiel');
+  const loc   = [t.city, t.wilaya ? WILAYAS[t.wilaya] : null].filter(Boolean).map(esc).join(', ');
   const days  = t.deadline_at ? daysUntil(t.deadline_at) : null;
   const deadlineStr = t.deadline_at
     ? `<span class="ao-deadline${days!==null&&days<=7?' soon':''}">⏰ ${days!==null&&days>=0?`${days} j restants`:'Clôturé'} — ${fmtDate(t.deadline_at)}</span>`
     : '';
 
-  return `<div class="ao-card${t.is_featured?' featured':''}" onclick="openAoModal('${t.slug}')">
+  return `<div class="ao-card${t.is_featured?' featured':''}" onclick="openAoModal('${esc(t.slug)}')">
     <div class="ao-card-top">
       <div>
-        <div class="ao-card-ref">${t.is_featured?'⭐ ':''}${t.reference||'Réf. non précisée'}</div>
-        <div class="ao-title">${t.title}</div>
-        <div class="ao-owner"><i class="fas fa-landmark"></i> ${owner} ${t.company_verified?'✓':''} · ${t.owner_type||''}</div>
+        <div class="ao-card-ref">${t.is_featured?'⭐ ':''}${esc(t.reference||'Réf. non précisée')}</div>
+        <div class="ao-title">${esc(t.title)}</div>
+        <div class="ao-owner"><i class="fas fa-landmark"></i> ${owner} ${t.company_verified?'✓':''} · ${esc(t.owner_type||'')}</div>
       </div>
-      <span class="ao-status ${STATUS_CLASS[t.status]||'status-open'}">${STATUS_LABELS[t.status]||t.status}</span>
+      <span class="ao-status ${STATUS_CLASS[t.status]||'status-open'}">${esc(STATUS_LABELS[t.status]||t.status)}</span>
     </div>
     <div class="ao-chips">
-      ${t.sector?`<span class="ao-chip chip-sector">${t.sector}</span>`:''}
-      ${t.lot?`<span class="ao-chip chip-lot">📦 ${t.lot}</span>`:''}
+      ${t.sector?`<span class="ao-chip chip-sector">${esc(t.sector)}</span>`:''}
+      ${t.lot?`<span class="ao-chip chip-lot">📦 ${esc(t.lot)}</span>`:''}
       ${loc?`<span class="ao-chip chip-loc"><i class="fas fa-map-marker-alt"></i> ${loc}</span>`:''}
-      ${t.budget_range?`<span class="ao-chip chip-type">💰 ${t.budget_range}</span>`:''}
+      ${t.budget_range?`<span class="ao-chip chip-type">💰 ${esc(t.budget_range)}</span>`:''}
     </div>
     <div class="ao-footer">
       <span>Publié le ${fmtDate(t.published_at)}</span>
@@ -358,27 +359,27 @@ async function openAoModal(slug) {
   try {
     const data = await get('/tenders/' + slug);
     const t = data.data;
-    const owner  = t.company_name || t.owner_name || 'Confidentiel';
-    const loc    = [t.city, t.wilaya ? WILAYAS[t.wilaya] : null].filter(Boolean).join(', ');
+    const owner  = esc(t.company_name || t.owner_name || 'Confidentiel');
+    const loc    = [t.city, t.wilaya ? WILAYAS[t.wilaya] : null].filter(Boolean).map(esc).join(', ');
     const days   = t.deadline_at ? daysUntil(t.deadline_at) : null;
     const contact = t.contact_email || t.contact_phone;
 
     document.getElementById('ao-modal-body').innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:12px">
         <div>
-          <div style="font-size:.8rem;color:#94a3b8;font-family:monospace">${t.reference||''}</div>
-          <div style="font-size:1.1rem;font-weight:800;color:#1e293b;margin:4px 0">${t.title}</div>
+          <div style="font-size:.8rem;color:#94a3b8;font-family:monospace">${esc(t.reference||'')}</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#1e293b;margin:4px 0">${esc(t.title)}</div>
           <div style="font-size:.88rem;color:#1B3A6B;font-weight:600"><i class="fas fa-landmark"></i> ${owner}</div>
         </div>
-        <span class="ao-status ${STATUS_CLASS[t.status]||'status-open'}" style="flex-shrink:0">${STATUS_LABELS[t.status]||t.status}</span>
+        <span class="ao-status ${STATUS_CLASS[t.status]||'status-open'}" style="flex-shrink:0">${esc(STATUS_LABELS[t.status]||t.status)}</span>
       </div>
 
       <div class="ao-modal-grid" style="margin-bottom:18px">
-        ${t.sector?`<div class="ao-info-cell"><label>Secteur</label><span>${t.sector}</span></div>`:''}
-        ${t.owner_type?`<div class="ao-info-cell"><label>Type maître d'ouvrage</label><span>${t.owner_type}</span></div>`:''}
+        ${t.sector?`<div class="ao-info-cell"><label>Secteur</label><span>${esc(t.sector)}</span></div>`:''}
+        ${t.owner_type?`<div class="ao-info-cell"><label>Type maître d'ouvrage</label><span>${esc(t.owner_type)}</span></div>`:''}
         ${loc?`<div class="ao-info-cell"><label>Localisation</label><span>${loc}</span></div>`:''}
-        ${t.lot?`<div class="ao-info-cell"><label>Lot</label><span>${t.lot}</span></div>`:''}
-        ${t.budget_range?`<div class="ao-info-cell"><label>Budget estimé</label><span>${t.budget_range}</span></div>`:''}
+        ${t.lot?`<div class="ao-info-cell"><label>Lot</label><span>${esc(t.lot)}</span></div>`:''}
+        ${t.budget_range?`<div class="ao-info-cell"><label>Budget estimé</label><span>${esc(t.budget_range)}</span></div>`:''}
         <div class="ao-info-cell"><label>Date de publication</label><span>${fmtDate(t.published_at)}</span></div>
         ${t.deadline_at?`<div class="ao-info-cell"><label>Date limite de soumission</label>
           <span style="${days!==null&&days<=7?'color:#ef4444;font-weight:700':''}">${fmtDate(t.deadline_at)}${days!==null?` (${days>=0?days+' j':' dépassé'})`:''}
@@ -386,19 +387,19 @@ async function openAoModal(slug) {
         ${t.opening_at?`<div class="ao-info-cell"><label>Ouverture des plis</label><span>${fmtDate(t.opening_at)}</span></div>`:''}
       </div>
 
-      ${t.description?`<div class="ao-modal-section"><h4>📋 Description</h4><p>${t.description}</p></div>`:''}
+      ${t.description?`<div class="ao-modal-section"><h4>📋 Description</h4><p>${esc(t.description)}</p></div>`:''}
 
       ${contact||t.cahier_url?`
       <div class="ao-modal-section">
         <h4>📞 Contact & Documents</h4>
-        ${t.contact_name?`<p style="font-weight:600;margin-bottom:6px">${t.contact_name}</p>`:''}
-        ${t.contact_address?`<p style="color:#64748b;font-size:.85rem;margin-bottom:6px">${t.contact_address}</p>`:''}
+        ${t.contact_name?`<p style="font-weight:600;margin-bottom:6px">${esc(t.contact_name)}</p>`:''}
+        ${t.contact_address?`<p style="color:#64748b;font-size:.85rem;margin-bottom:6px">${esc(t.contact_address)}</p>`:''}
         <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px">
-          ${t.contact_email?`<a href="mailto:${t.contact_email}" class="ao-apply-btn" style="font-size:.85rem;padding:8px 16px">
-            <i class="fas fa-envelope"></i> ${t.contact_email}</a>`:''}
-          ${t.contact_phone?`<a href="tel:${t.contact_phone}" class="ao-apply-btn" style="background:#1B3A6B;font-size:.85rem;padding:8px 16px">
-            <i class="fas fa-phone"></i> ${t.contact_phone}</a>`:''}
-          ${t.cahier_url?`<a href="${t.cahier_url}" target="_blank" class="ao-apply-btn" style="background:#7c3aed;font-size:.85rem;padding:8px 16px">
+          ${t.contact_email?`<a href="mailto:${esc(t.contact_email)}" class="ao-apply-btn" style="font-size:.85rem;padding:8px 16px">
+            <i class="fas fa-envelope"></i> ${esc(t.contact_email)}</a>`:''}
+          ${t.contact_phone?`<a href="tel:${esc(t.contact_phone)}" class="ao-apply-btn" style="background:#1B3A6B;font-size:.85rem;padding:8px 16px">
+            <i class="fas fa-phone"></i> ${esc(t.contact_phone)}</a>`:''}
+          ${t.cahier_url?`<a href="${esc(t.cahier_url)}" target="_blank" class="ao-apply-btn" style="background:#7c3aed;font-size:.85rem;padding:8px 16px">
             <i class="fas fa-file-pdf"></i> Cahier des charges</a>`:''}
         </div>
       </div>`:''}`;

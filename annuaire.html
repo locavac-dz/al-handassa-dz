@@ -241,6 +241,7 @@ const p = { search:'', specialty:'', availability:'', wilaya:'' };
 function initials(fn, ln) {
   return ((fn||'?')[0]+(ln||'?')[0]).toUpperCase();
 }
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 async function loadPros() {
   const qs = new URLSearchParams();
@@ -274,25 +275,25 @@ async function loadPros() {
 
 function cardHTML(pr) {
   const avatar = pr.photo_url
-    ? `<img src="${pr.photo_url}" alt="${pr.first_name} ${pr.last_name}" loading="lazy" />`
+    ? `<img src="${esc(pr.photo_url)}" alt="${esc(pr.first_name)} ${esc(pr.last_name)}" loading="lazy" />`
     : initials(pr.first_name, pr.last_name);
-  const loc = [pr.city, pr.wilaya ? WILAYAS[pr.wilaya] : null].filter(Boolean).join(', ');
+  const loc = [pr.city, pr.wilaya ? WILAYAS[pr.wilaya] : null].filter(Boolean).map(esc).join(', ');
   const avColor = AVAIL_COLOR[pr.availability] || {};
-  const specs = (pr.specialties||[]).slice(0,3).map(s=>`<span class="pro-spec">${s}</span>`).join('');
+  const specs = (pr.specialties||[]).slice(0,3).map(s=>`<span class="pro-spec">${esc(s)}</span>`).join('');
   const badges = [
     pr.is_verified ? '<span class="pro-badge badge-verified">✓ Vérifié</span>' : '',
     pr.is_premium  ? '<span class="pro-badge badge-premium">⭐ Premium</span>'  : '',
-    pr.availability ? `<span class="pro-badge" style="background:${avColor.bg||'#f3f4f6'};color:${avColor.color||'#6b7280'}">${pr.availability}</span>` : '',
+    pr.availability ? `<span class="pro-badge" style="background:${avColor.bg||'#f3f4f6'};color:${avColor.color||'#6b7280'}">${esc(pr.availability)}</span>` : '',
   ].filter(Boolean).join('');
 
-  return `<div class="pro-card${pr.is_premium?' premium':''}" onclick="openProModal('${pr.slug}')">
+  return `<div class="pro-card${pr.is_premium?' premium':''}" onclick="openProModal('${esc(pr.slug)}')">
     <div class="pro-avatar">${avatar}</div>
-    <div class="pro-name">${pr.first_name} ${pr.last_name}</div>
-    ${pr.title?`<div class="pro-title">${pr.title}</div>`:''}
+    <div class="pro-name">${esc(pr.first_name)} ${esc(pr.last_name)}</div>
+    ${pr.title?`<div class="pro-title">${esc(pr.title)}</div>`:''}
     <div class="pro-badges">${badges}</div>
     <div class="pro-specs">${specs}</div>
     ${loc?`<div class="pro-loc"><i class="fas fa-map-marker-alt"></i> ${loc}</div>`:''}
-    ${pr.experience_years?`<div class="pro-exp"><i class="fas fa-clock"></i> ${pr.experience_years} ans d'expérience</div>`:''}
+    ${pr.experience_years?`<div class="pro-exp"><i class="fas fa-clock"></i> ${esc(pr.experience_years)} ans d'expérience</div>`:''}
   </div>`;
 }
 
@@ -306,59 +307,59 @@ async function openProModal(slug) {
     const data = await get('/professionals/' + slug);
     const pr = data.data;
     const avatar = pr.photo_url
-      ? `<img src="${pr.photo_url}" alt="${pr.first_name} ${pr.last_name}" />`
+      ? `<img src="${esc(pr.photo_url)}" alt="${esc(pr.first_name)} ${esc(pr.last_name)}" />`
       : initials(pr.first_name, pr.last_name);
-    const loc = [pr.city, pr.wilaya ? WILAYAS[pr.wilaya] : null].filter(Boolean).join(', ');
+    const loc = [pr.city, pr.wilaya ? WILAYAS[pr.wilaya] : null].filter(Boolean).map(esc).join(', ');
     const avColor = AVAIL_COLOR[pr.availability] || {};
 
     document.getElementById('pro-modal-body').innerHTML = `
       <div class="pro-modal-top">
         <div class="pro-modal-avatar">${avatar}</div>
         <div>
-          <div style="font-size:1.2rem;font-weight:800;color:#1e293b">${pr.first_name} ${pr.last_name}</div>
-          ${pr.title?`<div style="color:#4a1d96;font-weight:600;font-size:.9rem">${pr.title}</div>`:''}
+          <div style="font-size:1.2rem;font-weight:800;color:#1e293b">${esc(pr.first_name)} ${esc(pr.last_name)}</div>
+          ${pr.title?`<div style="color:#4a1d96;font-weight:600;font-size:.9rem">${esc(pr.title)}</div>`:''}
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
             ${pr.is_verified?'<span class="pro-badge badge-verified">✓ Vérifié</span>':''}
             ${pr.is_premium?'<span class="pro-badge badge-premium">⭐ Premium</span>':''}
-            ${pr.availability?`<span class="pro-badge" style="background:${avColor.bg||'#f3f4f6'};color:${avColor.color||'#6b7280'}">${pr.availability}</span>`:''}
+            ${pr.availability?`<span class="pro-badge" style="background:${avColor.bg||'#f3f4f6'};color:${avColor.color||'#6b7280'}">${esc(pr.availability)}</span>`:''}
           </div>
         </div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
         ${loc?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Localisation</div><div style="font-size:.88rem;font-weight:600">${loc}</div></div>`:''}
-        ${pr.experience_years?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Expérience</div><div style="font-size:.88rem;font-weight:600">${pr.experience_years} ans</div></div>`:''}
-        ${pr.education?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Formation</div><div style="font-size:.88rem;font-weight:600">${pr.education}</div></div>`:''}
-        ${pr.institution?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Établissement</div><div style="font-size:.88rem;font-weight:600">${pr.institution}</div></div>`:''}
-        ${pr.contract_pref?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Préférence contrat</div><div style="font-size:.88rem;font-weight:600">${pr.contract_pref}</div></div>`:''}
+        ${pr.experience_years?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Expérience</div><div style="font-size:.88rem;font-weight:600">${esc(pr.experience_years)} ans</div></div>`:''}
+        ${pr.education?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Formation</div><div style="font-size:.88rem;font-weight:600">${esc(pr.education)}</div></div>`:''}
+        ${pr.institution?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Établissement</div><div style="font-size:.88rem;font-weight:600">${esc(pr.institution)}</div></div>`:''}
+        ${pr.contract_pref?`<div style="background:#f8fafc;border-radius:8px;padding:8px 12px"><div style="font-size:.75rem;color:#94a3b8">Préférence contrat</div><div style="font-size:.88rem;font-weight:600">${esc(pr.contract_pref)}</div></div>`:''}
       </div>
 
-      ${pr.tagline?`<div class="pro-modal-section"><p style="color:#4a1d96;font-style:italic;font-size:.95rem">"${pr.tagline}"</p></div>`:''}
-      ${pr.bio?`<div class="pro-modal-section"><h4>👤 À propos</h4><p>${pr.bio}</p></div>`:''}
+      ${pr.tagline?`<div class="pro-modal-section"><p style="color:#4a1d96;font-style:italic;font-size:.95rem">"${esc(pr.tagline)}"</p></div>`:''}
+      ${pr.bio?`<div class="pro-modal-section"><h4>👤 À propos</h4><p>${esc(pr.bio)}</p></div>`:''}
 
       ${(pr.specialties||[]).length?`
       <div class="pro-modal-section">
         <h4>🎯 Spécialités</h4>
-        <div class="pro-tags-wrap">${pr.specialties.map(s=>`<span class="pro-tag tag-spec">${s}</span>`).join('')}</div>
+        <div class="pro-tags-wrap">${pr.specialties.map(s=>`<span class="pro-tag tag-spec">${esc(s)}</span>`).join('')}</div>
       </div>`:''}
 
       ${(pr.skills||[]).length?`
       <div class="pro-modal-section">
         <h4>🛠️ Compétences techniques</h4>
-        <div class="pro-tags-wrap">${pr.skills.map(s=>`<span class="pro-tag tag-skill">${s}</span>`).join('')}</div>
+        <div class="pro-tags-wrap">${pr.skills.map(s=>`<span class="pro-tag tag-skill">${esc(s)}</span>`).join('')}</div>
       </div>`:''}
 
       ${(pr.languages||[]).length?`
       <div class="pro-modal-section">
         <h4>🌐 Langues</h4>
-        <div class="pro-tags-wrap">${pr.languages.map(l=>`<span class="pro-tag tag-lang">${l}</span>`).join('')}</div>
+        <div class="pro-tags-wrap">${pr.languages.map(l=>`<span class="pro-tag tag-lang">${esc(l)}</span>`).join('')}</div>
       </div>`:''}
 
       <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">
-        ${pr.email?`<a href="mailto:${pr.email}" class="pro-contact-btn"><i class="fas fa-envelope"></i> Contacter</a>`:''}
-        ${pr.phone?`<a href="tel:${pr.phone}" class="pro-contact-btn" style="background:#065f46"><i class="fas fa-phone"></i> ${pr.phone}</a>`:''}
-        ${pr.linkedin_url?`<a href="${pr.linkedin_url}" target="_blank" rel="noopener" class="pro-contact-btn linkedin"><i class="fab fa-linkedin"></i> LinkedIn</a>`:''}
-        ${pr.portfolio_url?`<a href="${pr.portfolio_url}" target="_blank" rel="noopener" class="pro-contact-btn portfolio"><i class="fas fa-globe"></i> Portfolio</a>`:''}
+        ${pr.email?`<a href="mailto:${esc(pr.email)}" class="pro-contact-btn"><i class="fas fa-envelope"></i> Contacter</a>`:''}
+        ${pr.phone?`<a href="tel:${esc(pr.phone)}" class="pro-contact-btn" style="background:#065f46"><i class="fas fa-phone"></i> ${esc(pr.phone)}</a>`:''}
+        ${pr.linkedin_url?`<a href="${esc(pr.linkedin_url)}" target="_blank" rel="noopener" class="pro-contact-btn linkedin"><i class="fab fa-linkedin"></i> LinkedIn</a>`:''}
+        ${pr.portfolio_url?`<a href="${esc(pr.portfolio_url)}" target="_blank" rel="noopener" class="pro-contact-btn portfolio"><i class="fas fa-globe"></i> Portfolio</a>`:''}
       </div>`;
   } catch {
     document.getElementById('pro-modal-body').innerHTML =

@@ -247,6 +247,7 @@ Object.entries(WILAYAS).forEach(([code,name]) => {
 
 let allJobs = [], debounce;
 const p = { search:'', contract:'', specialty:'', level:'', wilaya:'' };
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function timeAgo(d) {
   const days = Math.floor((Date.now()-new Date(d))/(86400000));
@@ -291,25 +292,25 @@ async function loadJobs() {
 
 function cardHTML(j) {
   const logo = j.company_logo
-    ? `<img src="${j.company_logo}" alt="${j.company_name||''}" loading="lazy" />`
+    ? `<img src="${esc(j.company_logo)}" alt="${esc(j.company_name||'')}" loading="lazy" />`
     : '💼';
-  const loc = [j.city, j.wilaya ? WILAYAS[j.wilaya] : null].filter(Boolean).join(', ');
+  const loc = [j.city, j.wilaya ? WILAYAS[j.wilaya] : null].filter(Boolean).map(esc).join(', ');
   const expire = j.expires_at ? `· Expire le ${new Date(j.expires_at).toLocaleDateString('fr-DZ')}` : '';
 
-  return `<a class="job-card${j.is_featured?' featured':''}" onclick="openJobModal('${j.slug}'); return false;" href="#">
+  return `<a class="job-card${j.is_featured?' featured':''}" onclick="openJobModal('${esc(j.slug)}'); return false;" href="#">
     <div class="job-logo">${logo}</div>
     <div class="job-body">
-      <div class="job-title">${j.is_featured?'⭐ ':''}${j.title}</div>
-      <div class="job-company">${j.company_name||'Entreprise confidentielle'}${j.company_verified?' ✓':''}</div>
+      <div class="job-title">${j.is_featured?'⭐ ':''}${esc(j.title)}</div>
+      <div class="job-company">${esc(j.company_name||'Entreprise confidentielle')}${j.company_verified?' ✓':''}</div>
       <div class="job-chips">
-        ${j.contract_type?`<span class="job-chip chip-contract">${j.contract_type}</span>`:''}
-        ${j.level?`<span class="job-chip chip-level">${j.level}</span>`:''}
+        ${j.contract_type?`<span class="job-chip chip-contract">${esc(j.contract_type)}</span>`:''}
+        ${j.level?`<span class="job-chip chip-level">${esc(j.level)}</span>`:''}
         ${loc?`<span class="job-chip chip-loc"><i class="fas fa-map-marker-alt"></i> ${loc}</span>`:''}
-        ${j.specialty?`<span class="job-chip chip-contract">${j.specialty}</span>`:''}
+        ${j.specialty?`<span class="job-chip chip-contract">${esc(j.specialty)}</span>`:''}
       </div>
       <div class="job-footer">
         <span>${timeAgo(j.created_at)} ${expire}</span>
-        ${j.salary_range?`<span class="job-salary">💰 ${j.salary_range}</span>`:''}
+        ${j.salary_range?`<span class="job-salary">💰 ${esc(j.salary_range)}</span>`:''}
       </div>
     </div>
   </a>`;
@@ -343,46 +344,46 @@ async function openJobModal(slug) {
   try {
     const data = await get('/jobs/' + slug);
     const j = data.data;
-    const loc = [j.city, j.wilaya ? WILAYAS[j.wilaya] : null].filter(Boolean).join(', ');
+    const loc = [j.city, j.wilaya ? WILAYAS[j.wilaya] : null].filter(Boolean).map(esc).join(', ');
     const logo = j.company_logo
-      ? `<img src="${j.company_logo}" alt="${j.company_name||''}" />`
+      ? `<img src="${esc(j.company_logo)}" alt="${esc(j.company_name||'')}" />`
       : '💼';
 
     const contact = j.contact_email || j.contact_phone;
     const applyHref = j.contact_email
-      ? `mailto:${j.contact_email}?subject=Candidature — ${j.title}`
-      : (j.contact_phone ? `tel:${j.contact_phone}` : '#');
+      ? `mailto:${encodeURIComponent(j.contact_email)}?subject=${encodeURIComponent('Candidature — ' + (j.title||''))}`
+      : (j.contact_phone ? `tel:${encodeURIComponent(j.contact_phone)}` : '#');
 
     document.getElementById('job-modal-body').innerHTML = `
       <div class="job-modal-header">
         <div class="job-modal-logo">${logo}</div>
         <div>
-          <div style="font-size:1.1rem;font-weight:800;color:#1e293b">${j.title}</div>
-          <div style="color:#1B3A6B;font-weight:600;font-size:.9rem">${j.company_name||'Confidentiel'}</div>
+          <div style="font-size:1.1rem;font-weight:800;color:#1e293b">${esc(j.title)}</div>
+          <div style="color:#1B3A6B;font-weight:600;font-size:.9rem">${esc(j.company_name||'Confidentiel')}</div>
           <div class="job-modal-meta">
-            ${[j.contract_type,j.level,loc,j.specialty].filter(Boolean).join(' · ')}
+            ${[j.contract_type,j.level].filter(Boolean).map(esc).concat(loc?[loc]:[],j.specialty?[esc(j.specialty)]:[]).join(' · ')}
           </div>
         </div>
       </div>
 
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
-        ${j.contract_type?`<span class="job-chip chip-contract" style="font-size:.82rem">${j.contract_type}</span>`:''}
-        ${j.level?`<span class="job-chip chip-level" style="font-size:.82rem">${j.level}</span>`:''}
-        ${j.education?`<span class="job-chip chip-loc" style="font-size:.82rem">🎓 ${j.education}</span>`:''}
-        ${j.experience?`<span class="job-chip chip-loc" style="font-size:.82rem">⏱ ${j.experience}</span>`:''}
-        ${j.salary_range?`<span class="job-chip" style="font-size:.82rem;background:#F0FDF4;color:#065f46">💰 ${j.salary_range}</span>`:''}
+        ${j.contract_type?`<span class="job-chip chip-contract" style="font-size:.82rem">${esc(j.contract_type)}</span>`:''}
+        ${j.level?`<span class="job-chip chip-level" style="font-size:.82rem">${esc(j.level)}</span>`:''}
+        ${j.education?`<span class="job-chip chip-loc" style="font-size:.82rem">🎓 ${esc(j.education)}</span>`:''}
+        ${j.experience?`<span class="job-chip chip-loc" style="font-size:.82rem">⏱ ${esc(j.experience)}</span>`:''}
+        ${j.salary_range?`<span class="job-chip" style="font-size:.82rem;background:#F0FDF4;color:#065f46">💰 ${esc(j.salary_range)}</span>`:''}
       </div>
 
-      ${j.description?`<div class="job-section"><h4>📋 Description du poste</h4><p>${j.description}</p></div>`:''}
-      ${j.missions?`<div class="job-section"><h4>🎯 Missions</h4><p>${j.missions}</p></div>`:''}
-      ${j.profile?`<div class="job-section"><h4>👤 Profil recherché</h4><p>${j.profile}</p></div>`:''}
+      ${j.description?`<div class="job-section"><h4>📋 Description du poste</h4><p>${esc(j.description)}</p></div>`:''}
+      ${j.missions?`<div class="job-section"><h4>🎯 Missions</h4><p>${esc(j.missions)}</p></div>`:''}
+      ${j.profile?`<div class="job-section"><h4>👤 Profil recherché</h4><p>${esc(j.profile)}</p></div>`:''}
 
       ${contact?`
       <div style="text-align:center;margin-top:8px">
-        <a href="${applyHref}" class="job-apply-btn">
+        <a href="${esc(applyHref)}" class="job-apply-btn">
           <i class="fas fa-paper-plane"></i> Postuler maintenant
         </a>
-        ${j.contact_phone?`<p style="margin:10px 0 0;font-size:.85rem;color:#64748b">📞 ${j.contact_phone}</p>`:''}
+        ${j.contact_phone?`<p style="margin:10px 0 0;font-size:.85rem;color:#64748b">📞 ${esc(j.contact_phone)}</p>`:''}
       </div>`:''}`;
   } catch {
     document.getElementById('job-modal-body').innerHTML =

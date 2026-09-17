@@ -196,6 +196,7 @@ WILAYAS.forEach(([code,name]) => {
 
 let debounceTimer;
 const params = { search:'', specialty:'', wilaya:'' };
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 async function loadCompanies() {
   document.getElementById('ent-skeleton').style.display = 'grid';
@@ -230,28 +231,28 @@ async function loadCompanies() {
 
 function cardHTML(c) {
   const logo = c.logo_url
-    ? `<img src="${c.logo_url}" alt="${c.name}" loading="lazy" />`
+    ? `<img src="${esc(c.logo_url)}" alt="${esc(c.name)}" loading="lazy" />`
     : `🏢`;
   const cover = c.cover_url
-    ? `<img src="${c.cover_url}" alt="" loading="lazy" />`
+    ? `<img src="${esc(c.cover_url)}" alt="" loading="lazy" />`
     : '';
-  const tags = (c.specialties || []).slice(0,3).map(s => `<span class="ent-tag">${s}</span>`).join('');
+  const tags = (c.specialties || []).slice(0,3).map(s => `<span class="ent-tag">${esc(s)}</span>`).join('');
   const wilayaName = c.wilaya_siege ? (WILAYAS.find(w=>w[0]==c.wilaya_siege)||['',''])[1] : '';
   const badges = [
     c.is_verified ? '<span class="ent-badge-verified">✓ Vérifié</span>' : '',
     c.is_premium  ? '<span class="ent-badge-premium">⭐ Premium</span>'  : '',
   ].filter(Boolean).join('');
 
-  return `<a class="ent-card" href="entreprise.html?slug=${c.slug}">
+  return `<a class="ent-card" href="entreprise.html?slug=${esc(c.slug)}">
     <div class="ent-card-cover">${cover}<div class="ent-card-logo">${logo}</div></div>
     <div class="ent-card-body">
-      <div class="ent-card-name">${c.name}</div>
-      ${c.tagline ? `<div class="ent-card-tagline">${c.tagline}</div>` : ''}
+      <div class="ent-card-name">${esc(c.name)}</div>
+      ${c.tagline ? `<div class="ent-card-tagline">${esc(c.tagline)}</div>` : ''}
       <div class="ent-card-tags">${tags}</div>
     </div>
     <div class="ent-card-footer">
-      <span>${wilayaName || '—'} ${c.founded_year ? '· '+c.founded_year : ''}</span>
-      <span>${badges || (c.projects_count > 0 ? c.projects_count+' réalisations' : '')}</span>
+      <span>${esc(wilayaName || '—')} ${c.founded_year ? '· '+esc(c.founded_year) : ''}</span>
+      <span>${badges || (c.projects_count > 0 ? esc(c.projects_count)+' réalisations' : '')}</span>
     </div>
   </a>`;
 }
