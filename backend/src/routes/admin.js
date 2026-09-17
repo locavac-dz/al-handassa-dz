@@ -690,6 +690,12 @@ router.post('/study-levels', async (req, res, next) => {
     const { slug, label_fr, label_ar, icon, color, db_value, sort_order } = req.body;
     if (!label_fr) throw new AppError('Le libellé (FR) est requis.', 400);
     if (!db_value) throw new AppError('La valeur base de données est requise.', 400);
+    // ALTER TYPE ... ADD VALUE ne supporte pas les requêtes paramétrées ($1) pour
+    // le nom de la valeur : on valide donc strictement le format plutôt que
+    // d'interpoler la chaîne brute dans le SQL (injection sinon).
+    if (!/^[a-z][a-z0-9_]{0,49}$/.test(db_value)) {
+      throw new AppError('Valeur base de données invalide (minuscules, chiffres, underscore uniquement).', 400);
+    }
     const finalSlug = slug || label_fr.toLowerCase().replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '');
 
     // Ajouter la valeur ENUM si elle n'existe pas encore
@@ -719,6 +725,9 @@ router.put('/study-levels/:id', async (req, res, next) => {
 
     // Ajouter la valeur ENUM si nouvelle
     if (db_value) {
+      if (!/^[a-z][a-z0-9_]{0,49}$/.test(db_value)) {
+        throw new AppError('Valeur base de données invalide (minuscules, chiffres, underscore uniquement).', 400);
+      }
       const enumCheck = await query(
         "SELECT 1 FROM pg_enum JOIN pg_type ON pg_enum.enumtypid=pg_type.oid WHERE pg_type.typname='content_level' AND enumlabel=$1",
         [db_value]
