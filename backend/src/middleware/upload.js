@@ -80,4 +80,4 @@ const uploadProductFiles = multer({
   },
 });
 
-module.exports = { uploadProduct, uploadVideo, uploadImage, uploadProductFiles };
+module.exports = { uploadProduct, uploadVideo, uploadImage, uploadProductFiles, ALLOWED, fileFilter };
