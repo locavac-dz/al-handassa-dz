@@ -31,6 +31,7 @@ const analyticsRoutes    = require('./routes/analytics');
 const paymentsFullRoutes = require('./routes/payments-full');
 const affiliateRoutes    = require('./routes/affiliate');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalytics');
+const licenseRoutes      = require('./routes/licenses');
 const referralRoutes     = require('./routes/referral');
 
 const app = express();
@@ -270,6 +271,7 @@ app.use('/api/jobs',     jobRoutes);
 app.use('/api/tenders',       tenderRoutes);
 app.use('/api/professionals', professionalRoutes);
 app.use('/api/assistant',    assistantRoutes);
+app.use('/api/licenses',     licenseRoutes);
 
 // ── Niveaux d'études (public) ──
 app.get('/api/study-levels', async (req, res) => {

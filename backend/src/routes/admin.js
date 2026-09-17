@@ -3,7 +3,8 @@ const { query } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
 const { AppError } = require('../middleware/errorHandler');
 const { paginate } = require('../utils/helpers');
-const { sendPaymentValidated, sendPaymentRejected } = require('../utils/email');
+const { sendPaymentValidated, sendPaymentRejected, sendLicenseIssued } = require('../utils/email');
+const { issueSoftwareLicenses } = require('../utils/license');
 
 // All routes require authenticate + authorize('admin')
 router.use(authenticate, authorize('admin'));
@@ -298,6 +299,9 @@ router.patch('/payments/:id/validate', async (req, res, next) => {
       [payment.order_id]
     );
 
+    // Émettre les licences logicielles si la commande en contient
+    const issuedLicenses = await issueSoftwareLicenses({ query }, payment.order_id, payment.user_id);
+
     // Email notification (non bloquant)
     const orderFull = await query('SELECT * FROM orders WHERE id=$1', [payment.order_id]);
     const userInfo = await query('SELECT email, first_name FROM users WHERE id=$1', [payment.user_id]);
@@ -306,6 +310,9 @@ router.patch('/payments/:id/validate', async (req, res, next) => {
       [payment.order_id]
     );
     sendPaymentValidated(orderFull.rows[0], userInfo.rows[0], orderItems.rows).catch(() => {});
+    if (issuedLicenses.length) {
+      sendLicenseIssued(userInfo.rows[0], issuedLicenses).catch(() => {});
+    }
 
     res.json({
       message: 'Paiement validé. Accès déverrouillé.',
@@ -808,6 +815,64 @@ router.patch('/users/:id/role', async (req, res, next) => {
       [role, req.params.id]
     );
     if (!result.rows.length) throw new AppError('Utilisateur introuvable.', 404);
+    res.json({ data: result.rows[0] });
+  } catch (err) { next(err); }
+});
+
+// GET /api/admin/licenses — liste des licences logicielles émises
+router.get('/licenses', async (req, res, next) => {
+  try {
+    const { page, limit: lim, search, app_slug } = req.query;
+    const { limit, offset, currentPage } = paginate(page, lim);
+
+    const conditions = [];
+    const params = [];
+    let i = 1;
+
+    if (search) {
+      conditions.push(`(sl.license_key ILIKE $${i} OR u.email ILIKE $${i})`);
+      params.push(`%${search}%`); i++;
+    }
+    if (app_slug) {
+      conditions.push(`sl.app_slug = $${i++}`);
+      params.push(app_slug);
+    }
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const countRes = await query(
+      `SELECT COUNT(*) FROM software_licenses sl JOIN users u ON u.id = sl.user_id ${where}`,
+      params
+    );
+    const total = parseInt(countRes.rows[0].count, 10);
+
+    params.push(limit, offset);
+    const result = await query(
+      `SELECT sl.id, sl.license_key, sl.app_slug, sl.license_plan, sl.status,
+              sl.activated_at, sl.expires_at, sl.created_at,
+              u.email AS user_email, u.first_name, u.last_name
+       FROM software_licenses sl
+       JOIN users u ON u.id = sl.user_id
+       ${where}
+       ORDER BY sl.created_at DESC
+       LIMIT $${i++} OFFSET $${i++}`,
+      params
+    );
+
+    res.json({
+      data: result.rows,
+      pagination: { page: currentPage, limit, total, pages: Math.ceil(total / limit) },
+    });
+  } catch (err) { next(err); }
+});
+
+// PATCH /api/admin/licenses/:id/revoke — révoquer une licence
+router.patch('/licenses/:id/revoke', async (req, res, next) => {
+  try {
+    const result = await query(
+      `UPDATE software_licenses SET status='revoked' WHERE id=$1 RETURNING id, license_key, status`,
+      [req.params.id]
+    );
+    if (!result.rows.length) throw new AppError('Licence introuvable.', 404);
     res.json({ data: result.rows[0] });
   } catch (err) { next(err); }
 });

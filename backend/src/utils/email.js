@@ -394,6 +394,50 @@ async function sendSubscriptionActivated(user, sub) {
   });
 }
 
+// ─── Licences logicielles (BétonLab DG, etc.) ─────────────────────────────────
+const { formatKeyForDisplay } = require('./license');
+
+async function sendLicenseIssued(user, licenses) {
+  const appNames = { 'betonlab-dg': 'BétonLab DG' };
+  const planNames = { pro: 'Pro', enterprise: 'Bureau / Labo' };
+
+  const rows = licenses.map(l => {
+    const expiresStr = new Date(l.expires_at).toLocaleDateString('fr-DZ', { day: 'numeric', month: 'long', year: 'numeric' });
+    return `
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:20px 24px;margin:16px 0">
+      <p style="margin:0 0 6px;color:#374151;font-weight:600;font-size:14px">
+        ${appNames[l.app_slug] || l.app_slug} — Plan ${planNames[l.license_plan] || l.license_plan}
+      </p>
+      <p style="margin:0 0 10px;font-family:monospace;font-size:18px;font-weight:700;color:#15803d;letter-spacing:0.05em">
+        ${formatKeyForDisplay(l.license_key)}
+      </p>
+      <p style="margin:0;color:#64748b;font-size:13px">Valable jusqu'au ${expiresStr}</p>
+    </div>`;
+  }).join('');
+
+  const html = _wrap(`
+    <div style="margin-bottom:24px">
+      ${_badge('🔑 Licence(s) prête(s) !', '#059669')}
+    </div>
+    <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Votre logiciel est activable</h1>
+    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${user.first_name}</strong>, merci pour votre achat. Voici votre/vos clé(s) de licence :</p>
+    ${rows}
+    <div style="background:#f8fafc;border-radius:8px;padding:16px 20px;margin:20px 0">
+      <p style="margin:0;color:#374151;font-size:14px">
+        Collez cette clé dans l'écran « Tarifs & Licence » de l'application pour l'activer.
+        Une connexion internet est nécessaire une seule fois, au moment de l'activation ;
+        l'application fonctionne ensuite hors-ligne jusqu'à l'expiration.
+      </p>
+    </div>
+  `);
+
+  return sendEmail({
+    to: user.email,
+    subject: `🔑 Votre clé de licence — Al Handassa.dz`,
+    html,
+  });
+}
+
 module.exports = {
   sendEmail,
   sendVerificationEmail,
@@ -404,4 +448,5 @@ module.exports = {
   sendPaymentRejected,
   sendPasswordReset,
   sendSubscriptionActivated,
+  sendLicenseIssued,
 };

@@ -1,6 +1,7 @@
 const { query, getClient } = require('../config/database');
 const { AppError } = require('../middleware/errorHandler');
 const { sendPaymentReceived, sendPaymentValidated } = require('../utils/email');
+const { issueSoftwareLicenses } = require('../utils/license');
 
 // ─── SATIM (CIB / Dahabiya) ──────────────────────────────────────
 async function initiateSatim(req, res, next) {
@@ -74,15 +75,26 @@ async function satimCallback(req, res, next) {
       [success ? 'completed' : 'failed', JSON.stringify(req.query), payment_id]
     );
 
+    let issuedLicenses = [];
     if (success) {
       await client.query(`UPDATE orders SET status='paid' WHERE id=$1`, [payment.order_id]);
       await unlockDownloads(client, payment.order_id, payment.user_id);
       await activateSubscriptionIfAny(client, payment.order_id, payment.user_id);
+      issuedLicenses = await issueSoftwareLicenses(client, payment.order_id, payment.user_id);
     } else {
       await client.query("UPDATE orders SET status='failed' WHERE id=$1", [payment.order_id]);
     }
 
     await client.query('COMMIT');
+
+    if (issuedLicenses.length) {
+      const userRes = await query('SELECT email, first_name FROM users WHERE id=$1', [payment.user_id]);
+      const { sendLicenseIssued } = require('../utils/email');
+      sendLicenseIssued(userRes.rows[0], issuedLicenses).catch(e => {
+        console.error('[EMAIL] sendLicenseIssued failed:', e.message);
+      });
+    }
+
     const redirectUrl = success
       ? `${process.env.FRONTEND_URL}/payment/success?order=${payment.order_id}`
       : `${process.env.FRONTEND_URL}/payment/fail?reason=declined`;
@@ -211,6 +223,9 @@ async function submitManualPayment(req, res, next) {
     // Activer l'abonnement si la commande en contient un
     const activatedPlan = await activateSubscriptionIfAny(client, order_id, req.user.id);
 
+    // Émettre les licences logicielles si la commande en contient
+    const issuedLicenses = await issueSoftwareLicenses(client, order_id, req.user.id);
+
     await client.query('COMMIT');
 
     // Email confirmation (non bloquant)
@@ -230,6 +245,12 @@ async function submitManualPayment(req, res, next) {
           console.error('[EMAIL] sendSubscriptionActivated failed:', e.message);
         });
       }
+    }
+    if (issuedLicenses.length) {
+      const { sendLicenseIssued } = require('../utils/email');
+      sendLicenseIssued(userInfo, issuedLicenses).catch(e => {
+        console.error('[EMAIL] sendLicenseIssued failed:', e.message);
+      });
     }
 
     res.json({
