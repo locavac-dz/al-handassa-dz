@@ -2,6 +2,9 @@ const { query, getClient } = require('../config/database');
 const { AppError } = require('../middleware/errorHandler');
 const { sendPaymentReceived } = require('../utils/email');
 const { issueSoftwareLicenses } = require('../utils/license');
+const SATIMLive = require('../config/satim-live');
+
+const satim = new SATIMLive();
 
 // ─── SATIM (CIB / Dahabiya) ──────────────────────────────────────
 async function initiateSatim(req, res, next) {
@@ -62,13 +65,27 @@ async function satimCallback(req, res, next) {
   const client = await getClient();
   try {
     await client.query('BEGIN');
-    const { payment_id, orderId, respCode } = req.query;
+    const { payment_id, orderId, respCode, signature, ...rest } = req.query;
 
     const payRes = await client.query('SELECT * FROM payments WHERE id=$1', [payment_id]);
     if (!payRes.rows.length) throw new AppError('Paiement introuvable.', 404);
 
     const payment = payRes.rows[0];
-    const success = respCode === '00'; // 00 = succès SATIM
+    // respCode seul n'est PAS une preuve de paiement : n'importe qui connaissant
+    // son propre payment_id pourrait appeler ce callback directement avec
+    // respCode=00 pour s'auto-approuver sans jamais avoir payé. La signature
+    // SATIM (HMAC avec la clé marchande, cf. SATIMLive.verifyPaymentConfirmation)
+    // est donc obligatoire — un callback sans signature valide n'est jamais
+    // considéré comme un succès, même si respCode=00.
+    let signatureValid = false;
+    if (signature) {
+      try {
+        signatureValid = satim.verifyPaymentConfirmation({ payment_id, orderId, respCode, ...rest }, signature);
+      } catch (e) {
+        console.error('[SATIM] Vérification de signature impossible:', e.message);
+      }
+    }
+    const success = respCode === '00' && signatureValid;
 
     await client.query(
       `UPDATE payments SET status=$1, ${success?'completed_at':'failed_at'}=NOW(), gateway_response=$2 WHERE id=$3`,
