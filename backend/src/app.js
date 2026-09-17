@@ -28,7 +28,6 @@ const tenderRoutes       = require('./routes/tenders');
 const professionalRoutes = require('./routes/professionals');
 const assistantRoutes    = require('./routes/assistant');
 const analyticsRoutes    = require('./routes/analytics');
-const paymentsFullRoutes = require('./routes/payments-full');
 const affiliateRoutes    = require('./routes/affiliate');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalytics');
 const licenseRoutes      = require('./routes/licenses');
@@ -256,7 +255,6 @@ app.use('/api/videos', videoRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
-app.use('/api/payments', paymentsFullRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/newsletter', newsletterRoutes);
@@ -344,7 +342,7 @@ app.use((req, res) => {
 // ── Error Handler ──
 app.use(errorHandler);
 
-// ── Start ──
+// ── Start (skipped on Vercel: serverless invokes the exported app directly) ──
 async function start() {
   const dbOk = await testConnection();
   if (!dbOk && process.env.NODE_ENV === 'production') {
@@ -359,6 +357,8 @@ async function start() {
   });
 }
 
-start();
+if (!process.env.VERCEL) {
+  start();
+}
 
 module.exports = app;

@@ -1,5 +1,7 @@
 const express   = require('express');
 const router    = express.Router();
+const { body }  = require('express-validator');
+const validate  = require('../middleware/validate');
 const { query } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
 const multer    = require('multer');
@@ -9,6 +11,24 @@ const sharp     = require('sharp');
 const { ALLOWED, fileFilter } = require('../middleware/upload');
 const auth  = authenticate;
 const admin = authorize('admin');
+
+const proFieldChecks = [
+  body('email').optional({ checkFalsy: true }).isEmail().withMessage('Email invalide.'),
+  body('linkedin_url').optional({ checkFalsy: true }).isURL().withMessage('URL LinkedIn invalide.'),
+  body('portfolio_url').optional({ checkFalsy: true }).isURL().withMessage('URL portfolio invalide.'),
+  body('experience_years').optional({ checkFalsy: true }).isInt({ min: 0, max: 70 }).withMessage('Années d\'expérience invalides.'),
+  body('wilaya').optional({ checkFalsy: true }).isInt({ min: 1, max: 58 }).withMessage('Wilaya invalide.'),
+];
+const createProValidation = [
+  body('first_name').trim().notEmpty().withMessage('Prénom requis.').isLength({ max: 100 }),
+  body('last_name').trim().notEmpty().withMessage('Nom requis.').isLength({ max: 100 }),
+  ...proFieldChecks,
+];
+const updateProValidation = [
+  body('first_name').optional().trim().notEmpty().withMessage('Le prénom ne peut pas être vide.').isLength({ max: 100 }),
+  body('last_name').optional().trim().notEmpty().withMessage('Le nom ne peut pas être vide.').isLength({ max: 100 }),
+  ...proFieldChecks,
+];
 
 const uploadDir = path.join(__dirname, '../../../uploads/professionals');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
@@ -93,15 +113,12 @@ router.get('/admin/list', auth, admin, async (req, res) => {
   } catch(e) { res.status(500).json({ success:false, message:e.message }); }
 });
 
-router.post('/admin', auth, admin, upload.single('photo'), async (req, res) => {
+router.post('/admin', auth, admin, upload.single('photo'), createProValidation, validate, async (req, res) => {
   try {
     const { first_name, last_name, title, tagline, bio, wilaya, city,
             specialties, skills, languages, experience_years, education, institution,
             availability, contract_pref, email, phone, linkedin_url, portfolio_url,
             is_verified, is_premium } = req.body;
-
-    if (!first_name || !last_name)
-      return res.status(400).json({ success:false, message:'Prénom et nom requis' });
 
     let slug = slugify(`${first_name} ${last_name}`) + '-' + Date.now().toString(36);
     let photo_url = null;
@@ -134,7 +151,7 @@ router.post('/admin', auth, admin, upload.single('photo'), async (req, res) => {
   } catch(e) { res.status(500).json({ success:false, message:e.message }); }
 });
 
-router.patch('/admin/:id', auth, admin, upload.single('photo'), async (req, res) => {
+router.patch('/admin/:id', auth, admin, upload.single('photo'), updateProValidation, validate, async (req, res) => {
   try {
     const exist = await query(`SELECT * FROM professionals WHERE id=$1`, [req.params.id]);
     if (!exist.rows.length) return res.status(404).json({ success:false, message:'Introuvable' });

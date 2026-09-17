@@ -1,5 +1,7 @@
 const express  = require('express');
 const router   = express.Router();
+const { body } = require('express-validator');
+const validate = require('../middleware/validate');
 const { query } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
 const authMiddleware  = authenticate;
@@ -9,6 +11,21 @@ const path     = require('path');
 const fs       = require('fs');
 const sharp    = require('sharp');
 const { ALLOWED, fileFilter } = require('../middleware/upload');
+
+const companyFieldChecks = [
+  body('email').optional({ checkFalsy: true }).isEmail().withMessage('Email invalide.'),
+  body('website').optional({ checkFalsy: true }).isURL().withMessage('Site web invalide.'),
+  body('founded_year').optional({ checkFalsy: true }).isInt({ min: 1900, max: 2100 }).withMessage('Année de fondation invalide.'),
+  body('wilaya_siege').optional({ checkFalsy: true }).isInt({ min: 1, max: 58 }).withMessage('Wilaya invalide.'),
+];
+const createCompanyValidation = [
+  body('name').trim().notEmpty().withMessage('Le nom est requis.').isLength({ max: 200 }),
+  ...companyFieldChecks,
+];
+const updateCompanyValidation = [
+  body('name').optional().trim().notEmpty().withMessage('Le nom ne peut pas être vide.').isLength({ max: 200 }),
+  ...companyFieldChecks,
+];
 
 // ── Upload config ─────────────────────────────────────────
 const uploadDir = path.join(__dirname, '../../../uploads/companies');
@@ -100,7 +117,7 @@ router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
 });
 
 // POST /api/admin/companies
-router.post('/admin', authMiddleware, adminMiddleware, upload.fields([{ name:'logo', maxCount:1 },{ name:'cover', maxCount:1 }]), async (req, res) => {
+router.post('/admin', authMiddleware, adminMiddleware, upload.fields([{ name:'logo', maxCount:1 },{ name:'cover', maxCount:1 }]), createCompanyValidation, validate, async (req, res) => {
   try {
     const { name, tagline, description, specialties, wilayas, wilaya_siege,
             size_range, founded_year, email, phone, website, address, agrement,
@@ -141,7 +158,7 @@ router.post('/admin', authMiddleware, adminMiddleware, upload.fields([{ name:'lo
 });
 
 // PATCH /api/admin/companies/:id
-router.patch('/admin/:id', authMiddleware, adminMiddleware, upload.fields([{ name:'logo', maxCount:1 },{ name:'cover', maxCount:1 }]), async (req, res) => {
+router.patch('/admin/:id', authMiddleware, adminMiddleware, upload.fields([{ name:'logo', maxCount:1 },{ name:'cover', maxCount:1 }]), updateCompanyValidation, validate, async (req, res) => {
   try {
     const { id } = req.params;
     const existing = await query(`SELECT * FROM companies WHERE id=$1`, [id]);

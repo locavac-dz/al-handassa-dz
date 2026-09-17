@@ -1,9 +1,26 @@
 const express   = require('express');
 const router    = express.Router();
+const { body }  = require('express-validator');
+const validate  = require('../middleware/validate');
 const { query } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
 const auth  = authenticate;
 const admin = authorize('admin');
+
+const tenderFieldChecks = [
+  body('contact_email').optional({ checkFalsy: true }).isEmail().withMessage('Email de contact invalide.'),
+  body('wilaya').optional({ checkFalsy: true }).isInt({ min: 1, max: 58 }).withMessage('Wilaya invalide.'),
+  body('deadline_at').optional({ checkFalsy: true }).isISO8601().withMessage('Date limite invalide.'),
+  body('opening_at').optional({ checkFalsy: true }).isISO8601().withMessage('Date d\'ouverture invalide.'),
+];
+const createTenderValidation = [
+  body('title').trim().notEmpty().withMessage('Titre requis.').isLength({ max: 300 }),
+  ...tenderFieldChecks,
+];
+const updateTenderValidation = [
+  body('title').optional().trim().notEmpty().withMessage('Le titre ne peut pas être vide.').isLength({ max: 300 }),
+  ...tenderFieldChecks,
+];
 
 function slugify(str) {
   return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
@@ -84,14 +101,12 @@ router.get('/admin/list', auth, admin, async (req, res) => {
   } catch(e) { res.status(500).json({ success:false, message:e.message }); }
 });
 
-router.post('/admin', auth, admin, async (req, res) => {
+router.post('/admin', auth, admin, createTenderValidation, validate, async (req, res) => {
   try {
     const { title, description, lot, sector, reference, company_id, owner_name, owner_type,
             wilaya, city, budget_range, published_at, deadline_at, opening_at,
             cahier_url, contact_name, contact_email, contact_phone, contact_address,
             status, is_featured } = req.body;
-
-    if (!title) return res.status(400).json({ success:false, message:'Titre requis' });
 
     const slug = slugify(title) + '-' + Date.now().toString(36);
 
@@ -115,7 +130,7 @@ router.post('/admin', auth, admin, async (req, res) => {
   } catch(e) { res.status(500).json({ success:false, message:e.message }); }
 });
 
-router.patch('/admin/:id', auth, admin, async (req, res) => {
+router.patch('/admin/:id', auth, admin, updateTenderValidation, validate, async (req, res) => {
   try {
     const exist = await query(`SELECT * FROM tenders WHERE id=$1`, [req.params.id]);
     if (!exist.rows.length) return res.status(404).json({ success:false, message:'Introuvable' });

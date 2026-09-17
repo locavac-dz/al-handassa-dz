@@ -1,9 +1,25 @@
 const express   = require('express');
 const router    = express.Router();
+const { body }  = require('express-validator');
+const validate  = require('../middleware/validate');
 const { query } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
 const auth  = authenticate;
 const admin = authorize('admin');
+
+const jobFieldChecks = [
+  body('contact_email').optional({ checkFalsy: true }).isEmail().withMessage('Email de contact invalide.'),
+  body('wilaya').optional({ checkFalsy: true }).isInt({ min: 1, max: 58 }).withMessage('Wilaya invalide.'),
+  body('expires_at').optional({ checkFalsy: true }).isISO8601().withMessage('Date d\'expiration invalide.'),
+];
+const createJobValidation = [
+  body('title').trim().notEmpty().withMessage('Titre requis.').isLength({ max: 300 }),
+  ...jobFieldChecks,
+];
+const updateJobValidation = [
+  body('title').optional().trim().notEmpty().withMessage('Le titre ne peut pas être vide.').isLength({ max: 300 }),
+  ...jobFieldChecks,
+];
 
 function slugify(str) {
   return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
@@ -88,13 +104,11 @@ router.get('/admin/list', auth, admin, async (req, res) => {
 });
 
 // POST /api/jobs/admin
-router.post('/admin', auth, admin, async (req, res) => {
+router.post('/admin', auth, admin, createJobValidation, validate, async (req, res) => {
   try {
     const { title, description, missions, profile, company_id, wilaya, city,
             contract_type, specialty, level, education, experience, salary_range,
             contact_email, contact_phone, is_featured, expires_at } = req.body;
-
-    if (!title) return res.status(400).json({ success:false, message:'Titre requis' });
 
     let slug = slugify(title) + '-' + Date.now().toString(36);
 
@@ -117,7 +131,7 @@ router.post('/admin', auth, admin, async (req, res) => {
 });
 
 // PATCH /api/jobs/admin/:id
-router.patch('/admin/:id', auth, admin, async (req, res) => {
+router.patch('/admin/:id', auth, admin, updateJobValidation, validate, async (req, res) => {
   try {
     const exist = await query(`SELECT * FROM job_offers WHERE id=$1`, [req.params.id]);
     if (!exist.rows.length) return res.status(404).json({ success:false, message:'Introuvable' });
