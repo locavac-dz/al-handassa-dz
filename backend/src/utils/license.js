@@ -16,7 +16,10 @@ function generateLicenseKey(licensePlan, expiresAt) {
   const secret = process.env.LICENSE_HMAC_SECRET;
   if (!secret) throw new Error('LICENSE_HMAC_SECRET manquant dans les variables d\'environnement.');
 
-  const mac = crypto.createHmac('sha256', secret).update(planCode + yymm).digest('hex').toUpperCase();
+  // Nonce aléatoire mélangé dans le HMAC : sans lui, deux clients achetant le
+  // même plan avec la même échéance (mois) recevraient la clé identique.
+  const nonce = crypto.randomBytes(8).toString('hex');
+  const mac = crypto.createHmac('sha256', secret).update(planCode + yymm + nonce).digest('hex').toUpperCase();
   const h1 = mac.slice(0, 8);
   const h2 = mac.slice(8, 16);
 
@@ -56,17 +59,23 @@ async function issueSoftwareLicenses(db, orderId, userId) {
     // Aligner l'expiration en fin de mois, comme le fait le générateur de clés existant
     const expiryEom = new Date(expiresAt.getFullYear(), expiresAt.getMonth() + 1, 0);
 
-    const licenseKey = generateLicenseKey(licensePlan, expiryEom);
-
-    const result = await db.query(
-      `INSERT INTO software_licenses (license_key, app_slug, license_plan, user_id, order_item_id, expires_at)
-       VALUES ($1,$2,$3,$4,$5,$6)
-       ON CONFLICT (license_key) DO NOTHING
-       RETURNING license_key, app_slug, license_plan, expires_at`,
-      [licenseKey, appSlug, licensePlan, userId, item.order_item_id, expiryEom]
-    );
-
-    if (result.rows.length) issued.push(result.rows[0]);
+    // Le nonce aléatoire dans generateLicenseKey() rend une collision
+    // astronomiquement improbable ; on retente quand même plutôt que de
+    // livrer silencieusement zéro licence pour un paiement encaissé.
+    let inserted = null;
+    for (let attempt = 0; attempt < 3 && !inserted; attempt++) {
+      const licenseKey = generateLicenseKey(licensePlan, expiryEom);
+      const result = await db.query(
+        `INSERT INTO software_licenses (license_key, app_slug, license_plan, user_id, order_item_id, expires_at)
+         VALUES ($1,$2,$3,$4,$5,$6)
+         ON CONFLICT (license_key) DO NOTHING
+         RETURNING license_key, app_slug, license_plan, expires_at`,
+        [licenseKey, appSlug, licensePlan, userId, item.order_item_id, expiryEom]
+      );
+      inserted = result.rows[0] || null;
+    }
+    if (!inserted) throw new Error(`Impossible de générer une clé de licence unique pour order_item ${item.order_item_id} après 3 tentatives.`);
+    issued.push(inserted);
   }
   return issued;
 }
