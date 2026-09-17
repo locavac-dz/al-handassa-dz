@@ -2339,15 +2339,29 @@ async function _submitCheckout(orderId, method) {
     let result;
     if (method === 'ccp_virement' || method === 'baridimob') {
       result = await api.manualPayment(orderId, method, ref, '');
+      // Paiement déclaré, pas encore vérifié par un admin : pas d'accès débloqué tout de suite.
+      _showCheckoutPending(result);
     } else if (method === 'code_prepaye') {
       result = await api.redeemPrepaid(code);
+      // Code prépayé : vérifié instantanément côté serveur, accès réellement débloqué.
+      _showCheckoutSuccess(orderId, result);
     }
-    // Succès : afficher l'écran de téléchargement
-    _showCheckoutSuccess(orderId, result);
   } catch (err) {
     btn.disabled = false; btn.textContent = '✅ Confirmer le paiement';
     showToast(err.message, 'error');
   }
+}
+
+function _showCheckoutPending(paymentResult) {
+  const modal = document.getElementById('checkout-modal');
+  if (!modal) return;
+  modal.innerHTML = `
+  <div class="checkout-box co-success">
+    <div class="co-success-icon">⏳</div>
+    <h2 class="co-success-title">Paiement en attente de vérification</h2>
+    <p class="co-success-sub">${paymentResult?.message || 'Votre paiement a été enregistré et sera vérifié par notre équipe sous peu. Vous recevrez un email dès que votre accès sera débloqué.'}</p>
+    <button class="btn btn-primary" style="margin-top:20px;width:100%" onclick="_closeCheckout()">Fermer</button>
+  </div>`;
 }
 
 async function _showCheckoutSuccess(orderId, paymentResult) {
@@ -2667,17 +2681,30 @@ async function _submitSubscription(plan) {
     // 2. Valider le paiement
     if (activeMethod === 'code_prepaye') {
       await api.redeemPrepaid(code);
+      // Code prépayé vérifié instantanément côté serveur : abonnement réellement actif.
+      _showSubSuccess(plan, cycle);
     } else {
       await api.manualPayment(orderId, activeMethod, reference, '');
+      // Paiement déclaré, pas encore vérifié par un admin : abonnement pas encore actif.
+      _showSubPending();
     }
-
-    // 3. Succès — afficher confirmation
-    _showSubSuccess(plan, cycle);
   } catch (err) {
     btn.disabled = false;
     btn.textContent = '✅ Confirmer l\'abonnement';
     showToast(err.message, 'error');
   }
+}
+
+function _showSubPending() {
+  const modal = document.getElementById('sub-modal');
+  if (!modal) return;
+  modal.innerHTML = `
+  <div class="sub-box sub-success">
+    <div class="sub-success-icon">⏳</div>
+    <h2 class="sub-success-title">Paiement en attente de vérification</h2>
+    <p class="sub-success-desc">Votre paiement a été enregistré et sera vérifié par notre équipe sous peu. Vous recevrez un email dès que votre abonnement sera activé.</p>
+    <button class="btn btn-primary" style="width:100%;margin-top:20px" onclick="_closeSubModal()">Fermer</button>
+  </div>`;
 }
 
 function _showSubSuccess(plan, cycle) {

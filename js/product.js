@@ -993,12 +993,13 @@ const productApp = {
       );
       const orderId = orderRes.data?.id;
 
-      // 2. Soumettre le paiement — validation automatique immédiate
+      // 2. Soumettre le paiement — déclaration en attente de vérification (24-48h)
       const note = document.getElementById('pay-note')?.value.trim();
-      const payRes = await api.manualPayment(orderId, this._payMethod, reference, note);
+      await api.manualPayment(orderId, this._payMethod, reference, note);
 
-      // 3. Afficher succès + bouton téléchargement immédiat
-      this._showPaySuccess(orderRes.data?.order_number || '—', p.id, p.title);
+      // 3. Afficher l'écran d'attente — l'accès n'est pas débloqué tant qu'un
+      // admin n'a pas vérifié le paiement.
+      this._showPayPending(orderRes.data?.order_number || '—');
     } catch (ex) {
       errEl.textContent = ex.message;
       errEl.style.display = 'block';
@@ -1007,32 +1008,19 @@ const productApp = {
     }
   },
 
-  _showPaySuccess(orderNum, productId, productTitle) {
+  _showPayPending(orderNum) {
     document.getElementById('pay-modal-body').innerHTML = `
       <div class="pay-success">
-        <div class="pay-success-icon">✅</div>
-        <h3>Paiement confirmé !</h3>
-        <p>Votre accès a été débloqué immédiatement.</p>
+        <div class="pay-success-icon">⏳</div>
+        <h3>Paiement en attente de vérification</h3>
+        <p>Votre paiement a été enregistré et sera vérifié par notre équipe sous 24 à 48h. Vous recevrez un email dès que votre accès sera débloqué.</p>
         <div class="order-num">Commande : ${esc(orderNum)}</div>
-        <p>Téléchargez votre fichier ci-dessous :</p>
       </div>`;
     document.getElementById('pay-modal-footer').innerHTML = `
-      <button class="btn btn-primary" style="flex:2"
-        onclick="productApp.closePayModal(); downloadBlob('${esc(productId)}','${esc(productTitle)}')">
-        <i class="fas fa-download"></i> Télécharger maintenant
-      </button>
       <button class="btn btn-outline" style="flex:1" onclick="productApp.closePayModal()">
         <i class="fas fa-times"></i> Fermer
       </button>`;
-    toast('Paiement validé ! Téléchargement disponible.', 'ok');
-    // Mettre à jour le bouton principal de la page
-    const ctaBtn = document.getElementById('cta-btn');
-    if (ctaBtn) {
-      ctaBtn.className = 'btn-buy btn-owned';
-      ctaBtn.innerHTML = '<i class="fas fa-download"></i> Télécharger';
-      ctaBtn.onclick = () => downloadBlob(productId, productTitle);
-      ctaBtn.disabled = false;
-    }
+    toast('Paiement enregistré, en attente de vérification.', 'ok');
   },
 
   closePayModal() {

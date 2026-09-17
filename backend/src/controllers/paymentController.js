@@ -1,6 +1,6 @@
 const { query, getClient } = require('../config/database');
 const { AppError } = require('../middleware/errorHandler');
-const { sendPaymentReceived, sendPaymentValidated } = require('../utils/email');
+const { sendPaymentReceived } = require('../utils/email');
 const { issueSoftwareLicenses } = require('../utils/license');
 
 // ─── SATIM (CIB / Dahabiya) ──────────────────────────────────────
@@ -191,7 +191,11 @@ async function redeemPrepaidCode(req, res, next) {
   }
 }
 
-// ─── Paiement manuel (CCP / BaridiMob) — validation automatique ──
+// ─── Paiement manuel (CCP / BaridiMob) — déclaration en attente de vérification ──
+// L'utilisateur déclare lui-même avoir payé (référence/note en texte libre, non
+// vérifiable automatiquement). Ça ne débloque RIEN tant qu'un admin n'a pas
+// validé via PATCH /api/admin/payments/:id/validate — sans quoi n'importe qui
+// pourrait s'auto-attribuer gratuitement téléchargements/abonnements/licences.
 async function submitManualPayment(req, res, next) {
   const client = await getClient();
   try {
@@ -205,62 +209,34 @@ async function submitManualPayment(req, res, next) {
     if (!orderRes.rows.length) throw new AppError('Commande introuvable.', 404);
     const order = orderRes.rows[0];
     if (order.status === 'paid') throw new AppError('Commande déjà validée.', 400);
+    if (order.status === 'processing') throw new AppError('Ce paiement est déjà en attente de vérification.', 400);
 
-    // Enregistrer le paiement comme complété immédiatement
+    // Enregistrer la déclaration de paiement — statut "pending", à vérifier par un admin
     await client.query(
-      `INSERT INTO payments (order_id, user_id, method, status, amount, gateway_response, completed_at)
-       VALUES ($1,$2,$3,'completed',$4,$5,NOW())`,
+      `INSERT INTO payments (order_id, user_id, method, status, amount, gateway_response)
+       VALUES ($1,$2,$3,'pending',$4,$5)`,
       [order_id, req.user.id, method, order.total_amount,
        JSON.stringify({ reference, proof_note })]
     );
 
-    // Passer la commande à "paid" directement
-    await client.query("UPDATE orders SET status='paid' WHERE id=$1", [order_id]);
-
-    // Débloquer les téléchargements (produits)
-    await unlockDownloads(client, order_id, req.user.id);
-
-    // Activer l'abonnement si la commande en contient un
-    const activatedPlan = await activateSubscriptionIfAny(client, order_id, req.user.id);
-
-    // Émettre les licences logicielles si la commande en contient
-    const issuedLicenses = await issueSoftwareLicenses(client, order_id, req.user.id);
+    // La commande passe en "processing" (déclarée, pas encore vérifiée) —
+    // surtout PAS "paid" : aucun accès n'est débloqué à ce stade.
+    await client.query("UPDATE orders SET status='processing' WHERE id=$1", [order_id]);
 
     await client.query('COMMIT');
 
-    // Email confirmation (non bloquant)
+    // Email "paiement reçu, en cours de vérification" (non bloquant)
     const userRes = await query('SELECT email, first_name FROM users WHERE id=$1', [req.user.id]);
     const userInfo = userRes.rows[0];
-    // Récupérer les items pour l'email
-    const orderItems = await query('SELECT * FROM order_items WHERE order_id=$1', [order_id]);
-    // Email "accès déverrouillé" plutôt que "en attente" — paiement validé instantanément
-    sendPaymentValidated(order, userInfo, orderItems.rows).catch(e => {
-      console.error('[EMAIL] sendPaymentValidated failed:', e.message);
+    sendPaymentReceived(order, userInfo, method).catch(e => {
+      console.error('[EMAIL] sendPaymentReceived failed:', e.message);
     });
-    // Si abonnement activé, envoyer aussi l'email de bienvenue abonnement (réutiliser sendWelcomeEmail)
-    if (activatedPlan) {
-      const { sendSubscriptionActivated } = require('../utils/email');
-      if (sendSubscriptionActivated) {
-        sendSubscriptionActivated(userInfo, activatedPlan).catch(e => {
-          console.error('[EMAIL] sendSubscriptionActivated failed:', e.message);
-        });
-      }
-    }
-    if (issuedLicenses.length) {
-      const { sendLicenseIssued } = require('../utils/email');
-      sendLicenseIssued(userInfo, issuedLicenses).catch(e => {
-        console.error('[EMAIL] sendLicenseIssued failed:', e.message);
-      });
-    }
 
     res.json({
-      message: activatedPlan
-        ? `Abonnement ${activatedPlan.plan} activé jusqu'au ${new Date(activatedPlan.expires_at).toLocaleDateString('fr-DZ')} !`
-        : 'Paiement confirmé ! Votre téléchargement est disponible.',
+      message: 'Paiement enregistré. Il sera vérifié par notre équipe sous peu — vous recevrez un email dès que votre accès sera débloqué.',
       order_number: order.order_number,
       order_id: order_id,
-      auto_validated: true,
-      subscription: activatedPlan,
+      auto_validated: false,
     });
   } catch (err) {
     await client.query('ROLLBACK');
