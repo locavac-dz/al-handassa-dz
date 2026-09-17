@@ -2,7 +2,7 @@
 
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('mongo-sanitize');
+const mongoSanitize = require('express-mongo-sanitize');
 
 // Rate limiting for API
 const apiLimiter = rateLimit({

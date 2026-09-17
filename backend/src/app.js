@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('mongo-sanitize');
+const mongoSanitize = require('express-mongo-sanitize');
 
 const { testConnection } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');

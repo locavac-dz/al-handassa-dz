@@ -3,7 +3,7 @@ const { authenticate, authorize } = require('../middleware/auth');
 const { query } = require('../config/database');
 
 // Analytics Dashboard (Admin only) - REAL DATA
-router.get('/dashboard', authenticate, authorize('admin'), async (req, res) => {
+router.get('/dashboard', authenticate, authorize('admin'), async (req, res, next) => {
   try {
     const [revenueResult, ordersResult, usersResult, monthlyResult, recentOrdersResult] = await Promise.all([
       query(`SELECT SUM(COALESCE(total_amount, 0)) as total FROM orders WHERE payment_status = 'completed'`),
@@ -55,6 +55,7 @@ router.get('/dashboard', authenticate, authorize('admin'), async (req, res) => {
     };
 
     res.json(analytics);
+  } catch (err) { next(err); }
 });
 
 // Revenue Chart Data
