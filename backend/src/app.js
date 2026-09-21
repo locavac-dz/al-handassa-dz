@@ -29,10 +29,8 @@ const tenderRoutes       = require('./routes/tenders');
 const professionalRoutes = require('./routes/professionals');
 const assistantRoutes    = require('./routes/assistant');
 const analyticsRoutes    = require('./routes/analytics');
-const affiliateRoutes    = require('./routes/affiliate');
 const advancedAnalyticsRoutes = require('./routes/advancedAnalytics');
 const licenseRoutes      = require('./routes/licenses');
-const referralRoutes     = require('./routes/referral');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -330,8 +328,10 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/analytics-advanced', advancedAnalyticsRoutes);
-app.use('/api/affiliate', affiliateRoutes);
-app.use('/api/referral', referralRoutes);
+// /api/affiliate et /api/referral NON montés : leurs tables (affiliates, referral_codes, user_rewards,
+// user_credits, affiliate_payouts…) n'existent dans aucune migration (les routes répondaient 500) et le code
+// contient des failles de fraude (activation rejouable, points/montants négatifs, solde jamais débité,
+// email des utilisateurs dans le classement public). À réécrire avant de les remonter.
 app.use('/api/contact',   contactRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/jobs',     jobRoutes);
