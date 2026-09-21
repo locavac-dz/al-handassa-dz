@@ -203,6 +203,22 @@ function showMsg(id, text, type) {
   el.className = 'msg ' + type + ' show';
 }
 
+// Redirection après connexion : uniquement vers une page du même site (jamais javascript:, //autre-site, https://autre-site)
+function safeRedirect(target) {
+  try {
+    const u = new URL(target || 'index.html', location.href);
+    if (u.origin === location.origin) return u.pathname + u.search + u.hash;
+  } catch (e) { /* URL invalide */ }
+  return 'index.html';
+}
+
+// L'API renvoie access_token + refresh_token (même clés que Auth dans js/api.js)
+function saveSession(data) {
+  localStorage.setItem('hds_token', data.access_token);
+  if (data.refresh_token) localStorage.setItem('hds_refresh', data.refresh_token);
+  if (data.user) localStorage.setItem('hds_user', JSON.stringify(data.user));
+}
+
 // Redirect si déjà connecté
 (function() {
   const token = localStorage.getItem('hds_token');
@@ -211,8 +227,7 @@ function showMsg(id, text, type) {
     .then(r => r.json())
     .then(d => {
       if (d.user) {
-        const redir = new URLSearchParams(location.search).get('redirect') || 'index.html';
-        location.href = redir;
+        location.href = safeRedirect(new URLSearchParams(location.search).get('redirect'));
       }
     }).catch(() => {});
 })();
@@ -231,13 +246,10 @@ async function doLogin(e) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Identifiants incorrects');
-    localStorage.setItem('hds_token', data.token);
-    if (data.user) localStorage.setItem('hds_user', JSON.stringify(data.user));
+    saveSession(data);
     showMsg('login-msg', '🎉 Connexion réussie ! Redirection...', 'success');
-    setTimeout(() => {
-      const redir = new URLSearchParams(location.search).get('redirect') || 'index.html';
-      location.href = redir;
-    }, 800);
+    const target = safeRedirect(new URLSearchParams(location.search).get('redirect'));
+    setTimeout(() => { location.href = target; }, 800);
   } catch (err) {
     showMsg('login-msg', '❌ ' + err.message, 'error');
     btn.disabled = false; btn.textContent = '🚀 Se Connecter';
@@ -274,8 +286,7 @@ async function doRegister(e) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Erreur lors de la création du compte');
-    localStorage.setItem('hds_token', data.token);
-    if (data.user) localStorage.setItem('hds_user', JSON.stringify(data.user));
+    saveSession(data);
     showMsg('register-msg', '🎉 Compte créé avec succès ! Redirection...', 'success');
     setTimeout(() => { location.href = 'index.html'; }, 1000);
   } catch (err) {
