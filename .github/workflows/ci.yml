@@ -42,6 +42,9 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
+      # pg_dump / pg_restore : requis par tests/backup.test.js (en CI leur absence est une erreur, pas un « ignoré »)
+      - name: Client PostgreSQL
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
       - name: Migrations depuis zéro
         run: npm run migrate
       - name: Migrations ré-appliquées (idempotence)

@@ -35,6 +35,7 @@ node tests/run.js payments  # seulement les fichiers dont le nom contient « pay
 | `access-rules.test.js` | Avis réservés aux acheteurs, codes prépayés (course entre 12 comptes) |
 | `security.test.js` | Limiteurs de débit, fichiers du dépôt jamais servis, CSP page / API |
 | `catalog.test.js` | Recherche produit, pagination, sitemap dynamique |
+| `backup.test.js` | `backup.js` : dump + instantanés d'uploads (liens physiques), rétention, garde-fous, verrou, échecs, restauration de contrôle qui détecte dump corrompu / données manquantes / fichier altéré. Exige `pg_dump` et `pg_restore` (`PG_BIN=<dossier>` si absents du PATH ; ignoré en local sans eux, erreur en CI) |
 | `env.test.js` | Contrôle des variables d'environnement au démarrage (sans base) |
 
 ## Écrire un test

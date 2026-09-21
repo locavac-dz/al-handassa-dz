@@ -74,7 +74,8 @@ sudo -u postgres psql <<SQL
 DO \$\$
 BEGIN
   IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '$DB_USER') THEN
-    CREATE ROLE $DB_USER LOGIN PASSWORD '$DB_PASS';
+    -- CREATEDB : node backup.js verify restaure la sauvegarde dans une base temporaire (voir « Sauvegardes »)
+    CREATE ROLE $DB_USER LOGIN CREATEDB PASSWORD '$DB_PASS';
   END IF;
 END \$\$;
 CREATE DATABASE $DB_NAME OWNER $DB_USER;

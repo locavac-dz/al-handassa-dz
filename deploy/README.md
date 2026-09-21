@@ -191,6 +191,65 @@ bash deploy/deploy.sh
 | **VPS** (nginx + PM2) | `deploy/*.sh`, `deploy/nginx/*` | Copier aussi `security-headers.conf` et `proxy.conf` dans `/etc/nginx/snippets/` (voir l'en-tête de `handassi.dz.conf`). `/uploads/` est **proxifié vers Node** : ne jamais le servir avec `alias`, cela contourne le contrôle d'accès aux fichiers payants. |
 | **Vercel** | `vercel.json`, `api/index.js` | Système de fichiers en lecture seule/éphémère : les uploads ne peuvent pas y vivre (prévoir un stockage objet). `sitemap.xml` statique masque la route dynamique : ajouter un rewrite `/sitemap.xml → /api/index`. |
 
+## Sauvegardes et restauration
+
+`backend/backup.js` sauvegarde la base PostgreSQL et le dossier `uploads/` ; `verify` prouve que la sauvegarde se
+restaure. Sans copie **hors du serveur** (voir plus bas), ce n'est pas encore une protection contre la perte du disque.
+
+**Prérequis** : client PostgreSQL au moins aussi récent que le serveur (`apt install postgresql-client`), Node (déjà là).
+
+```bash
+# Dossier des sauvegardes : HORS de uploads/ (qui est servi au public), lisible par l'utilisateur de l'app seulement
+install -d -m 700 -o <utilisateur-app> /var/backups/handassi
+
+# crontab de l'utilisateur de l'app : sauvegarde chaque nuit, contrôle de restauration chaque dimanche
+15 3 * * *  cd /var/www/handassi.dz/backend && BACKUP_DIR=/var/backups/handassi node backup.js run    >> /var/log/handassi-backup.log 2>&1
+30 4 * * 0  cd /var/www/handassi.dz/backend && BACKUP_DIR=/var/backups/handassi node backup.js verify >> /var/log/handassi-backup.log 2>&1
+```
+
+- **Contenu** : `db/db-AAAAMMJJ-HHMMSS.dump` (14 jours, + une copie mensuelle sur 12 mois) et `uploads/AAAAMMJJ-HHMMSS/`
+  (7 instantanés ; les fichiers inchangés sont des liens physiques, donc presque aucun espace en plus, et un fichier
+  supprimé par erreur reste récupérable dans un instantané antérieur). Durées : `BACKUP_KEEP_DAYS`,
+  `BACKUP_KEEP_MONTHLY`, `BACKUP_KEEP_SNAPSHOTS`.
+- **Perte maximale (RPO)** : jusqu'à 24 h de commandes avec une sauvegarde nocturne. Pour moins, planifier aussi
+  `BACKUP_UPLOADS=false node backup.js run` toutes les 4-6 h (base seule, très léger).
+- **`verify`** restaure le dernier dump dans une base temporaire (supprimée ensuite), compare les effectifs des tables
+  clés à la base réelle, et recompare un échantillon de fichiers par empreinte SHA-256. `--strict` exige l'égalité
+  exacte (juste après une sauvegarde). Une table vide dans la sauvegarde alors que la base contient des lignes est une
+  alerte ; sur un site tout neuf, une fausse alerte est possible la première semaine (relancer `verify`). L'utilisateur
+  de la base doit pouvoir créer une base : `setup.sh` le prévoit désormais (`CREATEDB`) ; sur un serveur déjà installé,
+  `sudo -u postgres psql -c "ALTER ROLE handassi CREATEDB;"`. Testé avec un rôle non-superutilisateur, propriétaire de
+  sa base, comme celui de `setup.sh` (migrations depuis zéro, sauvegarde et restauration).
+- **Alerte si la sauvegarde ne tourne plus** : créer deux contrôles gratuits sur healthchecks.io et renseigner
+  `HEALTHCHECK_URL` (pingée après chaque `run` réussi, `/fail` sinon) et `HEALTHCHECK_URL_VERIFY`. Sans cela, une
+  sauvegarde qui échoue en silence ne se voit qu'au jour du sinistre.
+
+### Restaurer après un sinistre
+
+```bash
+# 1. Base : créer une base vide, puis restaurer le dump voulu (le plus récent : db/db-….dump)
+createdb -h <hote> -U <utilisateur> handassi_db
+pg_restore --no-owner --no-privileges -h <hote> -U <utilisateur> -d handassi_db /var/backups/handassi/db/db-AAAAMMJJ-HHMMSS.dump
+cd /var/www/handassi.dz/backend && npm run migrate      # sans effet si déjà à jour, applique les migrations manquantes sinon
+
+# 2. Fichiers : recopier l'instantané voulu (ou un seul fichier supprimé par erreur)
+cp -a /var/backups/handassi/uploads/AAAAMMJJ-HHMMSS/. /var/www/handassi.dz/backend/uploads/
+```
+
+### Copie hors du serveur (à mettre en place — non fournie)
+
+Le dossier de sauvegarde est sur le même disque que le site : une panne du disque ou du VPS emporte tout. Copier
+`/var/backups/handassi` chaque nuit vers un autre fournisseur (stockage objet type Backblaze B2 / Hetzner Storage Box) avec
+un outil qui **chiffre côté client** — les sauvegardes contiennent emails et hachages de mots de passe (ex. `restic` ou
+`rclone` avec `crypt`). Non testé ici : à essayer avec une restauration réelle depuis la copie.
+
+### Si la production tourne sur Railway
+
+`backup.js` fonctionne contre n'importe quelle `DATABASE_URL` accessible : lancer `run` depuis une machine tierce avec l'URL
+**publique** de la base Railway et `BACKUP_UPLOADS=false`. Il ne peut **pas** atteindre le volume `/app/backend/uploads` de
+Railway : pour ces fichiers, utiliser la sauvegarde de volumes de Railway (à vérifier selon l'offre) ou, mieux, déplacer les
+uploads vers un stockage objet (chantier non fait).
+
 ## Variables d'environnement de production
 
 Obligatoires : `NODE_ENV=production`, `DATABASE_URL` (ou `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASSWORD`),
