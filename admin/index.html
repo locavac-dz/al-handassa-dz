@@ -223,10 +223,14 @@ function toast(msg, type='ok') {
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 function fmt(n)  { return Number(n||0).toLocaleString('fr-DZ'); }
 function dt(d)   { return d ? new Date(d).toLocaleDateString('fr-DZ',{day:'2-digit',month:'short',year:'numeric'}) : '—'; }
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+// Registre d'objets pour les boutons Modifier : évite d'injecter du JSON dans les attributs onclick
+let _regN = 0; const REG = {};
+function reg(o) { const k = 'r' + (++_regN); REG[k] = o; return k; }
 function bdg(s)  {
   const m = {pending:'En attente',paid:'Payé',completed:'Validé',failed:'Échoué',processing:'En cours',
              active:'Actif',inactive:'Inactif',admin:'Admin',student:'Étudiant',free:'Gratuit'};
-  return `<span class="bdg bdg-${s}">${m[s]||s}</span>`;
+  return `<span class="bdg bdg-${esc(s)}">${esc(m[s]||s)}</span>`;
 }
 
 // ── LOGIN ────────────────────────────────────────────────────────────────────
@@ -264,7 +268,7 @@ function openApp(user) {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-screen').style.display = 'flex';
   document.getElementById('topbar-user').innerHTML =
-    '<strong>' + user.first_name + ' ' + user.last_name + '</strong> &nbsp;·&nbsp; ' + bdg('admin');
+    '<strong>' + esc(user.first_name) + ' ' + esc(user.last_name) + '</strong> &nbsp;·&nbsp; ' + bdg('admin');
   loadPage('dashboard');
 }
 
@@ -312,7 +316,7 @@ async function pgDashboard() {
         <div class="card-hdr"><h3>🛒 Commandes récentes</h3><button class="btn btn-b" onclick="loadPage('payments')">Voir paiements</button></div>
         <table><thead><tr><th>Client</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead>
         <tbody>${(s.recent_orders||[]).map(o=>`<tr>
-          <td><strong>${o.first_name} ${o.last_name}</strong><br><small style="color:#94a3b8">${o.email}</small></td>
+          <td><strong>${esc(o.first_name)} ${esc(o.last_name)}</strong><br><small style="color:#94a3b8">${esc(o.email)}</small></td>
           <td><strong>${fmt(o.total_amount)} DZD</strong></td>
           <td>${bdg(o.status)}</td><td>${dt(o.created_at)}</td>
         </tr>`).join('') || '<tr><td colspan="4" class="no-data">Aucune commande</td></tr>'}</tbody></table>
@@ -321,7 +325,7 @@ async function pgDashboard() {
         <div class="card-hdr"><h3>👥 Nouveaux utilisateurs</h3></div>
         <table><thead><tr><th>Nom</th><th>Rôle</th><th>Date</th></tr></thead>
         <tbody>${(s.recent_users||[]).map(u=>`<tr>
-          <td><strong>${u.first_name} ${u.last_name}</strong><br><small style="color:#94a3b8">${u.email}</small></td>
+          <td><strong>${esc(u.first_name)} ${esc(u.last_name)}</strong><br><small style="color:#94a3b8">${esc(u.email)}</small></td>
           <td>${bdg(u.role)}</td><td>${dt(u.created_at)}</td>
         </tr>`).join('') || '<tr><td colspan="3" class="no-data">Aucun utilisateur</td></tr>'}</tbody></table>
       </div>
@@ -336,17 +340,17 @@ async function pgPayments() {
     <div class="card">
       <div class="card-hdr"><h3>⏳ Paiements en attente (${pays.length})</h3></div>
       <table><thead><tr><th>Client</th><th>Méthode</th><th>Montant</th><th>Référence</th><th>Date</th><th>Actions</th></tr></thead>
-      <tbody id="pay-body">${pays.map(p=>`<tr id="pr-${p.id}">
-        <td><strong>${p.first_name} ${p.last_name}</strong><br><small style="color:#94a3b8">${p.email}</small><br>
-            <small style="color:#94a3b8">Cmd: ${p.order_number||'—'}</small></td>
-        <td><strong>${(p.method||'').toUpperCase()}</strong></td>
+      <tbody id="pay-body">${pays.map(p=>`<tr id="pr-${esc(p.id)}">
+        <td><strong>${esc(p.first_name)} ${esc(p.last_name)}</strong><br><small style="color:#94a3b8">${esc(p.email)}</small><br>
+            <small style="color:#94a3b8">Cmd: ${esc(p.order_number||'—')}</small></td>
+        <td><strong>${esc((p.method||'').toUpperCase())}</strong></td>
         <td><strong style="color:#1B3A6B">${fmt(p.amount)} DZD</strong></td>
-        <td><code style="font-size:.75rem;background:#f0f4fa;padding:2px 8px;border-radius:6px">${p.reference||p.baridimob_ref||'—'}</code>
-            ${p.proof_note?'<br><small style="color:#64748b">'+p.proof_note+'</small>':''}</td>
+        <td><code style="font-size:.75rem;background:#f0f4fa;padding:2px 8px;border-radius:6px">${esc(p.reference||p.baridimob_ref||'—')}</code>
+            ${p.proof_note?'<br><small style="color:#64748b">'+esc(p.proof_note)+'</small>':''}</td>
         <td>${dt(p.initiated_at)}</td>
         <td style="display:flex;gap:6px">
-          <button class="btn btn-g" onclick="validatePay('${p.id}','${p.order_id}')"><i class="fas fa-check"></i> Valider</button>
-          <button class="btn btn-r" onclick="rejectPay('${p.id}')"><i class="fas fa-times"></i> Rejeter</button>
+          <button class="btn btn-g" onclick="validatePay('${esc(p.id)}','${esc(p.order_id)}')"><i class="fas fa-check"></i> Valider</button>
+          <button class="btn btn-r" onclick="rejectPay('${esc(p.id)}')"><i class="fas fa-times"></i> Rejeter</button>
         </td>
       </tr>`).join('') || '<tr><td colspan="6" class="no-data">✅ Aucun paiement en attente</td></tr>'}</tbody></table>
     </div>`;
@@ -385,13 +389,13 @@ async function pgOrders() {
     </div>
     <div class="card"><div class="card-hdr"><h3>📋 Toutes les commandes (${pays.length})</h3></div>
     <table><thead><tr><th>Client</th><th>Méthode</th><th>Montant</th><th>Statut</th><th>Date</th><th>Action</th></tr></thead>
-    <tbody id="ot">${pays.map(p=>`<tr data-status="${p.status}" data-search="${(p.first_name+' '+p.last_name+' '+p.email).toLowerCase()}">
-      <td><strong>${p.first_name} ${p.last_name}</strong><br><small style="color:#94a3b8">${p.email}</small></td>
-      <td>${(p.method||'').toUpperCase()}</td>
+    <tbody id="ot">${pays.map(p=>`<tr data-status="${esc(p.status)}" data-search="${esc((p.first_name+' '+p.last_name+' '+p.email).toLowerCase())}">
+      <td><strong>${esc(p.first_name)} ${esc(p.last_name)}</strong><br><small style="color:#94a3b8">${esc(p.email)}</small></td>
+      <td>${esc((p.method||'').toUpperCase())}</td>
       <td><strong>${fmt(p.amount)} DZD</strong></td>
       <td>${bdg(p.status)}</td>
       <td>${dt(p.initiated_at)}</td>
-      <td>${p.status==='pending'?'<button class="btn btn-g" onclick="validatePay(\''+p.id+'\',\''+p.order_id+'\')"><i class="fas fa-check"></i> Valider</button>':''}</td>
+      <td>${p.status==='pending'?'<button class="btn btn-g" onclick="validatePay(\''+esc(p.id)+'\',\''+esc(p.order_id)+'\')"><i class="fas fa-check"></i> Valider</button>':''}</td>
     </tr>`).join('')}</tbody></table></div>`;
 }
 
@@ -400,13 +404,13 @@ async function pgUsers() {
   const s = await api('GET', '/admin/stats');
   const users = s.recent_users || [];
   document.getElementById('page').innerHTML = `
-    <div class="card"><div class="card-hdr"><h3>👥 Utilisateurs (${s.total_users} total)</h3></div>
+    <div class="card"><div class="card-hdr"><h3>👥 Utilisateurs (${esc(s.total_users)} total)</h3></div>
     <table><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Abonnement</th><th>Inscription</th></tr></thead>
     <tbody>${users.map(u=>`<tr>
-      <td><strong>${u.first_name} ${u.last_name}</strong></td>
-      <td>${u.email}</td>
+      <td><strong>${esc(u.first_name)} ${esc(u.last_name)}</strong></td>
+      <td>${esc(u.email)}</td>
       <td>${bdg(u.role)}</td>
-      <td>${u.subscription_plan||'free'}</td>
+      <td>${esc(u.subscription_plan||'free')}</td>
       <td>${dt(u.created_at)}</td>
     </tr>`).join('')}</tbody></table>
     <div style="text-align:center;padding:12px;color:#94a3b8;font-size:.8rem">Affichage des 8 derniers inscrits</div>
@@ -425,7 +429,7 @@ async function loadCats() {
 }
 function catOptions(sel) {
   return '<option value="">-- Aucune --</option>' +
-    _cats.map(c=>`<option value="${c.id}"${c.id==sel?' selected':''}>${c.name_fr||c.name}</option>`).join('');
+    _cats.map(c=>`<option value="${esc(c.id)}"${c.id==sel?' selected':''}>${esc(c.name_fr||c.name)}</option>`).join('');
 }
 const TYPE_OPTS = `
   <option value="">-- Choisir --</option>
@@ -453,24 +457,24 @@ async function pgProducts() {
   document.getElementById('page').innerHTML = `
     <div class="filters">
       <select id="pt" onchange="filterTable('prod-tbl','pt','data-type')">
-        <option value="">Tous types</option>${types.map(t=>'<option value="'+t+'">'+t+'</option>').join('')}
+        <option value="">Tous types</option>${types.map(t=>'<option value="'+esc(t)+'">'+esc(t)+'</option>').join('')}
       </select>
       <input placeholder="Rechercher titre, catégorie…" oninput="filterTable('prod-tbl',null,null,this.value)">
       <button class="btn btn-p" onclick="showUpload()"><i class="fas fa-plus"></i> Ajouter une ressource</button>
     </div>
     <div class="card"><div class="card-hdr"><h3>📦 Produits (${prods.length})</h3></div>
     <table><thead><tr><th>Titre</th><th>Type</th><th>Catégorie</th><th>Tags</th><th>Prix</th><th>Actif</th><th>Actions</th></tr></thead>
-    <tbody id="prod-tbl">${prods.map(p=>`<tr data-type="${p.type}" data-search="${(p.title+' '+(catMap[p.category_id]||'')).toLowerCase()}">
-      <td><strong>${p.title}</strong><br><small style="color:#94a3b8;font-size:.68rem">${p.slug}</small></td>
-      <td><span style="font-size:.68rem;font-weight:700;background:#f0f4fa;padding:2px 7px;border-radius:20px;white-space:nowrap">${p.type}</span></td>
-      <td style="font-size:.75rem;color:#475569">${catMap[p.category_id]||'—'}</td>
-      <td style="font-size:.7rem;color:#64748b;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(p.tags||[]).join(', ')}">${(p.tags||[]).join(', ')||'—'}</td>
+    <tbody id="prod-tbl">${prods.map(p=>`<tr data-type="${esc(p.type)}" data-search="${esc((p.title+' '+(catMap[p.category_id]||'')).toLowerCase())}">
+      <td><strong>${esc(p.title)}</strong><br><small style="color:#94a3b8;font-size:.68rem">${esc(p.slug)}</small></td>
+      <td><span style="font-size:.68rem;font-weight:700;background:#f0f4fa;padding:2px 7px;border-radius:20px;white-space:nowrap">${esc(p.type)}</span></td>
+      <td style="font-size:.75rem;color:#475569">${esc(catMap[p.category_id]||'—')}</td>
+      <td style="font-size:.7rem;color:#64748b;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc((p.tags||[]).join(', '))}">${esc((p.tags||[]).join(', ')||'—')}</td>
       <td>${p.is_free?bdg('free'):'<strong>'+fmt(p.price)+' DZD</strong>'}</td>
-      <td><label class="tog"><input type="checkbox" ${p.is_active?'checked':''} onchange="toggleProd('${p.id}',this.checked)"><span class="tog-sl"></span></label></td>
+      <td><label class="tog"><input type="checkbox" ${p.is_active?'checked':''} onchange="toggleProd('${esc(p.id)}',this.checked)"><span class="tog-sl"></span></label></td>
       <td style="display:flex;gap:4px">
-        <a href="../product?slug=${p.slug}" target="_blank" class="btn btn-b" style="text-decoration:none;font-size:.72rem;padding:4px 8px" title="Voir"><i class="fas fa-eye"></i></a>
-        <button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" title="Modifier" onclick='showEditProd(${JSON.stringify(p).replace(/'/g,"&#39;")})'><i class="fas fa-edit"></i></button>
-        <button class="btn btn-r" style="font-size:.72rem;padding:4px 8px" title="Supprimer" onclick="delProd('${p.id}','${p.title.replace(/'/g,'').replace(/"/g,'')}')"><i class="fas fa-trash"></i></button>
+        <a href="../product?slug=${esc(p.slug)}" target="_blank" class="btn btn-b" style="text-decoration:none;font-size:.72rem;padding:4px 8px" title="Voir"><i class="fas fa-eye"></i></a>
+        <button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" title="Modifier" onclick="showEditProd(REG.${reg(p)})"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-r" style="font-size:.72rem;padding:4px 8px" title="Supprimer" data-n="${esc(p.title)}" onclick="delProd('${esc(p.id)}',this.dataset.n)"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`).join('')}</tbody></table></div>`;
 }
@@ -584,7 +588,7 @@ async function showEditProd(p) {
   openModal('✏️ Modifier la ressource', `
     <div class="adm-form">
       <div class="fld"><label>Titre *</label>
-        <input type="text" id="ep-title" value="${(p.title||'').replace(/"/g,'&quot;')}"/></div>
+        <input type="text" id="ep-title" value="${esc(p.title)}"/></div>
       <div class="grid2">
         <div class="fld"><label>Type *</label>
           <select id="ep-type">${typeOpts(p.type)}</select></div>
@@ -604,10 +608,10 @@ async function showEditProd(p) {
         <select id="ep-cat">${catOptions(p.category_id)}</select></div>
       <div class="fld">
         <label>Tags <small style="color:#94a3b8;font-weight:400">(séparés par virgule)</small></label>
-        <input type="text" id="ep-tags" value="${tags}" placeholder="tag1, tag2, tag3…"/></div>
+        <input type="text" id="ep-tags" value="${esc(tags)}" placeholder="tag1, tag2, tag3…"/></div>
       <div class="grid2">
         <div class="fld"><label>Prix (DZD)</label>
-          <input type="number" id="ep-price" value="${p.price||0}" min="0"/></div>
+          <input type="number" id="ep-price" value="${esc(p.price||0)}" min="0"/></div>
         <div class="fld"><label>Accès</label>
           <select id="ep-free">
             <option value="false"${!p.is_free?' selected':''}>💰 Payant</option>
@@ -616,7 +620,7 @@ async function showEditProd(p) {
       </div>
       <div class="fld" style="background:#f8fafc;border-radius:8px;padding:10px">
         <label style="color:#64748b">Fichier actuel</label>
-        <div style="font-size:.78rem;color:#475569;margin-top:4px;word-break:break-all"><code>${p.file_url||'— aucun —'}</code></div>
+        <div style="font-size:.78rem;color:#475569;margin-top:4px;word-break:break-all"><code>${esc(p.file_url||'— aucun —')}</code></div>
         <div style="margin-top:8px">
           <label style="font-size:.72rem;color:#64748b;font-weight:700">Remplacer le fichier (optionnel)</label>
           <input type="file" id="ep-file" accept=".pdf,.zip,.docx,.epub,.rar,.exe,.msi,.apk,.mp4"
@@ -624,7 +628,7 @@ async function showEditProd(p) {
         </div>
       </div>
     </div>`,
-    `<button class="btn btn-p" onclick="saveEditProd('${p.id}')"><i class="fas fa-save"></i> Enregistrer</button>`
+    `<button class="btn btn-p" onclick="saveEditProd('${esc(p.id)}')"><i class="fas fa-save"></i> Enregistrer</button>`
   );
 }
 
@@ -667,14 +671,14 @@ async function pgVideos() {
     </div>
     <div class="card"><div class="card-hdr"><h3>🎬 Vidéos (${vids.length})</h3></div>
     <table><thead><tr><th>Titre</th><th>Source</th><th>YouTube ID</th><th>Actif</th><th>Actions</th></tr></thead>
-    <tbody id="vid-tbl">${vids.map(v=>`<tr data-search="${v.title.toLowerCase()}">
-      <td><strong>${v.title}</strong></td>
-      <td>${v.source||'—'}</td>
-      <td><code style="font-size:.75rem">${v.youtube_id||'—'}</code></td>
-      <td><label class="tog"><input type="checkbox" ${v.is_active?'checked':''} onchange="toggleVid('${v.id}')"><span class="tog-sl"></span></label></td>
+    <tbody id="vid-tbl">${vids.map(v=>`<tr data-search="${esc(v.title.toLowerCase())}">
+      <td><strong>${esc(v.title)}</strong></td>
+      <td>${esc(v.source||'—')}</td>
+      <td><code style="font-size:.75rem">${esc(v.youtube_id||'—')}</code></td>
+      <td><label class="tog"><input type="checkbox" ${v.is_active?'checked':''} onchange="toggleVid('${esc(v.id)}')"><span class="tog-sl"></span></label></td>
       <td style="display:flex;gap:5px">
-        <button class="btn btn-b" onclick="showVideoForm(${JSON.stringify(v).replace(/"/g,'&quot;')})"><i class="fas fa-edit"></i></button>
-        <button class="btn btn-r" onclick="delVid('${v.id}','${v.title.replace(/'/g,'')}')"><i class="fas fa-trash"></i></button>
+        <button class="btn btn-b" onclick="showVideoForm(REG.${reg(v)})"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-r" data-n="${esc(v.title)}" onclick="delVid('${esc(v.id)}',this.dataset.n)"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`).join('')}</tbody></table></div>`;
 }
@@ -682,15 +686,15 @@ async function pgVideos() {
 function showVideoForm(v={}) {
   openModal(v.id?'✏️ Modifier vidéo':'🎬 Ajouter vidéo', `
     <div class="adm-form">
-      <div class="fld"><label>Titre *</label><input type="text" id="vf-t" value="${v.title||''}" placeholder="Titre"/></div>
+      <div class="fld"><label>Titre *</label><input type="text" id="vf-t" value="${esc(v.title||'')}" placeholder="Titre"/></div>
       <div class="grid2">
-        <div class="fld"><label>YouTube ID *</label><input type="text" id="vf-yt" value="${v.youtube_id||''}" placeholder="Ex: dQw4w9WgXcQ"/></div>
-        <div class="fld"><label>Durée (sec)</label><input type="number" id="vf-dur" value="${v.duration_sec||''}"/></div>
+        <div class="fld"><label>YouTube ID *</label><input type="text" id="vf-yt" value="${esc(v.youtube_id||'')}" placeholder="Ex: dQw4w9WgXcQ"/></div>
+        <div class="fld"><label>Durée (sec)</label><input type="number" id="vf-dur" value="${esc(v.duration_sec||'')}"/></div>
       </div>
-      <div class="fld"><label>Source / Chaîne</label><input type="text" id="vf-src" value="${v.source||''}" placeholder="Ex: AQC TV"/></div>
-      <div class="fld"><label>Description</label><textarea id="vf-desc">${v.description||''}</textarea></div>
+      <div class="fld"><label>Source / Chaîne</label><input type="text" id="vf-src" value="${esc(v.source||'')}" placeholder="Ex: AQC TV"/></div>
+      <div class="fld"><label>Description</label><textarea id="vf-desc">${esc(v.description||'')}</textarea></div>
     </div>`,
-    `<button class="btn btn-p" onclick="saveVid('${v.id||''}')"><i class="fas fa-save"></i> ${v.id?'Modifier':'Ajouter'}</button>`
+    `<button class="btn btn-p" onclick="saveVid('${esc(v.id||'')}')"><i class="fas fa-save"></i> ${v.id?'Modifier':'Ajouter'}</button>`
   );
 }
 
@@ -726,14 +730,14 @@ async function pgArticles() {
     </div>
     <div class="card"><div class="card-hdr"><h3>📰 Articles (${arts.length})</h3></div>
     <table><thead><tr><th>Titre</th><th>Catégorie</th><th>Publié</th><th>Date</th><th>Actions</th></tr></thead>
-    <tbody id="art-tbl">${arts.map(a=>`<tr data-search="${a.title.toLowerCase()}">
-      <td><strong>${a.title}</strong></td>
-      <td>${a.category||'—'}</td>
-      <td><label class="tog"><input type="checkbox" ${a.is_published?'checked':''} onchange="toggleArt('${a.id}')"><span class="tog-sl"></span></label></td>
+    <tbody id="art-tbl">${arts.map(a=>`<tr data-search="${esc(a.title.toLowerCase())}">
+      <td><strong>${esc(a.title)}</strong></td>
+      <td>${esc(a.category||'—')}</td>
+      <td><label class="tog"><input type="checkbox" ${a.is_published?'checked':''} onchange="toggleArt('${esc(a.id)}')"><span class="tog-sl"></span></label></td>
       <td>${dt(a.created_at)}</td>
       <td style="display:flex;gap:5px">
-        <button class="btn btn-b" onclick="showArtForm(${JSON.stringify(a).replace(/"/g,'&quot;')})"><i class="fas fa-edit"></i></button>
-        <button class="btn btn-r" onclick="delArt('${a.id}','${a.title.replace(/'/g,'')}')"><i class="fas fa-trash"></i></button>
+        <button class="btn btn-b" onclick="showArtForm(REG.${reg(a)})"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-r" data-n="${esc(a.title)}" onclick="delArt('${esc(a.id)}',this.dataset.n)"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`).join('') || '<tr><td colspan="5" class="no-data">Aucun article</td></tr>'}</tbody></table></div>`;
 }
@@ -741,18 +745,18 @@ async function pgArticles() {
 function showArtForm(a={}) {
   openModal(a.id?'✏️ Modifier article':'📝 Nouvel article', `
     <div class="adm-form">
-      <div class="fld"><label>Titre *</label><input type="text" id="af-t" value="${a.title||''}" placeholder="Titre"/></div>
-      <div class="fld"><label>Résumé</label><textarea id="af-ex" rows="2">${a.excerpt||''}</textarea></div>
-      <div class="fld"><label>Contenu</label><textarea id="af-ct" rows="6">${a.content||''}</textarea></div>
+      <div class="fld"><label>Titre *</label><input type="text" id="af-t" value="${esc(a.title||'')}" placeholder="Titre"/></div>
+      <div class="fld"><label>Résumé</label><textarea id="af-ex" rows="2">${esc(a.excerpt||'')}</textarea></div>
+      <div class="fld"><label>Contenu</label><textarea id="af-ct" rows="6">${esc(a.content||'')}</textarea></div>
       <div class="grid2">
-        <div class="fld"><label>Catégorie</label><input type="text" id="af-cat" value="${a.category||''}"/></div>
+        <div class="fld"><label>Catégorie</label><input type="text" id="af-cat" value="${esc(a.category||'')}"/></div>
         <div class="fld"><label>Publié</label><select id="af-pub">
           <option value="true" ${a.is_published?'selected':''}>✅ Publié</option>
           <option value="false" ${!a.is_published?'selected':''}>📝 Brouillon</option>
         </select></div>
       </div>
     </div>`,
-    `<button class="btn btn-p" onclick="saveArt('${a.id||''}')"><i class="fas fa-save"></i> ${a.id?'Modifier':'Publier'}</button>`
+    `<button class="btn btn-p" onclick="saveArt('${esc(a.id||'')}')"><i class="fas fa-save"></i> ${a.id?'Modifier':'Publier'}</button>`
   );
 }
 
@@ -789,18 +793,18 @@ async function pgCategories() {
     </div>
     <div class="card"><div class="card-hdr"><h3>📁 Catégories (${cats.length})</h3></div>
     <table><thead><tr><th>Icône</th><th>Nom (FR)</th><th>Slug</th><th>Produits</th><th>Vidéos</th><th>Actif</th><th>Actions</th></tr></thead>
-    <tbody id="cat-tbl">${cats.map(c=>`<tr data-search="${c.name_fr.toLowerCase()}">
-      <td style="font-size:1.3rem;text-align:center">${c.icon||'📁'}</td>
-      <td><strong>${c.name_fr}</strong><br><small style="color:#94a3b8">${c.name_ar||''}</small></td>
-      <td><code style="font-size:.72rem;color:#64748b">${c.slug}</code></td>
-      <td style="text-align:center"><span style="font-weight:700;color:#1B3A6B">${c.products_count||0}</span></td>
-      <td style="text-align:center"><span style="font-weight:700;color:#059669">${c.videos_count||0}</span></td>
+    <tbody id="cat-tbl">${cats.map(c=>`<tr data-search="${esc(c.name_fr.toLowerCase())}">
+      <td style="font-size:1.3rem;text-align:center">${esc(c.icon||'📁')}</td>
+      <td><strong>${esc(c.name_fr)}</strong><br><small style="color:#94a3b8">${esc(c.name_ar||'')}</small></td>
+      <td><code style="font-size:.72rem;color:#64748b">${esc(c.slug)}</code></td>
+      <td style="text-align:center"><span style="font-weight:700;color:#1B3A6B">${esc(c.products_count||0)}</span></td>
+      <td style="text-align:center"><span style="font-weight:700;color:#059669">${esc(c.videos_count||0)}</span></td>
       <td style="text-align:center">
-        <label class="tog"><input type="checkbox" ${c.is_active!==false?'checked':''} onchange="toggleCat('${c.id}',this.checked)">
+        <label class="tog"><input type="checkbox" ${c.is_active!==false?'checked':''} onchange="toggleCat('${esc(c.id)}',this.checked)">
         <span class="tog-sl"></span></label>
       </td>
       <td style="display:flex;gap:4px">
-        <button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" onclick='showCatForm(${JSON.stringify(c).replace(/'/g,"&#39;")})'><i class="fas fa-edit"></i></button>
+        <button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" onclick="showCatForm(REG.${reg(c)})"><i class="fas fa-edit"></i></button>
       </td>
     </tr>`).join('')}</tbody></table></div>`;
 }
@@ -811,21 +815,21 @@ function showCatForm(c={}) {
     <div class="adm-form">
       <div class="grid2">
         <div class="fld"><label>Icône (emoji)</label>
-          <input type="text" id="cf-icon" value="${c.icon||'📁'}" style="font-size:1.4rem;text-align:center"/></div>
+          <input type="text" id="cf-icon" value="${esc(c.icon||'📁')}" style="font-size:1.4rem;text-align:center"/></div>
         <div class="fld"><label>Slug <small style="color:#94a3b8;font-weight:400">(auto si vide)</small></label>
-          <input type="text" id="cf-slug" value="${c.slug||''}" placeholder="mon-slug" ${isEdit?'readonly style="background:#f8fafc;color:#94a3b8"':''}/>
+          <input type="text" id="cf-slug" value="${esc(c.slug||'')}" placeholder="mon-slug" ${isEdit?'readonly style="background:#f8fafc;color:#94a3b8"':''}/>
         </div>
       </div>
       <div class="fld"><label>Nom français *</label>
-        <input type="text" id="cf-fr" value="${(c.name_fr||'').replace(/"/g,'&quot;')}" placeholder="ex: Béton Armé"/></div>
+        <input type="text" id="cf-fr" value="${esc(c.name_fr)}" placeholder="ex: Béton Armé"/></div>
       <div class="fld"><label>Nom arabe</label>
-        <input type="text" id="cf-ar" value="${(c.name_ar||'').replace(/"/g,'&quot;')}" placeholder="ex: الخرسانة المسلحة" dir="rtl"/></div>
+        <input type="text" id="cf-ar" value="${esc(c.name_ar)}" placeholder="ex: الخرسانة المسلحة" dir="rtl"/></div>
       <div class="fld"><label>Description <small style="color:#94a3b8;font-weight:400">(optionnel)</small></label>
-        <textarea id="cf-desc" rows="2" placeholder="Brève description de la catégorie…">${c.description||''}</textarea></div>
+        <textarea id="cf-desc" rows="2" placeholder="Brève description de la catégorie…">${esc(c.description||'')}</textarea></div>
       <div class="fld"><label>Ordre d'affichage</label>
-        <input type="number" id="cf-order" value="${c.sort_order||0}" min="0"/></div>
+        <input type="number" id="cf-order" value="${esc(c.sort_order||0)}" min="0"/></div>
     </div>`,
-    `<button class="btn btn-p" onclick="saveCat('${c.id||''}')"><i class="fas fa-save"></i> ${isEdit?'Enregistrer':'Créer'}</button>`
+    `<button class="btn btn-p" onclick="saveCat('${esc(c.id||'')}')"><i class="fas fa-save"></i> ${isEdit?'Enregistrer':'Créer'}</button>`
   );
 }
 
@@ -865,17 +869,17 @@ async function pgNiveaux() {
     <div class="card"><div class="card-hdr"><h3>🎓 Niveaux de formation (${lvls.length})</h3></div>
     <table><thead><tr><th>Icône</th><th>Libellé (FR)</th><th>Valeur DB</th><th>Couleur</th><th>Ordre</th><th>Actif</th><th>Actions</th></tr></thead>
     <tbody>${lvls.map(l=>`<tr>
-      <td style="font-size:1.3rem;text-align:center">${l.icon||'🎓'}</td>
-      <td><strong>${l.label_fr}</strong><br><small style="color:#94a3b8">${l.label_ar||''}</small></td>
-      <td><code style="font-size:.75rem;background:#f0f4fa;padding:2px 8px;border-radius:6px">${l.db_value}</code></td>
-      <td><span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:${l.color||'#1B3A6B'};border:1.5px solid #e2e8f0;vertical-align:middle"></span>
-          <span style="font-size:.75rem;color:#64748b;margin-left:4px">${l.color||''}</span></td>
-      <td style="text-align:center;color:#64748b">${l.sort_order||0}</td>
+      <td style="font-size:1.3rem;text-align:center">${esc(l.icon||'🎓')}</td>
+      <td><strong>${esc(l.label_fr)}</strong><br><small style="color:#94a3b8">${esc(l.label_ar||'')}</small></td>
+      <td><code style="font-size:.75rem;background:#f0f4fa;padding:2px 8px;border-radius:6px">${esc(l.db_value)}</code></td>
+      <td><span style="display:inline-block;width:22px;height:22px;border-radius:50%;background:${esc(l.color||'#1B3A6B')};border:1.5px solid #e2e8f0;vertical-align:middle"></span>
+          <span style="font-size:.75rem;color:#64748b;margin-left:4px">${esc(l.color||'')}</span></td>
+      <td style="text-align:center;color:#64748b">${esc(l.sort_order||0)}</td>
       <td style="text-align:center"><label class="tog">
-        <input type="checkbox" ${l.is_active!==false?'checked':''} onchange="toggleLvl('${l.id}',${JSON.stringify(l)}.label_fr,this.checked)">
+        <input type="checkbox" ${l.is_active!==false?'checked':''} onchange="toggleLvl('${esc(l.id)}',REG.${reg(l)}.label_fr,this.checked)">
         <span class="tog-sl"></span></label>
       </td>
-      <td><button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" onclick='showLvlForm(${JSON.stringify(l).replace(/'/g,"&#39;")})'><i class="fas fa-edit"></i></button></td>
+      <td><button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" onclick="showLvlForm(REG.${reg(l)})"><i class="fas fa-edit"></i></button></td>
     </tr>`).join('')}</tbody></table></div>
     <div class="card" style="margin-top:12px">
       <div class="card-hdr"><h3>ℹ️ Valeur DB (study_level)</h3></div>
@@ -893,26 +897,26 @@ function showLvlForm(l={}) {
     <div class="adm-form">
       <div class="grid2">
         <div class="fld"><label>Icône (emoji)</label>
-          <input type="text" id="lf-icon" value="${l.icon||'🎓'}" style="font-size:1.4rem;text-align:center"/></div>
+          <input type="text" id="lf-icon" value="${esc(l.icon||'🎓')}" style="font-size:1.4rem;text-align:center"/></div>
         <div class="fld"><label>Couleur (hex)</label>
           <div style="display:flex;gap:6px;align-items:center">
-            <input type="color" id="lf-color-pick" value="${l.color||'#1B3A6B'}" style="width:40px;height:36px;border:none;cursor:pointer;border-radius:6px" oninput="document.getElementById('lf-color').value=this.value"/>
-            <input type="text" id="lf-color" value="${l.color||'#1B3A6B'}" style="flex:1" oninput="document.getElementById('lf-color-pick').value=this.value"/>
+            <input type="color" id="lf-color-pick" value="${esc(l.color||'#1B3A6B')}" style="width:40px;height:36px;border:none;cursor:pointer;border-radius:6px" oninput="document.getElementById('lf-color').value=this.value"/>
+            <input type="text" id="lf-color" value="${esc(l.color||'#1B3A6B')}" style="flex:1" oninput="document.getElementById('lf-color-pick').value=this.value"/>
           </div>
         </div>
       </div>
       <div class="fld"><label>Libellé français *</label>
-        <input type="text" id="lf-fr" value="${(l.label_fr||'').replace(/"/g,'&quot;')}" placeholder="ex: Licence / L3"/></div>
+        <input type="text" id="lf-fr" value="${esc(l.label_fr)}" placeholder="ex: Licence / L3"/></div>
       <div class="fld"><label>Libellé arabe</label>
-        <input type="text" id="lf-ar" value="${(l.label_ar||'').replace(/"/g,'&quot;')}" placeholder="ex: ليسانس" dir="rtl"/></div>
+        <input type="text" id="lf-ar" value="${esc(l.label_ar)}" placeholder="ex: ليسانس" dir="rtl"/></div>
       <div class="fld">
         <label>Valeur DB * <small style="color:#94a3b8;font-weight:400">${isEdit?'(non modifiable)':'(identifiant court, sans accents)'}</small></label>
-        <input type="text" id="lf-db" value="${l.db_value||''}" placeholder="ex: licence" ${isEdit?'readonly style="background:#f8fafc;color:#94a3b8"':''}/>
+        <input type="text" id="lf-db" value="${esc(l.db_value||'')}" placeholder="ex: licence" ${isEdit?'readonly style="background:#f8fafc;color:#94a3b8"':''}/>
       </div>
       <div class="fld"><label>Ordre d'affichage</label>
-        <input type="number" id="lf-order" value="${l.sort_order||0}" min="0"/></div>
+        <input type="number" id="lf-order" value="${esc(l.sort_order||0)}" min="0"/></div>
     </div>`,
-    `<button class="btn btn-p" onclick="saveLvl('${l.id||''}')"><i class="fas fa-save"></i> ${isEdit?'Enregistrer':'Créer'}</button>`
+    `<button class="btn btn-p" onclick="saveLvl('${esc(l.id||'')}')"><i class="fas fa-save"></i> ${isEdit?'Enregistrer':'Créer'}</button>`
   );
 }
 
@@ -976,17 +980,17 @@ async function pgCompanies() {
         </tr></thead>
         <tbody>${companies.map(c=>`
           <tr>
-            <td>${c.logo_url?`<img src="${c.logo_url}" style="width:36px;height:36px;border-radius:8px;object-fit:cover" />`:'🏢'}</td>
-            <td><strong>${c.name}</strong><br><small style="color:#94a3b8">${c.slug}</small></td>
-            <td>${(c.specialties||[]).slice(0,2).map(s=>`<span class="tag-chip">${s}</span>`).join('')}</td>
+            <td>${c.logo_url?`<img src="${esc(c.logo_url)}" style="width:36px;height:36px;border-radius:8px;object-fit:cover" />`:'🏢'}</td>
+            <td><strong>${esc(c.name)}</strong><br><small style="color:#94a3b8">${esc(c.slug)}</small></td>
+            <td>${(c.specialties||[]).slice(0,2).map(s=>`<span class="tag-chip">${esc(s)}</span>`).join('')}</td>
             <td>${WILAYAS_LIST.find(w=>w[0]==c.wilaya_siege)?.[1]||'—'}</td>
             <td>${c.is_verified?'✅':'❌'}</td>
             <td>${c.is_premium?'⭐':'—'}</td>
-            <td>${c.views_count||0}</td>
+            <td>${esc(c.views_count||0)}</td>
             <td>
-              <button class="btn btn-b btn-sm" onclick="showCompanyForm(${JSON.stringify(c).replace(/"/g,'&quot;')})">✏️</button>
-              <a href="/entreprise.html?slug=${c.slug}" target="_blank" class="btn btn-b btn-sm">👁️</a>
-              <button class="btn btn-b btn-sm" style="color:#ef4444" onclick="deleteCompany('${c.id}','${c.name}')">🗑️</button>
+              <button class="btn btn-b btn-sm" onclick="showCompanyForm(REG.${reg(c)})">✏️</button>
+              <a href="/entreprise.html?slug=${esc(c.slug)}" target="_blank" class="btn btn-b btn-sm">👁️</a>
+              <button class="btn btn-b btn-sm" style="color:#ef4444" data-n="${esc(c.name)}" onclick="deleteCompany('${esc(c.id)}',this.dataset.n)">🗑️</button>
             </td>
           </tr>`).join('')}
         </tbody>
@@ -1000,34 +1004,34 @@ function showCompanyForm(c={}) {
     `<option value="${code}"${c.wilaya_siege==code?' selected':''}>${code} — ${name}</option>`).join('');
   const specChecks = SPECIALTIES.map(s=>
     `<label style="display:flex;align-items:center;gap:6px;font-size:.85rem">
-      <input type="checkbox" name="spec" value="${s}" ${(c.specialties||[]).includes(s)?'checked':''}> ${s}
+      <input type="checkbox" name="spec" value="${esc(s)}" ${(c.specialties||[]).includes(s)?'checked':''}> ${esc(s)}
     </label>`).join('');
 
   openModal(isEdit?`✏️ Modifier — ${c.name}`:'➕ Nouvelle entreprise', `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="fg" style="grid-column:1/-1">
         <label>Nom de l'entreprise *</label>
-        <input id="cf-name" class="fi" value="${c.name||''}" placeholder="SARL Construction Atlas" />
+        <input id="cf-name" class="fi" value="${esc(c.name||'')}" placeholder="SARL Construction Atlas" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Accroche (tagline)</label>
-        <input id="cf-tagline" class="fi" value="${c.tagline||''}" placeholder="Spécialiste en gros œuvre depuis 1995" />
+        <input id="cf-tagline" class="fi" value="${esc(c.tagline||'')}" placeholder="Spécialiste en gros œuvre depuis 1995" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Description</label>
-        <textarea id="cf-desc" class="fi" rows="4" placeholder="Présentation de l'entreprise…">${c.description||''}</textarea>
+        <textarea id="cf-desc" class="fi" rows="4" placeholder="Présentation de l'entreprise…">${esc(c.description||'')}</textarea>
       </div>
       <div class="fg">
         <label>Email</label>
-        <input id="cf-email" class="fi" type="email" value="${c.email||''}" />
+        <input id="cf-email" class="fi" type="email" value="${esc(c.email||'')}" />
       </div>
       <div class="fg">
         <label>Téléphone</label>
-        <input id="cf-phone" class="fi" value="${c.phone||''}" placeholder="+213 555 000 000" />
+        <input id="cf-phone" class="fi" value="${esc(c.phone||'')}" placeholder="+213 555 000 000" />
       </div>
       <div class="fg">
         <label>Site web</label>
-        <input id="cf-website" class="fi" value="${c.website||''}" placeholder="https://…" />
+        <input id="cf-website" class="fi" value="${esc(c.website||'')}" placeholder="https://…" />
       </div>
       <div class="fg">
         <label>Wilaya siège *</label>
@@ -1036,20 +1040,20 @@ function showCompanyForm(c={}) {
       <div class="fg">
         <label>Effectif</label>
         <select id="cf-size" class="fi">
-          ${['','1-10','11-50','51-200','200+'].map(s=>`<option${c.size_range===s?' selected':''}>${s}</option>`).join('')}
+          ${['','1-10','11-50','51-200','200+'].map(s=>`<option${c.size_range===s?' selected':''}>${esc(s)}</option>`).join('')}
         </select>
       </div>
       <div class="fg">
         <label>Année de création</label>
-        <input id="cf-year" class="fi" type="number" value="${c.founded_year||''}" placeholder="1995" />
+        <input id="cf-year" class="fi" type="number" value="${esc(c.founded_year||'')}" placeholder="1995" />
       </div>
       <div class="fg">
         <label>Agrément</label>
-        <input id="cf-agrement" class="fi" value="${c.agrement||''}" placeholder="N° agrément" />
+        <input id="cf-agrement" class="fi" value="${esc(c.agrement||'')}" placeholder="N° agrément" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Adresse</label>
-        <input id="cf-address" class="fi" value="${c.address||''}" placeholder="Zone d'activité, Commune, Wilaya" />
+        <input id="cf-address" class="fi" value="${esc(c.address||'')}" placeholder="Zone d'activité, Commune, Wilaya" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Spécialités</label>
@@ -1075,7 +1079,7 @@ function showCompanyForm(c={}) {
         </label>
       </div>
     </div>`,
-    `<button class="btn btn-b" onclick="saveCompany('${c.id||''}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
+    `<button class="btn btn-b" onclick="saveCompany('${esc(c.id||'')}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
      <button class="btn" onclick="closeModal()">Annuler</button>`);
 }
 
@@ -1153,17 +1157,17 @@ async function pgJobs() {
         </tr></thead>
         <tbody>${jobs.map(j=>`
           <tr>
-            <td><strong>${j.title}</strong><br><small style="color:#94a3b8">${j.specialty||''}</small></td>
-            <td>${j.company_name||'<em style="color:#94a3b8">Confidentiel</em>'}</td>
-            <td><span class="tag-chip">${j.contract_type||'—'}</span></td>
-            <td>${j.level||'—'}</td>
+            <td><strong>${esc(j.title)}</strong><br><small style="color:#94a3b8">${esc(j.specialty||'')}</small></td>
+            <td>${esc(j.company_name)||'<em style="color:#94a3b8">Confidentiel</em>'}</td>
+            <td><span class="tag-chip">${esc(j.contract_type||'—')}</span></td>
+            <td>${esc(j.level||'—')}</td>
             <td>${WILAYAS_LIST.find(w=>w[0]==j.wilaya)?.[1]||'—'}</td>
             <td>${j.is_featured?'⭐':'—'}</td>
-            <td>${j.views_count||0}</td>
+            <td>${esc(j.views_count||0)}</td>
             <td>${j.expires_at?new Date(j.expires_at).toLocaleDateString('fr-DZ'):'—'}</td>
             <td>
-              <button class="btn btn-b btn-sm" onclick='showJobForm(${JSON.stringify(j).replace(/'/g,"&#39;")})'>✏️</button>
-              <button class="btn btn-b btn-sm" style="color:#ef4444" onclick="deleteJob('${j.id}','${j.title.replace(/'/g,"\\'")}')">🗑️</button>
+              <button class="btn btn-b btn-sm" onclick="showJobForm(REG.${reg(j)})">✏️</button>
+              <button class="btn btn-b btn-sm" style="color:#ef4444" data-n="${esc(j.title)}" onclick="deleteJob('${esc(j.id)}',this.dataset.n)">🗑️</button>
             </td>
           </tr>`).join('')}
         </tbody>
@@ -1178,17 +1182,17 @@ async function showJobForm(j={}) {
   try {
     const cr = await api('GET', '/companies/admin/list');
     companyOpts += (cr.data||[]).map(c=>
-      `<option value="${c.id}"${j.company_id===c.id?' selected':''}>${c.name}</option>`).join('');
+      `<option value="${esc(c.id)}"${j.company_id===c.id?' selected':''}>${esc(c.name)}</option>`).join('');
   } catch {}
 
   const selOpt = (arr, val) => arr.map(v=>
-    `<option${val===v?' selected':''}>${v}</option>`).join('');
+    `<option${val===v?' selected':''}>${esc(v)}</option>`).join('');
 
   openModal(isEdit?`✏️ Modifier — ${j.title}`:'➕ Nouvelle offre d\'emploi', `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="fg" style="grid-column:1/-1">
         <label>Titre du poste *</label>
-        <input id="jf-title" class="fi" value="${j.title||''}" placeholder="Ingénieur Génie Civil, Chef de chantier…" />
+        <input id="jf-title" class="fi" value="${esc(j.title||'')}" placeholder="Ingénieur Génie Civil, Chef de chantier…" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Entreprise</label>
@@ -1223,35 +1227,35 @@ async function showJobForm(j={}) {
       </div>
       <div class="fg">
         <label>Ville</label>
-        <input id="jf-city" class="fi" value="${j.city||''}" placeholder="Ex: Hydra, Alger" />
+        <input id="jf-city" class="fi" value="${esc(j.city||'')}" placeholder="Ex: Hydra, Alger" />
       </div>
       <div class="fg">
         <label>Salaire (optionnel)</label>
-        <input id="jf-salary" class="fi" value="${j.salary_range||''}" placeholder="Ex: 80 000 – 120 000 DA" />
+        <input id="jf-salary" class="fi" value="${esc(j.salary_range||'')}" placeholder="Ex: 80 000 – 120 000 DA" />
       </div>
       <div class="fg">
         <label>Email de contact</label>
-        <input id="jf-email" class="fi" type="email" value="${j.contact_email||''}" />
+        <input id="jf-email" class="fi" type="email" value="${esc(j.contact_email||'')}" />
       </div>
       <div class="fg">
         <label>Téléphone de contact</label>
-        <input id="jf-phone" class="fi" value="${j.contact_phone||''}" />
+        <input id="jf-phone" class="fi" value="${esc(j.contact_phone||'')}" />
       </div>
       <div class="fg">
         <label>Date d'expiration</label>
-        <input id="jf-expires" class="fi" type="date" value="${j.expires_at?j.expires_at.slice(0,10):''}" />
+        <input id="jf-expires" class="fi" type="date" value="${esc(j.expires_at?j.expires_at.slice(0,10):'')}" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Description du poste</label>
-        <textarea id="jf-desc" class="fi" rows="4" placeholder="Contexte, objectifs, environnement de travail…">${j.description||''}</textarea>
+        <textarea id="jf-desc" class="fi" rows="4" placeholder="Contexte, objectifs, environnement de travail…">${esc(j.description||'')}</textarea>
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Missions</label>
-        <textarea id="jf-missions" class="fi" rows="4" placeholder="- Superviser les travaux de fondation&#10;- Rédiger les rapports journaliers…">${j.missions||''}</textarea>
+        <textarea id="jf-missions" class="fi" rows="4" placeholder="- Superviser les travaux de fondation&#10;- Rédiger les rapports journaliers…">${esc(j.missions||'')}</textarea>
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Profil recherché</label>
-        <textarea id="jf-profile" class="fi" rows="4" placeholder="- Diplôme ingénieur génie civil&#10;- 3 ans d'expérience minimum…">${j.profile||''}</textarea>
+        <textarea id="jf-profile" class="fi" rows="4" placeholder="- Diplôme ingénieur génie civil&#10;- 3 ans d'expérience minimum…">${esc(j.profile||'')}</textarea>
       </div>
       <div class="fg" style="display:flex;gap:16px;align-items:center">
         <label style="display:flex;align-items:center;gap:6px">
@@ -1262,7 +1266,7 @@ async function showJobForm(j={}) {
         </label>
       </div>
     </div>`,
-    `<button class="btn btn-b" onclick="saveJob('${j.id||''}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
+    `<button class="btn btn-b" onclick="saveJob('${esc(j.id||'')}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
      <button class="btn" onclick="closeModal()">Annuler</button>`);
 }
 
@@ -1332,17 +1336,17 @@ async function pgTenders() {
         </tr></thead>
         <tbody>${tenders.map(t=>`
           <tr>
-            <td><strong>${t.title}</strong><br><small style="color:#94a3b8;font-family:monospace">${t.reference||''}</small></td>
-            <td>${t.company_name||t.owner_name||'<em style="color:#94a3b8">—</em>'}<br>
-                <small style="color:#94a3b8">${t.owner_type||''}</small></td>
-            <td>${t.sector||'—'}</td>
+            <td><strong>${esc(t.title)}</strong><br><small style="color:#94a3b8;font-family:monospace">${esc(t.reference||'')}</small></td>
+            <td>${esc(t.company_name||t.owner_name)||'<em style="color:#94a3b8">—</em>'}<br>
+                <small style="color:#94a3b8">${esc(t.owner_type||'')}</small></td>
+            <td>${esc(t.sector||'—')}</td>
             <td>${WILAYAS_LIST.find(w=>w[0]==t.wilaya)?.[1]||'—'}</td>
-            <td><span class="tag-chip">${AO_STATUS_LABELS[t.status]||t.status}</span></td>
+            <td><span class="tag-chip">${esc(AO_STATUS_LABELS[t.status]||t.status)}</span></td>
             <td>${fmtDate(t.deadline_at)}</td>
             <td>${t.is_featured?'⭐':'—'}</td>
             <td>
-              <button class="btn btn-b btn-sm" onclick='showTenderForm(${JSON.stringify(t).replace(/'/g,"&#39;")})'>✏️</button>
-              <button class="btn btn-b btn-sm" style="color:#ef4444" onclick="deleteTender('${t.id}','${t.title.replace(/'/g,"\\'")}')">🗑️</button>
+              <button class="btn btn-b btn-sm" onclick="showTenderForm(REG.${reg(t)})">✏️</button>
+              <button class="btn btn-b btn-sm" style="color:#ef4444" data-n="${esc(t.title)}" onclick="deleteTender('${esc(t.id)}',this.dataset.n)">🗑️</button>
             </td>
           </tr>`).join('')}
         </tbody>
@@ -1356,23 +1360,23 @@ async function showTenderForm(t={}) {
   try {
     const cr = await api('GET', '/companies/admin/list');
     companyOpts += (cr.data||[]).map(c=>
-      `<option value="${c.id}"${t.company_id===c.id?' selected':''}>${c.name}</option>`).join('');
+      `<option value="${esc(c.id)}"${t.company_id===c.id?' selected':''}>${esc(c.name)}</option>`).join('');
   } catch {}
 
   const selOpt = (arr, val, labels={}) => arr.map(v=>
-    `<option value="${v}"${val===v?' selected':''}>${labels[v]||v}</option>`).join('');
+    `<option value="${esc(v)}"${val===v?' selected':''}>${esc(labels[v]||v)}</option>`).join('');
 
-  const d = s => t[s]?t[s].slice?.(0,10)||t[s]:'';
+  const d = s => esc(t[s]?t[s].slice?.(0,10)||t[s]:'');
 
   openModal(isEdit?`✏️ Modifier — ${t.title}`:"➕ Nouvel appel d'offres", `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="fg" style="grid-column:1/-1">
         <label>Titre de l'AO *</label>
-        <input id="tf-title" class="fi" value="${t.title||''}" placeholder="Construction d'un lycée, Aménagement route nationale…" />
+        <input id="tf-title" class="fi" value="${esc(t.title||'')}" placeholder="Construction d'un lycée, Aménagement route nationale…" />
       </div>
       <div class="fg">
         <label>Référence</label>
-        <input id="tf-ref" class="fi" value="${t.reference||''}" placeholder="N°AO-2026-001" />
+        <input id="tf-ref" class="fi" value="${esc(t.reference||'')}" placeholder="N°AO-2026-001" />
       </div>
       <div class="fg">
         <label>Secteur</label>
@@ -1380,7 +1384,7 @@ async function showTenderForm(t={}) {
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Lot</label>
-        <input id="tf-lot" class="fi" value="${t.lot||''}" placeholder="Lot 01 — Gros œuvre, Lot 02 — Second œuvre…" />
+        <input id="tf-lot" class="fi" value="${esc(t.lot||'')}" placeholder="Lot 01 — Gros œuvre, Lot 02 — Second œuvre…" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Entreprise maître d'ouvrage (si référencée)</label>
@@ -1388,13 +1392,13 @@ async function showTenderForm(t={}) {
       </div>
       <div class="fg">
         <label>Nom maître d'ouvrage (libre)</label>
-        <input id="tf-owner" class="fi" value="${t.owner_name||''}" placeholder="OPGI Alger, APC Oran…" />
+        <input id="tf-owner" class="fi" value="${esc(t.owner_name||'')}" placeholder="OPGI Alger, APC Oran…" />
       </div>
       <div class="fg">
         <label>Type maître d'ouvrage</label>
         <select id="tf-owner-type" class="fi">
           <option value="">—</option>
-          ${['Public','Privé','Semi-public'].map(v=>`<option${t.owner_type===v?' selected':''}>${v}</option>`).join('')}
+          ${['Public','Privé','Semi-public'].map(v=>`<option${t.owner_type===v?' selected':''}>${esc(v)}</option>`).join('')}
         </select>
       </div>
       <div class="fg">
@@ -1406,11 +1410,11 @@ async function showTenderForm(t={}) {
       </div>
       <div class="fg">
         <label>Ville</label>
-        <input id="tf-city" class="fi" value="${t.city||''}" />
+        <input id="tf-city" class="fi" value="${esc(t.city||'')}" />
       </div>
       <div class="fg">
         <label>Budget estimé (optionnel)</label>
-        <input id="tf-budget" class="fi" value="${t.budget_range||''}" placeholder="Ex: 50 – 80 M DA" />
+        <input id="tf-budget" class="fi" value="${esc(t.budget_range||'')}" placeholder="Ex: 50 – 80 M DA" />
       </div>
       <div class="fg">
         <label>Date de publication</label>
@@ -1426,27 +1430,27 @@ async function showTenderForm(t={}) {
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Description</label>
-        <textarea id="tf-desc" class="fi" rows="4" placeholder="Objet du marché, conditions…">${t.description||''}</textarea>
+        <textarea id="tf-desc" class="fi" rows="4" placeholder="Objet du marché, conditions…">${esc(t.description||'')}</textarea>
       </div>
       <div class="fg">
         <label>Nom du contact</label>
-        <input id="tf-cname" class="fi" value="${t.contact_name||''}" />
+        <input id="tf-cname" class="fi" value="${esc(t.contact_name||'')}" />
       </div>
       <div class="fg">
         <label>Email contact</label>
-        <input id="tf-cemail" class="fi" type="email" value="${t.contact_email||''}" />
+        <input id="tf-cemail" class="fi" type="email" value="${esc(t.contact_email||'')}" />
       </div>
       <div class="fg">
         <label>Téléphone contact</label>
-        <input id="tf-cphone" class="fi" value="${t.contact_phone||''}" />
+        <input id="tf-cphone" class="fi" value="${esc(t.contact_phone||'')}" />
       </div>
       <div class="fg">
         <label>Lien cahier des charges</label>
-        <input id="tf-cahier" class="fi" value="${t.cahier_url||''}" placeholder="https://… ou /uploads/…" />
+        <input id="tf-cahier" class="fi" value="${esc(t.cahier_url||'')}" placeholder="https://… ou /uploads/…" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Adresse contact</label>
-        <input id="tf-caddr" class="fi" value="${t.contact_address||''}" />
+        <input id="tf-caddr" class="fi" value="${esc(t.contact_address||'')}" />
       </div>
       <div class="fg">
         <label>Statut</label>
@@ -1461,7 +1465,7 @@ async function showTenderForm(t={}) {
         </label>
       </div>
     </div>`,
-    `<button class="btn btn-b" onclick="saveTender('${t.id||''}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
+    `<button class="btn btn-b" onclick="saveTender('${esc(t.id||'')}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
      <button class="btn" onclick="closeModal()">Annuler</button>`);
 }
 
@@ -1533,17 +1537,17 @@ async function pgProfessionals() {
         <tbody>${pros.map(p=>`
           <tr>
             <td>${p.photo_url
-              ? `<img src="${p.photo_url}" style="width:36px;height:36px;border-radius:50%;object-fit:cover"/>`
-              : `<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1B3A6B,#4a1d96);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.75rem">${(p.first_name[0]||'?')+(p.last_name[0]||'?')}</div>`}</td>
-            <td><strong>${p.first_name} ${p.last_name}</strong></td>
-            <td style="font-size:.82rem;color:#64748b">${p.title||'—'}</td>
-            <td>${(p.specialties||[]).slice(0,2).map(s=>`<span class="tag-chip">${s}</span>`).join('')}</td>
+              ? `<img src="${esc(p.photo_url)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover"/>`
+              : `<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1B3A6B,#4a1d96);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.75rem">${esc((p.first_name[0]||'?')+(p.last_name[0]||'?'))}</div>`}</td>
+            <td><strong>${esc(p.first_name)} ${esc(p.last_name)}</strong></td>
+            <td style="font-size:.82rem;color:#64748b">${esc(p.title||'—')}</td>
+            <td>${(p.specialties||[]).slice(0,2).map(s=>`<span class="tag-chip">${esc(s)}</span>`).join('')}</td>
             <td>${WILAYAS_LIST.find(w=>w[0]==p.wilaya)?.[1]||'—'}</td>
-            <td><span class="tag-chip">${p.availability||'—'}</span></td>
+            <td><span class="tag-chip">${esc(p.availability||'—')}</span></td>
             <td>${p.is_verified?'✅':'❌'}</td>
             <td>
-              <button class="btn btn-b btn-sm" onclick='showProForm(${JSON.stringify(p).replace(/'/g,"&#39;")})'>✏️</button>
-              <button class="btn btn-b btn-sm" style="color:#ef4444" onclick="deletePro('${p.id}','${(p.first_name+' '+p.last_name).replace(/'/g,"\\'")}')">🗑️</button>
+              <button class="btn btn-b btn-sm" onclick="showProForm(REG.${reg(p)})">✏️</button>
+              <button class="btn btn-b btn-sm" style="color:#ef4444" data-n="${esc(p.first_name+' '+p.last_name)}" onclick="deletePro('${esc(p.id)}',this.dataset.n)">🗑️</button>
             </td>
           </tr>`).join('')}
         </tbody>
@@ -1555,34 +1559,34 @@ function showProForm(p={}) {
   const isEdit = !!p.id;
   const specChecks = PRO_SPECS.map(s=>
     `<label style="display:flex;align-items:center;gap:6px;font-size:.82rem">
-      <input type="checkbox" name="pspec" value="${s}" ${(p.specialties||[]).includes(s)?'checked':''}> ${s}
+      <input type="checkbox" name="pspec" value="${esc(s)}" ${(p.specialties||[]).includes(s)?'checked':''}> ${esc(s)}
     </label>`).join('');
   const langChecks = PRO_LANGS.map(l=>
     `<label style="display:flex;align-items:center;gap:6px;font-size:.82rem">
-      <input type="checkbox" name="plang" value="${l}" ${(p.languages||[]).includes(l)?'checked':''}> ${l}
+      <input type="checkbox" name="plang" value="${esc(l)}" ${(p.languages||[]).includes(l)?'checked':''}> ${esc(l)}
     </label>`).join('');
 
-  openModal(isEdit?`✏️ Modifier — ${p.first_name} ${p.last_name}`:'➕ Nouveau profil', `
+  openModal(isEdit?`✏️ Modifier — ${p.first_name} ${esc(p.last_name)}`:'➕ Nouveau profil', `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="fg">
         <label>Prénom *</label>
-        <input id="pf-fn" class="fi" value="${p.first_name||''}" placeholder="Mohamed" />
+        <input id="pf-fn" class="fi" value="${esc(p.first_name||'')}" placeholder="Mohamed" />
       </div>
       <div class="fg">
         <label>Nom *</label>
-        <input id="pf-ln" class="fi" value="${p.last_name||''}" placeholder="Benali" />
+        <input id="pf-ln" class="fi" value="${esc(p.last_name||'')}" placeholder="Benali" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Titre professionnel</label>
-        <input id="pf-title" class="fi" value="${p.title||''}" placeholder="Ingénieur Génie Civil, Architecte DPLG…" />
+        <input id="pf-title" class="fi" value="${esc(p.title||'')}" placeholder="Ingénieur Génie Civil, Architecte DPLG…" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Accroche</label>
-        <input id="pf-tagline" class="fi" value="${p.tagline||''}" placeholder="Expert en structures béton armé — 10 ans d'expérience" />
+        <input id="pf-tagline" class="fi" value="${esc(p.tagline||'')}" placeholder="Expert en structures béton armé — 10 ans d'expérience" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Biographie</label>
-        <textarea id="pf-bio" class="fi" rows="4" placeholder="Présentation détaillée, parcours, projets marquants…">${p.bio||''}</textarea>
+        <textarea id="pf-bio" class="fi" rows="4" placeholder="Présentation détaillée, parcours, projets marquants…">${esc(p.bio||'')}</textarea>
       </div>
       <div class="fg">
         <label>Wilaya</label>
@@ -1593,50 +1597,50 @@ function showProForm(p={}) {
       </div>
       <div class="fg">
         <label>Ville</label>
-        <input id="pf-city" class="fi" value="${p.city||''}" />
+        <input id="pf-city" class="fi" value="${esc(p.city||'')}" />
       </div>
       <div class="fg">
         <label>Années d'expérience</label>
-        <input id="pf-exp" class="fi" type="number" value="${p.experience_years||''}" placeholder="5" />
+        <input id="pf-exp" class="fi" type="number" value="${esc(p.experience_years||'')}" placeholder="5" />
       </div>
       <div class="fg">
         <label>Disponibilité</label>
         <select id="pf-avail" class="fi">
           <option value="">—</option>
-          ${PRO_AVAIL.map(a=>`<option${p.availability===a?' selected':''}>${a}</option>`).join('')}
+          ${PRO_AVAIL.map(a=>`<option${p.availability===a?' selected':''}>${esc(a)}</option>`).join('')}
         </select>
       </div>
       <div class="fg">
         <label>Formation</label>
-        <input id="pf-edu" class="fi" value="${p.education||''}" placeholder="Ingénieur d'État en Génie Civil" />
+        <input id="pf-edu" class="fi" value="${esc(p.education||'')}" placeholder="Ingénieur d'État en Génie Civil" />
       </div>
       <div class="fg">
         <label>Établissement</label>
-        <input id="pf-inst" class="fi" value="${p.institution||''}" placeholder="USTHB, ENP Alger…" />
+        <input id="pf-inst" class="fi" value="${esc(p.institution||'')}" placeholder="USTHB, ENP Alger…" />
       </div>
       <div class="fg">
         <label>Préférence contrat</label>
-        <input id="pf-contract" class="fi" value="${p.contract_pref||''}" placeholder="CDI, Freelance, Mission…" />
+        <input id="pf-contract" class="fi" value="${esc(p.contract_pref||'')}" placeholder="CDI, Freelance, Mission…" />
       </div>
       <div class="fg">
         <label>Email</label>
-        <input id="pf-email" class="fi" type="email" value="${p.email||''}" />
+        <input id="pf-email" class="fi" type="email" value="${esc(p.email||'')}" />
       </div>
       <div class="fg">
         <label>Téléphone</label>
-        <input id="pf-phone" class="fi" value="${p.phone||''}" />
+        <input id="pf-phone" class="fi" value="${esc(p.phone||'')}" />
       </div>
       <div class="fg">
         <label>LinkedIn</label>
-        <input id="pf-linkedin" class="fi" value="${p.linkedin_url||''}" placeholder="https://linkedin.com/in/…" />
+        <input id="pf-linkedin" class="fi" value="${esc(p.linkedin_url||'')}" placeholder="https://linkedin.com/in/…" />
       </div>
       <div class="fg">
         <label>Portfolio / Site</label>
-        <input id="pf-portfolio" class="fi" value="${p.portfolio_url||''}" placeholder="https://…" />
+        <input id="pf-portfolio" class="fi" value="${esc(p.portfolio_url||'')}" placeholder="https://…" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Compétences techniques <small>(séparées par virgule)</small></label>
-        <input id="pf-skills" class="fi" value="${(p.skills||[]).join(', ')}" placeholder="ETABS, SAP2000, AutoCAD, BIM, Revit…" />
+        <input id="pf-skills" class="fi" value="${esc((p.skills||[]).join(', '))}" placeholder="ETABS, SAP2000, AutoCAD, BIM, Revit…" />
       </div>
       <div class="fg" style="grid-column:1/-1">
         <label>Spécialités</label>
@@ -1662,7 +1666,7 @@ function showProForm(p={}) {
         </label>
       </div>
     </div>`,
-    `<button class="btn btn-b" onclick="savePro('${p.id||''}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
+    `<button class="btn btn-b" onclick="savePro('${esc(p.id||'')}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
      <button class="btn" onclick="closeModal()">Annuler</button>`);
 }
 
