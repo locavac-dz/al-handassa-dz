@@ -576,14 +576,14 @@ router.post('/articles', async (req, res, next) => {
     const pub = is_published === true || is_published === 'true';
     const result = await query(
       `INSERT INTO articles (title, slug, excerpt, content, category_id, author_id, thumbnail_url,
-        read_time_min, is_free, price, language, tags, doi, is_published, published_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *`,
+        read_time_min, is_free, price, language, tags, doi, is_published, published_at, status)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16::article_status) RETURNING *`,
       [title, slug, excerpt || null, content,
        category_id || null, author_id || null, thumbnail_url || null,
        parseInt(read_time_min) || null,
-       is_free === true || is_free === 'true', parseFloat(price) || 0,
+       is_free === true || is_free === 'true', parsePrice(price),
        language || 'fr', tags ? JSON.parse(tags) : [], doi || null,
-       pub, pub ? new Date() : null]
+       pub, pub ? new Date() : null, pub ? 'published' : 'draft']
     );
     res.status(201).json({ data: result.rows[0] });
   } catch (err) { next(err); }
@@ -598,12 +598,16 @@ router.put('/articles/:id', async (req, res, next) => {
       `UPDATE articles SET title=$1, excerpt=$2, content=$3, category_id=$4, author_id=$5,
         thumbnail_url=$6, read_time_min=$7, is_free=$8, price=$9, language=$10,
         tags=$11, doi=$12, is_published=$13,
+        -- les routes publiques ne lisent que status='published' : is_published et status doivent évoluer ensemble
+        -- (un article 'pending'/'rejected' en modération n'est pas touché par une simple sauvegarde non publiée)
+        status = CASE WHEN $13::boolean THEN 'published'::article_status
+                      WHEN status = 'published' THEN 'draft'::article_status ELSE status END,
         published_at = CASE WHEN $13=TRUE AND published_at IS NULL THEN NOW() ELSE published_at END,
         updated_at=NOW()
        WHERE id=$14 RETURNING *`,
       [title, excerpt || null, content, category_id || null, author_id || null,
        thumbnail_url || null, parseInt(read_time_min) || null,
-       is_free === true || is_free === 'true', parseFloat(price) || 0,
+       is_free === true || is_free === 'true', parsePrice(price),
        language || 'fr', tags ? JSON.parse(tags) : [], doi || null, pub, req.params.id]
     );
     if (!result.rows.length) throw new AppError('Article introuvable.', 404);
@@ -615,6 +619,7 @@ router.patch('/articles/:id/toggle-published', async (req, res, next) => {
   try {
     const result = await query(
       `UPDATE articles SET is_published = NOT is_published,
+        status = CASE WHEN NOT is_published THEN 'published'::article_status ELSE 'draft'::article_status END,
         published_at = CASE WHEN NOT is_published AND published_at IS NULL THEN NOW() ELSE published_at END
        WHERE id=$1 RETURNING id, title, is_published`,
       [req.params.id]
