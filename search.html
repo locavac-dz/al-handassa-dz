@@ -68,6 +68,11 @@
 <script src="js/cart.js"></script>
 <script>
 
+// Les titres/catégories viennent de la base : jamais injectés bruts dans innerHTML
+function escHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 function getQueryParam(name) {
   const params = new URLSearchParams(window.location.search);
   return params.get(name) || '';
@@ -115,15 +120,15 @@ async function performSearch(query) {
       const icon = '📄';
       const hasThumb = p.thumbnail_url;
       const thumbImg = hasThumb
-        ? `<img src="${HDS_SERVER}${p.thumbnail_url}" alt="${p.title}" onerror="this.style.display='none'">`
+        ? `<img src="${escHtml(HDS_SERVER + p.thumbnail_url)}" alt="${escHtml(p.title)}" onerror="this.style.display='none'">`
         : `<span>${icon}</span>`;
 
       html += `
-        <div class="result-card" onclick="location.href='product.html?slug=${p.slug}'">
+        <div class="result-card" onclick="location.href='product.html?slug=${encodeURIComponent(p.slug)}'">
           <div class="result-card-thumb">${thumbImg}</div>
           <div class="result-card-body">
-            <div class="result-title">${p.title}</div>
-            <div class="result-meta">${p.type} • ${p.category_name || 'Génie Civil'}</div>
+            <div class="result-title">${escHtml(p.title)}</div>
+            <div class="result-meta">${escHtml(p.type)} • ${escHtml(p.category_name || 'Génie Civil')}</div>
             <div class="result-price">${p.is_free ? 'Gratuit' : (p.price || 0).toLocaleString('fr-DZ') + ' DA'}</div>
           </div>
         </div>

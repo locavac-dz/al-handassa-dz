@@ -5,25 +5,30 @@ const { authenticate, authorize, optionalAuth } = require('../middleware/auth');
 const { uploadProduct, uploadImage, uploadProductFiles } = require('../middleware/upload');
 const validate = require('../middleware/validate');
 
-// GET /api/products/search?q=query — recherche fulltext
-router.get('/search/query', optionalAuth, async (req, res) => {
+// GET /api/products/search/query?q=mot — recherche par titre, description, catégorie ou tag
+// (category_name / instructor_name viennent de jointures : ce ne sont pas des colonnes de products,
+// l'ancienne requête échouait donc à chaque appel)
+router.get('/search/query', optionalAuth, async (req, res, next) => {
   try {
-    const q = (req.query.q || '').trim().toLowerCase();
-    if (!q || q.length < 2) {
-      return res.json({ data: [] });
-    }
+    const q = String(req.query.q || '').trim().toLowerCase().slice(0, 100);
+    if (q.length < 2) return res.json({ data: [] });
 
     const { query } = require('../config/database');
-    const searchPattern = `%${q}%`;
+    // % _ et \ saisis par l'utilisateur sont des caractères littéraux, pas des jokers LIKE
+    const searchPattern = `%${q.replace(/[\\%_]/g, '\\$&')}%`;
 
     const result = await query(
-      `SELECT p.id, p.slug, p.title, p.type, p.price, p.is_free, p.rating_avg, p.rating_count,
-              p.thumbnail_url, p.study_level, p.category_name, p.category_slug, p.instructor_name
+      `SELECT p.id, p.slug, p.title, p.type, p.price, p.discount_price, p.is_free, p.rating_avg, p.rating_count,
+              p.thumbnail_url, p.study_level,
+              c.name_fr AS category_name, c.slug AS category_slug,
+              inst.display_name AS instructor_name
        FROM products p
+       LEFT JOIN categories c ON p.category_id = c.id
+       LEFT JOIN instructors inst ON p.instructor_id = inst.id
        WHERE p.is_active = TRUE AND (
          LOWER(p.title) LIKE $1
-         OR LOWER(p.description) LIKE $1
-         OR LOWER(p.category_name) LIKE $1
+         OR LOWER(COALESCE(p.description, '')) LIKE $1
+         OR LOWER(COALESCE(c.name_fr, '')) LIKE $1
          OR LOWER(p.tags::text) LIKE $1
        )
        ORDER BY
@@ -35,9 +40,7 @@ router.get('/search/query', optionalAuth, async (req, res) => {
     );
 
     res.json({ data: result.rows });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { next(err); }
 });
 
 // GET /api/products — liste publique avec filtres
