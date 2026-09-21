@@ -2,7 +2,7 @@
 
 class AIChat {
   constructor() {
-    this.API_ENDPOINT = 'http://localhost:5000/api/assistant';
+    this.API_ENDPOINT = HDS_SERVER + '/api/assistant';
     this.messages = [];
     this.isOpen = false;
     this.init();

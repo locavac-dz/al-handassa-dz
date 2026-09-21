@@ -2,7 +2,7 @@
    Al Handassa.dz — Page Détail Produit
    ============================================= */
 
-const SERVER_URL = 'http://localhost:5000'; // URL de base pour images/fichiers (api.js gère déjà API_BASE)
+const SERVER_URL = HDS_SERVER; // URL de base pour images/fichiers (api.js gère déjà API_BASE)
 
 const TYPE_LABEL = {
   ouvrage: 'Ouvrage', cours_pdf: 'Cours PDF', exercices: 'Exercices',

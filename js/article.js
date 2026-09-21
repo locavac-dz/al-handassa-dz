@@ -189,7 +189,7 @@ async function loadArticle() {
     // ── Thumbnail ─────────────────────────────────────────────────────────────
     if (a.thumbnail_url) {
       const imgEl = document.getElementById('article-thumb-img');
-      imgEl.src = a.thumbnail_url.startsWith('http') ? a.thumbnail_url : `http://localhost:5000${a.thumbnail_url}`;
+      imgEl.src = a.thumbnail_url.startsWith('http') ? a.thumbnail_url : `${HDS_SERVER}${a.thumbnail_url}`;
       imgEl.alt = a.title;
       document.getElementById('article-thumb-wrap').style.display = 'block';
     }

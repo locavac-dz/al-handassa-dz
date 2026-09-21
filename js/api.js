@@ -2,7 +2,7 @@
    Al Handassa.dz — Service API
    ============================================= */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = HDS_SERVER + '/api';
 
 // ── Token storage ───────────────────────────────────────────────────────────
 

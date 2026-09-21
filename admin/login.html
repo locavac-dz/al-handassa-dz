@@ -21,6 +21,7 @@
   <button onclick="login()">🔐 Se connecter</button>
   <div id="msg"></div>
 </div>
+<script src="../js/config.js"></script>
 <script>
 async function login() {
   const email = document.getElementById('email').value.trim();
@@ -28,7 +29,7 @@ async function login() {
   const msg   = document.getElementById('msg');
   msg.textContent = 'Connexion...';
   try {
-    const r = await fetch('http://localhost:5000/api/auth/login', {
+    const r = await fetch(HDS_SERVER + '/api/auth/login', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({email, password: pass})

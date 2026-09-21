@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const CART_KEY = 'hds_cart';
-const API = 'http://localhost:5000/api';
+const API = HDS_SERVER + '/api';
 
 class Cart {
   constructor() {

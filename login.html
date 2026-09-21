@@ -187,8 +187,9 @@
   </div>
 </div>
 
+<script src="js/config.js"></script>
 <script>
-const API = 'http://localhost:5000/api';
+const API = HDS_SERVER + '/api';
 
 function switchTab(tab) {
   document.getElementById('tab-login').classList.toggle('active', tab === 'login');

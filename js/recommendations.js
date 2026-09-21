@@ -2,7 +2,7 @@
 
 class ProductRecommendations {
   constructor() {
-    this.API = 'http://localhost:5000/api';
+    this.API = HDS_SERVER + '/api';
     this.purchaseHistory = JSON.parse(localStorage.getItem('hds_purchase_history') || '[]');
   }
 
@@ -69,7 +69,7 @@ class ProductRecommendations {
           ${products.map(p => `
             <div style="border: 1px solid #e0e4e8; border-radius: 8px; padding: 12px; cursor: pointer;" onclick="location.href='product.html?slug=${p.slug}'">
               <div style="width: 100%; height: 150px; background: #f0f0f0; border-radius: 4px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center;">
-                <img src="http://localhost:5000${p.thumbnail_url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none'">
+                <img src="${HDS_SERVER}${p.thumbnail_url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none'">
               </div>
               <div style="font-weight: 600; color: #1B3A6B; font-size: 13px; margin-bottom: 8px;">${p.title}</div>
               <div style="color: #D4A017; font-weight: 700;">${(p.price || 0).toLocaleString('fr-DZ')} DA</div>

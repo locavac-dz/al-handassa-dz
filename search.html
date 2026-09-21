@@ -64,9 +64,10 @@
   </div>
 </div>
 
+<script src="js/config.js"></script>
 <script src="js/cart.js"></script>
 <script>
-const API = 'http://localhost:5000/api';
+const API = HDS_SERVER + '/api';
 
 function getQueryParam(name) {
   const params = new URLSearchParams(window.location.search);
@@ -115,7 +116,7 @@ async function performSearch(query) {
       const icon = '📄';
       const hasThumb = p.thumbnail_url;
       const thumbImg = hasThumb
-        ? `<img src="http://localhost:5000${p.thumbnail_url}" alt="${p.title}" onerror="this.style.display='none'">`
+        ? `<img src="${HDS_SERVER}${p.thumbnail_url}" alt="${p.title}" onerror="this.style.display='none'">`
         : `<span>${icon}</span>`;
 
       html += `

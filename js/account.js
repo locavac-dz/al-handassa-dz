@@ -2,7 +2,7 @@
    Al Handassa.dz — Espace Utilisateur
    ============================================= */
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = HDS_SERVER;
 
 const TYPE_ICON = {
   ouvrage: '📚', cours_pdf: '📄', exercices: '✏️',

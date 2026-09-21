@@ -1,5 +1,5 @@
 (() => {
-  const API = 'http://localhost:5000/api/assistant/chat';
+  const API = HDS_SERVER + '/api/assistant/chat';
   let messages = [];
   let open = false;
 

@@ -2,7 +2,7 @@
    AL HANDASSA.DZ — Page Logiciels
    ============================================= */
 
-// API_BASE est déjà défini dans api.js : 'http://localhost:5000/api'
+// API_BASE est déjà défini dans api.js : HDS_SERVER + '/api'
 
 const LEVEL_MAP = {
   debutant: 'Débutant',

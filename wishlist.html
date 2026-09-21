@@ -54,6 +54,7 @@
   </div>
 </div>
 
+<script src="js/config.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/wishlist.js"></script>
 <script>
@@ -72,7 +73,7 @@
       card.className = 'wishlist-card';
       card.innerHTML = `
         <div class="wishlist-thumb">
-          <img src="http://localhost:5000${item.thumbnail_url || '/img/placeholder.png'}" alt="${item.title}" onerror="this.style.display='none'">
+          <img src="${HDS_SERVER}${item.thumbnail_url || '/img/placeholder.png'}" alt="${item.title}" onerror="this.style.display='none'">
         </div>
         <div class="wishlist-body">
           <div class="wishlist-title-card">${item.title}</div>
