@@ -80,8 +80,42 @@ describe('sécurité : limitation de débit, fichiers du dépôt, en-têtes', ()
       assert.match(csp, /script-src[^;]*'unsafe-inline'/);   // nécessaire aux pages actuelles (voir CLAUDE.md)
     });
 
-    it('/health répond sans authentification', async () => {
-      assert.equal((await ctx.call('GET', '/health')).status, 200);
+    it('/health répond sans authentification et confirme que la base répond', async () => {
+      const r = await ctx.call('GET', '/health');
+      assert.equal(r.status, 200);
+      assert.equal(r.json.status, 'ok');
+      assert.equal(r.json.db, 'ok');
+    });
+
+    describe('/health quand la base est défaillante', () => {
+      const { pool } = require('../src/config/database');
+      let original;
+      before(() => { original = pool.query; });
+      after(() => { pool.query = original; delete process.env.HEALTH_DB_TIMEOUT_MS; });
+
+      it('erreur de la base → 503, sans détail technique dans la réponse', async () => {
+        pool.query = async () => { throw new Error('connexion refusée à 10.0.0.5:5432 (secret-interne)'); };
+        const r = await ctx.call('GET', '/health');
+        pool.query = original;
+        assert.equal(r.status, 503);
+        assert.equal(r.json.status, 'error');
+        assert.equal(r.json.db, 'down');
+        assert.ok(!r.text.includes('10.0.0.5') && !r.text.includes('secret-interne'), 'aucune fuite de l\'erreur');
+      });
+
+      it('base qui ne répond plus (requête bloquée) → 503 dans le délai imparti, pas d\'attente infinie', async () => {
+        process.env.HEALTH_DB_TIMEOUT_MS = '300';
+        pool.query = () => new Promise(() => {});          // ne se résout jamais
+        const t0 = Date.now();
+        const r = await ctx.call('GET', '/health');
+        pool.query = original;
+        assert.equal(r.status, 503);
+        assert.ok(Date.now() - t0 < 2500, `réponse en ${Date.now() - t0} ms`);
+      });
+
+      it('la santé revient dès que la base répond de nouveau', async () => {
+        assert.equal((await ctx.call('GET', '/health')).status, 200);
+      });
     });
   });
 });

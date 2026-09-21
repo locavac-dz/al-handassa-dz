@@ -250,6 +250,15 @@ un outil qui **chiffre côté client** — les sauvegardes contiennent emails et
 Railway : pour ces fichiers, utiliser la sauvegarde de volumes de Railway (à vérifier selon l'offre) ou, mieux, déplacer les
 uploads vers un stockage objet (chantier non fait).
 
+## Surveillance de la disponibilité
+
+`GET /health` interroge aussi la base : **200** `{"status":"ok","db":"ok"}` si tout répond, **503** `{"status":"error","db":"down"}`
+sinon (le détail de l'erreur est dans les journaux, jamais dans la réponse). Railway (`healthcheckPath`) et le
+`HEALTHCHECK` du `Dockerfile` l'utilisent déjà. Pour être prévenu d'une panne **en dehors** des déploiements, brancher un
+moniteur externe sur `https://<domaine>/health` toutes les minutes (UptimeRobot, Better Stack ou healthchecks.io — gratuits)
+avec une alerte email/SMS : c'est ce qui manque tant qu'aucun n'est configuré. Ne pas surveiller `/` : la page d'accueil
+resterait « verte » base éteinte.
+
 ## Variables d'environnement de production
 
 Obligatoires : `NODE_ENV=production`, `DATABASE_URL` (ou `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASSWORD`),

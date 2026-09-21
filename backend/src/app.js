@@ -231,11 +231,29 @@ app.use('/uploads', uploadsGuard, express.static(path.join(__dirname, '../upload
 
 
 // ── Health Check ──
-app.get('/health', (req, res) => {
+// Vérifie aussi la base : sans cela, Railway, le HEALTHCHECK Docker et un moniteur de disponibilité verraient « ok »
+// alors que chaque requête échoue. 503 si la base ne répond pas (erreur ou délai HEALTH_DB_TIMEOUT_MS, défaut 3 s).
+app.get('/health', async (req, res) => {
+  const timeoutMs = parseInt(process.env.HEALTH_DB_TIMEOUT_MS, 10) || 3000;
+  const started = Date.now();
+  let timer;
+  try {
+    await Promise.race([
+      pool.query('SELECT 1'),
+      new Promise((_, reject) => { timer = setTimeout(() => reject(new Error(`pas de réponse en ${timeoutMs} ms`)), timeoutMs); }),
+    ]);
+  } catch (err) {
+    console.error('[health] base indisponible :', err.message);   // détail dans les journaux seulement, jamais dans la réponse
+    return res.status(503).json({ status: 'error', service: 'Al Handassa.dz API', db: 'down', timestamp: new Date().toISOString() });
+  } finally {
+    clearTimeout(timer);
+  }
   res.json({
     status: 'ok',
     service: 'Al Handassa.dz API',
     version: '1.0.0',
+    db: 'ok',
+    db_ms: Date.now() - started,
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV,
   });

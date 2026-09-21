@@ -25,7 +25,9 @@ const pool = new Pool({
   ...connection,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  // Attente maximale d'une connexion (établissement SSL vers une base distante, ou file d'attente quand les 20 sont prises).
+  // 2 s renvoyait des erreurs 500 dès qu'un pic ou une base lente dépassait ce délai ; DB_CONNECT_TIMEOUT_MS pour ajuster.
+  connectionTimeoutMillis: parseInt(process.env.DB_CONNECT_TIMEOUT_MS, 10) || 10000,
   ssl: sslConfig(),
 });
 
