@@ -104,10 +104,10 @@ function _orderTable(items = [], totalAmount) {
 }
 
 // ─── Core send ────────────────────────────────────────────────────────────────
-async function sendEmail({ to, subject, html, text }) {
+async function sendEmail({ to, subject, html, text, headers }) {
   return transporter.sendMail({
     from: process.env.EMAIL_FROM,
-    to, subject, html, text,
+    to, subject, html, text, headers,
   });
 }
 
