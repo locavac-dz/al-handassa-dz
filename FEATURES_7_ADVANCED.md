@@ -1,3 +1,7 @@
+> ⚠️ **Document historique — ne décrit plus le code.** Les services SMS (Twilio), WhatsApp et chatbot avancé ont été
+> supprimés (jamais importés), `/api/affiliate` et `/api/referral` ne sont pas montés (tables absentes, failles de
+> fraude) et les analytics utilisent désormais de vraies données. Voir `CLAUDE.md` pour l'état réel.
+
 # 7 Advanced Features Implementation Guide
 
 ## 📱 **1. Mobile App (React Native)**
