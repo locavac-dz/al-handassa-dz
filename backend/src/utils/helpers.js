@@ -16,10 +16,14 @@ function generateToken(bytes = 32) {
   return crypto.randomBytes(bytes).toString('hex');
 }
 
-function paginate(page = 1, limit = 20) {
-  const p = Math.max(1, parseInt(page, 10));
-  const l = Math.min(100, Math.max(1, parseInt(limit, 10)));
-  return { limit: l, offset: (p - 1) * l, page: p };
+// page/limit viennent de la query string : "abc", "-5", "1e9" ou un tableau ne doivent ni casser le SQL
+// (LIMIT NaN → erreur 500) ni permettre de vider une table (LIMIT 1000000).
+function paginate(page, limit, { defaultLimit = 20, maxLimit = 100 } = {}) {
+  const rawPage = parseInt(page, 10);
+  const rawLimit = parseInt(limit, 10);
+  const p = Number.isFinite(rawPage) ? Math.min(100000, Math.max(1, rawPage)) : 1;
+  const l = Number.isFinite(rawLimit) ? Math.min(maxLimit, Math.max(1, rawLimit)) : defaultLimit;
+  return { limit: l, offset: (p - 1) * l, page: p, currentPage: p };
 }
 
 function formatPrice(amount) {

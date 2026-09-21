@@ -4,6 +4,7 @@ const { body }  = require('express-validator');
 const validate  = require('../middleware/validate');
 const { query } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
+const { paginate } = require('../utils/helpers');
 const auth  = authenticate;
 const admin = authorize('admin');
 
@@ -33,7 +34,8 @@ function slugify(str) {
 // GET /api/jobs — liste
 router.get('/', async (req, res) => {
   try {
-    const { wilaya, specialty, contract_type, level, search, featured, page=1, limit=20 } = req.query;
+    const { wilaya, specialty, contract_type, level, search, featured } = req.query;
+    const { page, limit, offset } = paginate(req.query.page, req.query.limit, { defaultLimit: 20 });
     const params = [];
     const conds  = ['j.is_active = TRUE', '(j.expires_at IS NULL OR j.expires_at >= CURRENT_DATE)'];
 
@@ -48,8 +50,7 @@ router.get('/', async (req, res) => {
     }
 
     const where  = conds.join(' AND ');
-    const offset = (parseInt(page)-1)*parseInt(limit);
-    params.push(parseInt(limit), offset);
+    params.push(limit, offset);
 
     const [rows, total] = await Promise.all([
       query(`SELECT j.id, j.slug, j.title, j.contract_type, j.specialty, j.level,
@@ -66,7 +67,7 @@ router.get('/', async (req, res) => {
     ]);
 
     res.json({ success:true, data:rows.rows, total:parseInt(total.rows[0].count),
-               page:parseInt(page), limit:parseInt(limit) });
+               page:page, limit:limit });
   } catch(e) { res.status(500).json({ success:false, message:e.message }); }
 });
 

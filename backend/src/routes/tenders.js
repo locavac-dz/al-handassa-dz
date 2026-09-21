@@ -4,6 +4,7 @@ const { body }  = require('express-validator');
 const validate  = require('../middleware/validate');
 const { query } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
+const { paginate } = require('../utils/helpers');
 const auth  = authenticate;
 const admin = authorize('admin');
 
@@ -34,7 +35,8 @@ function slugify(str) {
 // GET /api/tenders
 router.get('/', async (req, res) => {
   try {
-    const { wilaya, sector, status, owner_type, featured, search, page=1, limit=20 } = req.query;
+    const { wilaya, sector, status, owner_type, featured, search } = req.query;
+    const { page, limit, offset } = paginate(req.query.page, req.query.limit, { defaultLimit: 20 });
     const params = [];
     const conds  = ['t.is_active = TRUE'];
 
@@ -49,8 +51,7 @@ router.get('/', async (req, res) => {
     }
 
     const where  = conds.join(' AND ');
-    const offset = (parseInt(page)-1)*parseInt(limit);
-    params.push(parseInt(limit), offset);
+    params.push(limit, offset);
 
     const [rows, total] = await Promise.all([
       query(`SELECT t.id, t.slug, t.title, t.reference, t.sector, t.owner_name, t.owner_type,
@@ -67,7 +68,7 @@ router.get('/', async (req, res) => {
     ]);
 
     res.json({ success:true, data:rows.rows, total:parseInt(total.rows[0].count),
-               page:parseInt(page), limit:parseInt(limit) });
+               page:page, limit:limit });
   } catch(e) { res.status(500).json({ success:false, message:e.message }); }
 });
 

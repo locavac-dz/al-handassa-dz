@@ -4,6 +4,7 @@ const { body }  = require('express-validator');
 const validate  = require('../middleware/validate');
 const { query } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
+const { paginate } = require('../utils/helpers');
 const multer    = require('multer');
 const path      = require('path');
 const fs        = require('fs');
@@ -57,7 +58,8 @@ function arr(val) {
 // GET /api/professionals
 router.get('/', async (req, res) => {
   try {
-    const { wilaya, specialty, availability, search, page=1, limit=24 } = req.query;
+    const { wilaya, specialty, availability, search } = req.query;
+    const { page, limit, offset } = paginate(req.query.page, req.query.limit, { defaultLimit: 24 });
     const params = [];
     const conds  = ['p.is_active = TRUE'];
 
@@ -72,8 +74,7 @@ router.get('/', async (req, res) => {
     }
 
     const where  = conds.join(' AND ');
-    const offset = (parseInt(page)-1)*parseInt(limit);
-    params.push(parseInt(limit), offset);
+    params.push(limit, offset);
 
     const [rows, total] = await Promise.all([
       query(`SELECT id, slug, first_name, last_name, photo_url, title, tagline,
@@ -86,7 +87,7 @@ router.get('/', async (req, res) => {
     ]);
 
     res.json({ success:true, data:rows.rows, total:parseInt(total.rows[0].count),
-               page:parseInt(page), limit:parseInt(limit) });
+               page:page, limit:limit });
   } catch(e) { res.status(500).json({ success:false, message:e.message }); }
 });
 

@@ -4,6 +4,7 @@ const { body } = require('express-validator');
 const validate = require('../middleware/validate');
 const { query } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
+const { paginate } = require('../utils/helpers');
 const authMiddleware  = authenticate;
 const adminMiddleware = authorize('admin');
 const multer   = require('multer');
@@ -55,8 +56,8 @@ async function resizeImage(src, dest, width, height) {
 // GET /api/companies — liste (annuaire)
 router.get('/', async (req, res) => {
   try {
-    const { wilaya, specialty, search, premium, page = 1, limit = 24 } = req.query;
-    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const { wilaya, specialty, search, premium } = req.query;
+    const { page, limit, offset } = paginate(req.query.page, req.query.limit, { defaultLimit: 24 });
     const params = [];
     const conds  = ['c.is_active = TRUE'];
 
@@ -69,7 +70,7 @@ router.get('/', async (req, res) => {
     }
 
     const where = conds.join(' AND ');
-    params.push(parseInt(limit), offset);
+    params.push(limit, offset);
 
     const [rows, countRow] = await Promise.all([
       query(`SELECT c.id, c.slug, c.name, c.logo_url, c.tagline, c.specialties,
@@ -82,7 +83,7 @@ router.get('/', async (req, res) => {
       query(`SELECT COUNT(*) FROM companies c WHERE ${where}`, params.slice(0,-2)),
     ]);
 
-    res.json({ success: true, data: rows.rows, total: parseInt(countRow.rows[0].count), page: parseInt(page), limit: parseInt(limit) });
+    res.json({ success: true, data: rows.rows, total: parseInt(countRow.rows[0].count), page: page, limit: limit });
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
