@@ -87,7 +87,7 @@ router.post('/', contactLimiter, async (req, res) => {
       port: parseInt(process.env.SMTP_PORT, 10),
       secure: process.env.SMTP_PORT === '465',
       auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-      tls: { rejectUnauthorized: false },
+      tls: { rejectUnauthorized: process.env.SMTP_TLS_INSECURE !== 'true' },   // certificat vérifié (voir utils/email.js)
     });
 
     // Email à l'administrateur

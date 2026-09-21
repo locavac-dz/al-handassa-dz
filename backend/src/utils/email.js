@@ -5,7 +5,9 @@ const transporter = nodemailer.createTransport({
   port: parseInt(process.env.SMTP_PORT, 10),
   secure: process.env.SMTP_PORT === '465',
   auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-  tls: { rejectUnauthorized: false },   // accepter les certs auto-signés en dev
+  // Certificat du serveur SMTP vérifié (sinon un intermédiaire pourrait lire les identifiants et les emails).
+  // SMTP_TLS_INSECURE=true uniquement pour un serveur de développement à certificat auto-signé.
+  tls: { rejectUnauthorized: process.env.SMTP_TLS_INSECURE !== 'true' },
   pool: true,                            // réutiliser les connexions
   maxConnections: 3,
   rateDelta: 1000,
