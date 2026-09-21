@@ -243,7 +243,8 @@ curl https://your-domain.com/health
 ### 2. Create Admin Account
 
 ```bash
-node backend/reset-admin-password.js
+# Réinitialise le mot de passe d'un compte ADMIN existant (12 caractères minimum, jamais affiché)
+node backend/reset-admin-password.js <email> <mot_de_passe>
 ```
 
 ### 3. Test Payment Gateway

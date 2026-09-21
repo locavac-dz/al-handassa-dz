@@ -121,16 +121,14 @@ You have 2 options:
 
 **Option A: Via Terminal (Recommended)**
 ```bash
-# In your local terminal, run:
-node backend/reset-admin-password.js
-
-# Follow prompts to create admin user
+# In your local terminal, run (compte admin existant ; 12 caractères minimum) :
+node backend/reset-admin-password.js <email> <mot_de_passe>
 ```
 
 **Option B: Via Railway Console**
 ```
 Railway Dashboard → Settings → "Command"
-Run: node backend/reset-admin-password.js
+Run: node backend/reset-admin-password.js <email> <mot_de_passe>
 ```
 
 ### **Initialize Database:**
