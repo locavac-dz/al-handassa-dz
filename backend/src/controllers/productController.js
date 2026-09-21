@@ -1,5 +1,5 @@
 const { query } = require('../config/database');
-const { slugify, paginate } = require('../utils/helpers');
+const { slugify, paginate, parsePrice } = require('../utils/helpers');
 const { AppError } = require('../middleware/errorHandler');
 const { generateThumb } = require('../utils/generateThumb');
 const { generatePreviewAsync } = require('../utils/generatePreview');
@@ -137,7 +137,7 @@ async function create(req, res, next) {
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
        RETURNING *`,
       [title, slug, description, type, category_id, study_level || 'tous',
-       instructor_id || null, parseFloat(price) || 0, discount_price || null,
+       instructor_id || null, parsePrice(price), (discount_price === undefined || discount_price === null || discount_price === '') ? null : parsePrice(discount_price),
        is_free === 'true', file_url, thumbnail_url, language || 'fr',
        tags ? JSON.parse(tags) : []]
     );
@@ -174,8 +174,11 @@ async function update(req, res, next) {
 
     for (const key of allowed) {
       if (fields[key] !== undefined) {
+        let val = fields[key];
+        if (key === 'price') val = parsePrice(val);
+        else if (key === 'discount_price') val = (val === null || val === '') ? null : parsePrice(val);
         updates.push(`${key} = $${i++}`);
-        params.push(fields[key]);
+        params.push(val);
       }
     }
     if (!updates.length) throw new AppError('Aucun champ à mettre à jour.', 400);
@@ -263,7 +266,11 @@ async function addReview(req, res, next) {
       WHERE id=$1`, [id]);
 
     res.status(201).json({ message: 'Avis publié avec succès. Merci !' });
-  } catch (err) { next(err); }
+  } catch (err) {
+    // Index unique (user_id, product_id) : deux avis simultanés → le second est refusé par la base
+    if (err.code === '23505') return next(new AppError('Vous avez déjà donné un avis pour ce produit.', 409));
+    next(err);
+  }
 }
 
 async function uploadFile(req, res, next) {

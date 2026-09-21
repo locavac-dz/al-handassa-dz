@@ -17,6 +17,18 @@ function errorHandler(err, req, res, next) {
     return res.status(400).json({ error: 'Référence invalide dans les données.' });
   }
 
+  // Données refusées par PostgreSQL : entrée invalide (uuid mal formé, hors limites, trop long…) = erreur client
+  const PG_BAD_INPUT = {
+    '22P02': 'Valeur invalide.',              // invalid_text_representation (ex. UUID/enum mal formé)
+    '22003': 'Valeur numérique hors limites.',
+    '22001': 'Valeur trop longue.',
+    '23514': 'Valeur hors des limites autorisées.',   // CHECK (prix négatif, quantité nulle…)
+    '23502': 'Champ obligatoire manquant.',
+  };
+  if (PG_BAD_INPUT[err.code]) {
+    return res.status(400).json({ error: PG_BAD_INPUT[err.code] });
+  }
+
   // CORS
   if (err.message?.startsWith('CORS bloqué')) {
     return res.status(403).json({ error: err.message });

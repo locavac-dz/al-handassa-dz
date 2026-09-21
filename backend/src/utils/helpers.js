@@ -26,6 +26,18 @@ function paginate(page, limit, { defaultLimit = 20, maxLimit = 100 } = {}) {
   return { limit: l, offset: (p - 1) * l, page: p, currentPage: p };
 }
 
+// Montant en DZD saisi par un admin/instructeur : nombre fini >= 0 (vide → 0). Un prix négatif annulait le
+// total d'un panier ; « abc » devenait silencieusement 0.
+function parsePrice(value) {
+  if (value === undefined || value === null || value === '') return 0;
+  const n = typeof value === 'number' ? value : Number(String(value).replace(',', '.'));
+  if (!Number.isFinite(n) || n < 0 || n > 99999999) {
+    const { AppError } = require('../middleware/errorHandler');
+    throw new AppError('Prix invalide (nombre positif requis).', 400);
+  }
+  return Math.round(n * 100) / 100;
+}
+
 function formatPrice(amount) {
   return new Intl.NumberFormat('fr-DZ', { style: 'decimal' }).format(amount) + ' DZD';
 }
@@ -35,4 +47,4 @@ function sanitizeUser(user) {
   return safe;
 }
 
-module.exports = { slugify, generateToken, paginate, formatPrice, sanitizeUser };
+module.exports = { slugify, generateToken, paginate, parsePrice, formatPrice, sanitizeUser };

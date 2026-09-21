@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { query, getClient } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
 const { AppError } = require('../middleware/errorHandler');
-const { paginate } = require('../utils/helpers');
+const { paginate, parsePrice } = require('../utils/helpers');
 const { sendPaymentValidated, sendPaymentRejected, sendLicenseIssued } = require('../utils/email');
 const { settleOrder } = require('../utils/fulfillment');
 
@@ -83,7 +83,7 @@ router.patch('/products/:id', async (req, res, next) => {
           params.push(val === true || val === 'true');
         } else if (key === 'price') {
           updates.push(`${key} = $${i++}`);
-          params.push(parseFloat(val) || 0);
+          params.push(parsePrice(val));
         } else {
           updates.push(`${key} = $${i++}`);
           params.push(val);
@@ -493,7 +493,7 @@ router.post('/videos', async (req, res, next) => {
        study_level || 'tous', instructor_id || null,
        video_url || null, video_host || 'youtube',
        thumbnail_url || null, parseInt(duration_seconds) || null,
-       parseFloat(price) || 0, is_free === true || is_free === 'true',
+       parsePrice(price), is_free === true || is_free === 'true',
        language || 'fr', tags ? JSON.parse(tags) : [], is_featured === true || is_featured === 'true']
     );
     res.status(201).json({ data: result.rows[0] });
@@ -514,7 +514,7 @@ router.put('/videos/:id', async (req, res, next) => {
        study_level || 'tous', instructor_id || null,
        video_url || null, video_host || 'youtube',
        thumbnail_url || null, parseInt(duration_seconds) || null,
-       parseFloat(price) || 0, is_free === true || is_free === 'true',
+       parsePrice(price), is_free === true || is_free === 'true',
        language || 'fr', tags ? JSON.parse(tags) : [],
        is_featured === true || is_featured === 'true', req.params.id]
     );
