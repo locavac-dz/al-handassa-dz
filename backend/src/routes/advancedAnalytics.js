@@ -135,18 +135,74 @@ router.get('/export/excel', authenticate, authorize('admin'), async (req, res) =
 });
 
 // Custom report builder
+// Colonnes et filtres passent par une liste blanche / des paramètres liés : aucune valeur venant du
+// client n'est concaténée dans le SQL (le SELECT dynamique permettait de lire password_hash ou
+// d'exécuter des requêtes empilées).
+const REPORT_COLUMNS = {
+  order_number:        'o.order_number',
+  status:              'o.status',
+  subtotal:            'o.subtotal',
+  discount_amount:     'o.discount_amount',
+  total_amount:        'o.total_amount',
+  payment_method:      'o.payment_method',
+  coupon_code:         'o.coupon_code',
+  created_at:          'o.created_at',
+  customer_email:      'u.email',
+  customer_first_name: 'u.first_name',
+  customer_last_name:  'u.last_name',
+};
+const ORDER_STATUSES = ['pending', 'processing', 'paid', 'failed', 'refunded', 'cancelled'];
+const REPORT_MAX_ROWS = 10000;
+
 router.post('/custom-report', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const { columns, filters, format } = req.body;
+    const { columns, filters = {}, format = 'json' } = req.body || {};
 
-    let sql = 'SELECT ' + columns.join(', ') + ' FROM orders o JOIN users u ON o.user_id = u.id WHERE 1=1';
+    if (!Array.isArray(columns) || !columns.length || columns.length > Object.keys(REPORT_COLUMNS).length) {
+      return res.status(400).json({ error: 'columns doit être une liste non vide de colonnes autorisées.' });
+    }
+    const unknown = columns.filter(c => typeof c !== 'string' || !Object.hasOwn(REPORT_COLUMNS, c));
+    if (unknown.length) {
+      return res.status(400).json({ error: 'Colonne non autorisée.', allowed: Object.keys(REPORT_COLUMNS) });
+    }
+    if (!['json', 'xlsx'].includes(format)) {
+      return res.status(400).json({ error: "format doit être 'json' ou 'xlsx'." });
+    }
+    if (typeof filters !== 'object' || filters === null || Array.isArray(filters)) {
+      return res.status(400).json({ error: 'filters invalide.' });
+    }
 
-    if (filters.dateFrom) sql += ` AND o.created_at >= '${filters.dateFrom}'`;
-    if (filters.dateTo) sql += ` AND o.created_at <= '${filters.dateTo}'`;
-    if (filters.status) sql += ` AND o.payment_status = '${filters.status}'`;
-    if (filters.minAmount) sql += ` AND o.total_amount >= ${filters.minAmount}`;
+    const conds = [];
+    const params = [];
+    const isoDate = /^\d{4}-\d{2}-\d{2}(?:[T ][\d:.]+(?:Z|[+-]\d{2}:?\d{2})?)?$/;
 
-    const result = await query(sql);
+    for (const [key, op] of [['dateFrom', '>='], ['dateTo', '<=']]) {
+      if (filters[key] === undefined || filters[key] === null || filters[key] === '') continue;
+      if (typeof filters[key] !== 'string' || !isoDate.test(filters[key]) || Number.isNaN(Date.parse(filters[key]))) {
+        return res.status(400).json({ error: `${key} invalide (format AAAA-MM-JJ attendu).` });
+      }
+      params.push(filters[key]);
+      conds.push(`o.created_at ${op} $${params.length}`);
+    }
+    if (filters.status) {
+      if (!ORDER_STATUSES.includes(filters.status)) {
+        return res.status(400).json({ error: 'status invalide.', allowed: ORDER_STATUSES });
+      }
+      params.push(filters.status);
+      conds.push(`o.status = $${params.length}::order_status`);
+    }
+    if (filters.minAmount !== undefined && filters.minAmount !== null && filters.minAmount !== '') {
+      const min = Number(filters.minAmount);
+      if (!Number.isFinite(min) || min < 0) return res.status(400).json({ error: 'minAmount invalide.' });
+      params.push(min);
+      conds.push(`o.total_amount >= $${params.length}`);
+    }
+
+    const select = columns.map(c => `${REPORT_COLUMNS[c]} AS "${c}"`).join(', ');
+    const sql = `SELECT ${select} FROM orders o JOIN users u ON o.user_id = u.id
+                 ${conds.length ? 'WHERE ' + conds.join(' AND ') : ''}
+                 ORDER BY o.created_at DESC LIMIT ${REPORT_MAX_ROWS}`;
+    const result = await query(sql, params);
 
     if (format === 'xlsx') {
       const workbook = new ExcelJS.Workbook();
@@ -158,7 +214,7 @@ router.post('/custom-report', authenticate, authorize('admin'), async (req, res)
       res.setHeader('Content-Disposition', 'attachment; filename="report.xlsx"');
       await workbook.xlsx.write(res);
       res.end();
-    } else if (format === 'json') {
+    } else {
       res.json({ data: result.rows });
     }
 
