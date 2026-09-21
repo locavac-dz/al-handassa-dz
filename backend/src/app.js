@@ -44,27 +44,52 @@ const trustProxyHops = process.env.TRUST_PROXY !== undefined
 if (trustProxyHops > 0) app.set('trust proxy', trustProxyHops);
 
 // ── Security ──
+// Les autres en-têtes Helmet (HSTS, nosniff, referrer-policy…) s'appliquent partout ; la CSP est posée séparément
+// ci-dessous car elle diffère entre les pages du site et les réponses de l'API.
 app.use(helmet({
+  contentSecurityPolicy: false,
   crossOriginResourcePolicy: { policy: 'cross-origin' },
   frameguard: false,
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
-      fontSrc: ["'self'"],
-      connectSrc: ["'self'"],
-      frameSrc: ["'none'"],
-      objectSrc: ["'none'"]
-    }
-  },
   hsts: {
     maxAge: 31536000,
     includeSubDomains: true,
     preload: true
   }
 }));
+
+// CSP des pages (HTML/CSS/JS du site, servis par ce même serveur) : les pages utilisent des scripts et des
+// gestionnaires d'événements inline (onclick=…), Font Awesome et Chart.js depuis cdnjs, Google Fonts, et un
+// <iframe> same-origin pour les aperçus PDF. L'ancienne politique (script-src-attr 'none', styles/polices 'self',
+// frame-src 'none') cassait les boutons, les icônes et les aperçus dès que le front était servi par Express.
+// Contrepartie assumée : 'unsafe-inline' (déjà présent pour les <script>) couvre désormais aussi les attributs
+// onclick ; la protection repose sur l'échappement systématique des données (esc()), pas sur la CSP.
+// Le retour vers script-src-attr 'none' passe par la migration des gestionnaires inline vers addEventListener.
+const CDN = 'https://cdnjs.cloudflare.com';
+const pageCsp = helmet.contentSecurityPolicy({
+  useDefaults: false,
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'unsafe-inline'", CDN],
+    scriptSrcAttr: ["'unsafe-inline'"],
+    styleSrc: ["'self'", "'unsafe-inline'", CDN, 'https://fonts.googleapis.com'],
+    fontSrc: ["'self'", CDN, 'https://fonts.gstatic.com', 'data:'],
+    imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+    mediaSrc: ["'self'", 'blob:', 'https:'],
+    connectSrc: ["'self'"],
+    frameSrc: ["'self'"],
+    objectSrc: ["'none'"],
+    baseUri: ["'self'"],
+    formAction: ["'self'"],
+    frameAncestors: ["'self'"],
+    ...(process.env.NODE_ENV === 'production' ? { upgradeInsecureRequests: [] } : {}),
+  },
+});
+// Réponses de l'API (JSON, XML) : rien n'a à s'exécuter ni à être embarqué.
+const apiCsp = helmet.contentSecurityPolicy({
+  useDefaults: false,
+  directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
+});
+app.use((req, res, next) => (req.path.startsWith('/api/') ? apiCsp(req, res, next) : pageCsp(req, res, next)));
 
 // ── CORS ──
 const allowedOrigins = [
