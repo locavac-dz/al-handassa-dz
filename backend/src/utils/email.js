@@ -20,6 +20,10 @@ transporter.verify().then(() => {
   console.error('[EMAIL]    Vérifiez SMTP_HOST / SMTP_USER / SMTP_PASS dans .env');
 });
 
+// Échappement HTML : prénom, titres d'articles, notes de l'admin… viennent de saisies utilisateur ou de la base et
+// sont insérés dans un email HTML (un prénom d'inscription est envoyé depuis le domaine légitime à n'importe quelle adresse).
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
 // ─── Base layout ─────────────────────────────────────────────────────────────
 function _wrap(content) {
   return `<!DOCTYPE html>
@@ -76,7 +80,7 @@ function _orderTable(items = [], totalAmount) {
   const rows = items.map(i => `
     <tr>
       <td style="padding:12px 16px;border-bottom:1px solid #f0f4f8;color:#374151">
-        ${i.title || i.item_type || 'Article'}
+        ${esc(i.title || i.item_type || 'Article')}
       </td>
       <td style="padding:12px 16px;border-bottom:1px solid #f0f4f8;text-align:right;white-space:nowrap;color:#374151;font-weight:500">
         ${Number(i.subtotal || i.unit_price || 0).toLocaleString('fr-DZ')} DZD
@@ -116,7 +120,7 @@ async function sendVerificationEmail(user, token) {
   const url = `${process.env.FRONTEND_URL}/verify-email.html?token=${token}`;
 
   const html = _wrap(`
-    <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Bienvenue, ${user.first_name} ! 🎉</h1>
+    <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Bienvenue, ${esc(user.first_name)} ! 🎉</h1>
     <p style="margin:0 0 20px;color:#64748b">Votre compte <strong>Al Handassa.dz</strong> a été créé avec succès.</p>
 
     <div style="background:#f0f7ff;border:1px solid #bfdbfe;border-radius:10px;padding:24px;text-align:center;margin:20px 0">
@@ -153,7 +157,7 @@ async function sendVerificationEmail(user, token) {
 // ─── 1b. Bienvenue (après vérification) ───────────────────────────────────────
 async function sendWelcomeEmail(user) {
   const html = _wrap(`
-    <h1 style="margin:0 0 8px;font-size:26px;color:#1B3A6B">Bienvenue, ${user.first_name} ! 🎉</h1>
+    <h1 style="margin:0 0 8px;font-size:26px;color:#1B3A6B">Bienvenue, ${esc(user.first_name)} ! 🎉</h1>
     <p style="margin:0 0 20px;color:#64748b;font-size:15px">Votre compte <strong>Al Handassa.dz</strong> a été créé avec succès.</p>
 
     <div style="background:#f0f7ff;border-left:4px solid #1B3A6B;border-radius:0 8px 8px 0;padding:16px 20px;margin:20px 0">
@@ -184,8 +188,8 @@ async function sendOrderConfirmation(order, user) {
       ${_badge('✅ Commande enregistrée', '#059669')}
     </div>
     <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Commande confirmée</h1>
-    <p style="margin:0 0 4px;color:#64748b">Bonjour <strong>${user.first_name}</strong>,</p>
-    <p style="margin:0 0 24px;color:#64748b">Votre commande <strong style="color:#1B3A6B">${order.order_number}</strong> a bien été enregistrée.</p>
+    <p style="margin:0 0 4px;color:#64748b">Bonjour <strong>${esc(user.first_name)}</strong>,</p>
+    <p style="margin:0 0 24px;color:#64748b">Votre commande <strong style="color:#1B3A6B">${esc(order.order_number)}</strong> a bien été enregistrée.</p>
 
     ${_orderTable(order.items || [], order.total_amount)}
 
@@ -219,8 +223,8 @@ async function sendPaymentReceived(order, user, method) {
   const html = _wrap(`
     <div style="margin-bottom:24px">${_badge('⏳ Paiement en cours', '#D97706')}</div>
     <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Paiement reçu</h1>
-    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${user.first_name}</strong>,</p>
-    <p style="color:#374151">Paiement de <strong>${Number(order.total_amount).toLocaleString('fr-DZ')} DZD</strong> par ${methodLabel} pour la commande <strong>${order.order_number}</strong> enregistré.</p>
+    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${esc(user.first_name)}</strong>,</p>
+    <p style="color:#374151">Paiement de <strong>${Number(order.total_amount).toLocaleString('fr-DZ')} DZD</strong> par ${esc(methodLabel)} pour la commande <strong>${esc(order.order_number)}</strong> enregistré.</p>
     <p style="text-align:center;margin:28px 0 8px">
       ${_btn(process.env.FRONTEND_URL, '📋 Accéder à mon compte', '#1B3A6B')}
     </p>
@@ -235,11 +239,11 @@ async function sendPaymentValidated(order, user, items = []) {
       ${_badge('✅ Paiement validé — Accès déverrouillé !', '#059669')}
     </div>
     <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Votre paiement a été validé 🎉</h1>
-    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${user.first_name}</strong>,</p>
+    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${esc(user.first_name)}</strong>,</p>
 
     <p style="color:#374151">
       Bonne nouvelle ! Votre paiement pour la commande
-      <strong style="color:#1B3A6B">${order.order_number}</strong> a été <strong style="color:#059669">validé par notre équipe</strong>.
+      <strong style="color:#1B3A6B">${esc(order.order_number)}</strong> a été <strong style="color:#059669">validé par notre équipe</strong>.
       Vos fichiers sont maintenant disponibles au téléchargement.
     </p>
 
@@ -270,17 +274,17 @@ async function sendPaymentRejected(order, user, notes = '') {
       ${_badge('❌ Paiement non confirmé', '#DC2626')}
     </div>
     <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Paiement non confirmé</h1>
-    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${user.first_name}</strong>,</p>
+    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${esc(user.first_name)}</strong>,</p>
 
     <p style="color:#374151">
       Nous n'avons pas pu confirmer votre paiement pour la commande
-      <strong style="color:#1B3A6B">${order.order_number}</strong>.
+      <strong style="color:#1B3A6B">${esc(order.order_number)}</strong>.
     </p>
 
     ${notes ? `
     <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:16px 20px;margin:20px 0">
       <p style="margin:0 0 4px;color:#7f1d1d;font-weight:600;font-size:14px">Motif :</p>
-      <p style="margin:0;color:#991b1b;font-size:14px">${notes}</p>
+      <p style="margin:0;color:#991b1b;font-size:14px">${esc(notes)}</p>
     </div>` : ''}
 
     <div style="background:#f8fafc;border-radius:8px;padding:16px 20px;margin:20px 0">
@@ -312,7 +316,7 @@ async function sendPasswordReset(user, token) {
 
   const html = _wrap(`
     <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Réinitialisation du mot de passe</h1>
-    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${user.first_name}</strong>,</p>
+    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${esc(user.first_name)}</strong>,</p>
 
     <p style="color:#374151">Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le bouton ci-dessous.
        Ce lien est valable <strong>1 heure</strong>.</p>
@@ -347,14 +351,14 @@ async function sendSubscriptionActivated(user, sub) {
     <div style="margin-bottom:24px">
       ${_badge('✅ Abonnement activé !', '#059669')}
     </div>
-    <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Bienvenue dans le plan ${planName} 🎉</h1>
-    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${user.first_name}</strong>,</p>
+    <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Bienvenue dans le plan ${esc(planName)} 🎉</h1>
+    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${esc(user.first_name)}</strong>,</p>
 
     <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:24px;margin:20px 0">
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="color:#64748b;font-size:14px;padding:5px 0">Plan</td>
-          <td style="text-align:right;font-weight:700;color:#15803d">${planName}</td>
+          <td style="text-align:right;font-weight:700;color:#15803d">${esc(planName)}</td>
         </tr>
         <tr>
           <td style="color:#64748b;font-size:14px;padding:5px 0">Type</td>
@@ -406,7 +410,7 @@ async function sendLicenseIssued(user, licenses) {
     return `
     <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:20px 24px;margin:16px 0">
       <p style="margin:0 0 6px;color:#374151;font-weight:600;font-size:14px">
-        ${appNames[l.app_slug] || l.app_slug} — Plan ${planNames[l.license_plan] || l.license_plan}
+        ${esc(appNames[l.app_slug] || l.app_slug)} — Plan ${esc(planNames[l.license_plan] || l.license_plan)}
       </p>
       <p style="margin:0 0 10px;font-family:monospace;font-size:18px;font-weight:700;color:#15803d;letter-spacing:0.05em">
         ${formatKeyForDisplay(l.license_key)}
@@ -420,7 +424,7 @@ async function sendLicenseIssued(user, licenses) {
       ${_badge('🔑 Licence(s) prête(s) !', '#059669')}
     </div>
     <h1 style="margin:0 0 8px;font-size:24px;color:#1B3A6B">Votre logiciel est activable</h1>
-    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${user.first_name}</strong>, merci pour votre achat. Voici votre/vos clé(s) de licence :</p>
+    <p style="margin:0 0 20px;color:#64748b">Bonjour <strong>${esc(user.first_name)}</strong>, merci pour votre achat. Voici votre/vos clé(s) de licence :</p>
     ${rows}
     <div style="background:#f8fafc;border-radius:8px;padding:16px 20px;margin:20px 0">
       <p style="margin:0;color:#374151;font-size:14px">
