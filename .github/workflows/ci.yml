@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  # Tests d'intégration du backend sur un PostgreSQL vierge : valide aussi que schema.sql + migrations 020→… s'appliquent
+  # depuis zéro et sont ré-applicables (idempotentes), comme le fait le preDeployCommand de Railway.
+  backend:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]          # 20 = version de l'image Docker de production
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: handassi_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/handassi_test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/handassi_test
+      DB_SSL: 'false'
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - name: Migrations depuis zéro
+        run: npm run migrate
+      - name: Migrations ré-appliquées (idempotence)
+        run: npm run migrate
+      - name: Tests
+        run: npm test
+
+  # Construit l'image de production (Dockerfile jamais exécuté avant ce job) et vérifie qu'elle contient ce qu'il faut.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fichiers de déploiement valides
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('railway.json','utf8')); console.log('railway.json : JSON valide')"
+      - name: Construction de l'image
+        run: docker build -t al-handassa:ci .
+      - name: PyMuPDF disponible (aperçus PDF)
+        run: docker run --rm --entrypoint python3 al-handassa:ci -c "import pymupdf; print('PyMuPDF', pymupdf.VersionBind)"
+      - name: L'application se charge avec les seules dépendances de production
+        run: >
+          docker run --rm -e NODE_ENV=test -e DATABASE_URL=postgres://x:x@127.0.0.1:1/x
+          -e JWT_SECRET=ci-only-secret-0123456789abcdef0123456789
+          --entrypoint node al-handassa:ci -e "require('/app/backend/src/app.js'); console.log('app.js chargé'); process.exit(0)"
+      - name: Fonctionne sans root et avec un dossier uploads inscriptible
+        run: docker run --rm --entrypoint sh al-handassa:ci -c 'test "$(id -u)" != 0 && touch backend/uploads/.w && echo OK'
