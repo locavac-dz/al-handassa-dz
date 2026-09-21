@@ -165,7 +165,7 @@ if (process.env.NODE_ENV !== 'test') {
 // servir tout le dossier exposerait backend/ (code, scripts, uploads payants), .git, package.json…
 const frontendPath = path.resolve(__dirname, '../..');
 const FRONT_PUBLIC_DIRS = new Set(['css', 'js', 'img', 'assets', 'admin']);
-const FRONT_ROOT_FILE = /^(?:[\w-]+\.html|[\w-]+\.(?:png|jpe?g|webp|gif|svg|ico)|manifest\.json|sw\.js|robots\.txt|sitemap[\w-]*\.xml)$/i;
+const FRONT_ROOT_FILE = /^(?:[\w-]+\.html|[\w-]+\.(?:png|jpe?g|webp|gif|svg|ico)|manifest\.json|sw\.js|robots\.txt)$/i;
 
 function isPublicFrontPath(reqPath) {
   let p;
@@ -216,102 +216,18 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ── Sitemap dynamique ──
-app.get('/api/sitemap', async (req, res) => {
+// ── Sitemap (toujours à jour, généré depuis la base — utils/sitemap.js) ──
+// robots.txt déclare /sitemap.xml ; /api/sitemap.xml est conservé pour compatibilité.
+async function serveSitemap(req, res, next) {
   try {
-    const { query } = require('./config/database');
-    const result = await query(
-      `SELECT slug, updated_at FROM products WHERE is_active = TRUE ORDER BY updated_at DESC`
-    );
-    const base = process.env.FRONTEND_URL || 'https://handassi.dz';
-    const staticUrls = [
-      { loc: `${base}/`, priority: '1.0', changefreq: 'daily' },
-      { loc: `${base}/index.html`, priority: '1.0', changefreq: 'daily' },
-    ];
-    const productUrls = result.rows.map(p => ({
-      loc: `${base}/product.html?slug=${p.slug}`,
-      lastmod: p.updated_at ? new Date(p.updated_at).toISOString().split('T')[0] : undefined,
-      priority: '0.8',
-      changefreq: 'weekly',
-    }));
-    const allUrls = [...staticUrls, ...productUrls];
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${allUrls.map(u => `  <url>
-    <loc>${u.loc}</loc>
-    ${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}
-    <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>
-  </url>`).join('\n')}
-</urlset>`;
-    res.set('Content-Type', 'application/xml');
-    res.send(xml);
-  } catch (err) {
-    res.status(500).send('<?xml version="1.0"?><urlset/>');
-  }
-});
-
-// ── Sitemap principal (racine — c'est cette URL que robots.txt déclare) ──
-app.get('/sitemap.xml', async (req, res) => {
-  try {
-    const { query } = require('./config/database');
-    const BASE = process.env.FRONTEND_URL || 'https://handassi.dz';
-    const today = new Date().toISOString().slice(0, 10);
-
-    const [products, categories, articles] = await Promise.all([
-      query(`SELECT slug, type, updated_at FROM products WHERE is_active=TRUE ORDER BY updated_at DESC`),
-      query(`SELECT slug FROM categories WHERE is_active=TRUE ORDER BY sort_order`),
-      query(`SELECT slug, published_at FROM articles WHERE is_published=TRUE ORDER BY published_at DESC`),
-    ]);
-
-    const staticPages = [
-      { loc: `${BASE}/`,             priority: '1.0', changefreq: 'daily',   lastmod: today },
-      { loc: `${BASE}/index.html`,   priority: '0.9', changefreq: 'daily',   lastmod: today },
-      { loc: `${BASE}/about.html`,   priority: '0.7', changefreq: 'monthly', lastmod: today },
-      { loc: `${BASE}/contact.html`, priority: '0.6', changefreq: 'monthly', lastmod: today },
-      { loc: `${BASE}/logiciels.html`, priority: '0.8', changefreq: 'weekly', lastmod: today },
-      { loc: `${BASE}/cgu.html`,     priority: '0.3', changefreq: 'yearly',  lastmod: today },
-    ];
-
-    const catPages = categories.rows.map(c => ({
-      loc: `${BASE}/index.html?category=${c.slug}`,
-      priority: '0.7', changefreq: 'weekly', lastmod: today,
-    }));
-
-    const productPages = products.rows.map(p => ({
-      loc: `${BASE}/product.html?slug=${p.slug}`,
-      priority: '0.8', changefreq: 'monthly',
-      lastmod: p.updated_at ? new Date(p.updated_at).toISOString().slice(0, 10) : today,
-    }));
-
-    const articlePages = articles.rows.map(a => ({
-      loc: `${BASE}/article.html?slug=${a.slug}`,
-      priority: '0.7', changefreq: 'monthly',
-      lastmod: a.published_at ? new Date(a.published_at).toISOString().slice(0, 10) : today,
-    }));
-
-    const allUrls = [...staticPages, ...catPages, ...productPages, ...articlePages];
-    const urlNodes = allUrls.map(u => `  <url>
-    <loc>${u.loc}</loc>
-    <lastmod>${u.lastmod}</lastmod>
-    <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>
-  </url>`).join('\n');
-
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-${urlNodes}
-</urlset>`;
+    const { xml } = await require('./utils/sitemap').buildSitemapXml();
     res.set('Content-Type', 'application/xml; charset=utf-8');
     res.set('Cache-Control', 'public, max-age=3600');
     res.send(xml);
-  } catch (err) {
-    res.status(500).send('<?xml version="1.0"?><urlset/>');
-  }
-});
+  } catch (err) { next(err); }
+}
+app.get('/sitemap.xml', serveSitemap);
+app.get('/api/sitemap.xml', serveSitemap);
 
 // ── API Routes ──
 app.use('/api/auth/login', loginIpLimiter, loginEmailLimiter);
@@ -349,58 +265,6 @@ app.get('/api/study-levels', async (req, res) => {
       'SELECT id, slug, label_fr, label_ar, icon, color, db_value, racine FROM study_levels WHERE is_active=TRUE ORDER BY sort_order'
     );
     res.json({ data: result.rows });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// ── Sitemap XML dynamique ──
-app.get('/api/sitemap.xml', async (req, res) => {
-  try {
-    const { query } = require('./config/database');
-    const BASE = process.env.FRONTEND_URL || 'https://handassi.dz';
-
-    const products = await query(
-      `SELECT slug, type, updated_at FROM products WHERE is_active=TRUE ORDER BY updated_at DESC`
-    );
-    const categories = await query(
-      `SELECT slug FROM categories WHERE is_active=TRUE ORDER BY sort_order`
-    );
-
-    const staticPages = [
-      { loc: `${BASE}/`, priority: '1.0', changefreq: 'daily' },
-      { loc: `${BASE}/index.html`, priority: '0.9', changefreq: 'daily' },
-      { loc: `${BASE}/td.html`, priority: '0.8', changefreq: 'weekly' },
-      { loc: `${BASE}/login.html`, priority: '0.5', changefreq: 'monthly' },
-      { loc: `${BASE}/register.html`, priority: '0.5', changefreq: 'monthly' },
-    ];
-
-    const catPages = categories.rows.map(c => ({
-      loc: `${BASE}/index.html?category=${c.slug}`,
-      priority: '0.7',
-      changefreq: 'weekly',
-    }));
-
-    const productPages = products.rows.map(p => ({
-      loc: `${BASE}/product.html?slug=${p.slug}`,
-      priority: '0.8',
-      changefreq: 'monthly',
-      lastmod: p.updated_at ? new Date(p.updated_at).toISOString().slice(0, 10) : undefined,
-    }));
-
-    const allUrls = [...staticPages, ...catPages, ...productPages];
-
-    const urlNodes = allUrls.map(u => `  <url>
-    <loc>${u.loc}</loc>${u.lastmod ? `\n    <lastmod>${u.lastmod}</lastmod>` : ''}
-    <changefreq>${u.changefreq}</changefreq>
-    <priority>${u.priority}</priority>
-  </url>`).join('\n');
-
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urlNodes}
-</urlset>`;
-
-    res.set('Content-Type', 'application/xml');
-    res.send(xml);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

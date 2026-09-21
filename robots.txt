@@ -9,6 +9,18 @@ Disallow: /account.html
 Disallow: /reset-password.html
 Disallow: /verify-email.html
 Disallow: /api-test.html
+Disallow: /admin.html
+Disallow: /cart.html
+Disallow: /checkout.html
+Disallow: /dashboard.html
+Disallow: /downloads.html
+Disallow: /login.html
+Disallow: /register.html
+Disallow: /wishlist.html
+Disallow: /payment-success.html
+Disallow: /payment-failed.html
+Disallow: /test-apercu.html
+Disallow: /search.html
 
 # Sitemap
 Sitemap: https://handassi.dz/sitemap.xml
