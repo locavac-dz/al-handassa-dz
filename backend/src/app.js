@@ -278,6 +278,10 @@ app.use(errorHandler);
 
 // ── Start (skipped on Vercel: serverless invokes the exported app directly) ──
 async function start() {
+  if (!require('./config/env').checkEnv()) {
+    console.error("Arrêt : configuration d'environnement invalide (voir ci-dessus).");
+    process.exit(1);
+  }
   const dbOk = await testConnection();
   if (!dbOk && process.env.NODE_ENV === 'production') {
     console.error('Arrêt: impossible de se connecter à PostgreSQL.');
