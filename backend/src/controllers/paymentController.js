@@ -1,7 +1,7 @@
 const { query, getClient } = require('../config/database');
 const { AppError } = require('../middleware/errorHandler');
 const { sendPaymentReceived } = require('../utils/email');
-const { issueSoftwareLicenses } = require('../utils/license');
+const { settleOrder } = require('../utils/fulfillment');
 const SATIMLive = require('../config/satim-live');
 
 const satim = new SATIMLive();
@@ -61,13 +61,20 @@ async function initiateSatim(req, res, next) {
 }
 
 // ─── SATIM Callback (retour depuis la page de paiement) ──────────
+// Idempotent : l'URL de retour signée transite par le navigateur du client, elle peut être
+// rejouée à volonté. Le paiement est verrouillé (FOR UPDATE) et seule la première livraison
+// (settleOrder) a des effets ; un rejeu redirige simplement vers la page de succès.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 async function satimCallback(req, res, next) {
-  const client = await getClient();
+  let client;
   try {
+    client = await getClient();
     await client.query('BEGIN');
     const { payment_id, orderId, respCode, signature, ...rest } = req.query;
 
-    const payRes = await client.query('SELECT * FROM payments WHERE id=$1', [payment_id]);
+    if (typeof payment_id !== 'string' || !UUID_RE.test(payment_id)) throw new AppError('Paiement introuvable.', 404);
+    const payRes = await client.query('SELECT * FROM payments WHERE id=$1 FOR UPDATE', [payment_id]);
     if (!payRes.rows.length) throw new AppError('Paiement introuvable.', 404);
 
     const payment = payRes.rows[0];
@@ -85,21 +92,34 @@ async function satimCallback(req, res, next) {
         console.error('[SATIM] Vérification de signature impossible:', e.message);
       }
     }
-    const success = respCode === '00' && signatureValid;
-
-    await client.query(
-      `UPDATE payments SET status=$1, ${success?'completed_at':'failed_at'}=NOW(), gateway_response=$2 WHERE id=$3`,
-      [success ? 'completed' : 'failed', JSON.stringify(req.query), payment_id]
-    );
+    // L'identifiant SATIM renvoyé doit être celui obtenu à l'initiation de CE paiement
+    const orderIdMatches = !payment.satim_order_id || orderId === payment.satim_order_id;
+    const success = respCode === '00' && signatureValid && orderIdMatches;
 
     let issuedLicenses = [];
-    if (success) {
-      await client.query(`UPDATE orders SET status='paid' WHERE id=$1`, [payment.order_id]);
-      await unlockDownloads(client, payment.order_id, payment.user_id);
-      await activateSubscriptionIfAny(client, payment.order_id, payment.user_id);
-      issuedLicenses = await issueSoftwareLicenses(client, payment.order_id, payment.user_id);
-    } else {
-      await client.query("UPDATE orders SET status='failed' WHERE id=$1", [payment.order_id]);
+    let paid = payment.status === 'completed';   // rejeu d'un paiement déjà traité : aucun effet de bord
+
+    if (!paid && payment.status !== 'refunded') {
+      if (success) {
+        await client.query(
+          `UPDATE payments SET status='completed', completed_at=NOW(), gateway_response=$2 WHERE id=$1`,
+          [payment_id, JSON.stringify(req.query)]
+        );
+        const settled = await settleOrder(client, { orderId: payment.order_id, userId: payment.user_id, paymentId: payment.id });
+        issuedLicenses = settled.licenses;
+        paid = true;
+        if (!settled.fulfilled) {
+          // Argent encaissé mais commande déjà payée par un autre paiement, ou annulée/remboursée : à voir à la main
+          console.warn(`[SATIM] Paiement ${payment.id} encaissé mais commande ${payment.order_id} non livrée (déjà payée ou annulée).`);
+        }
+      } else if (payment.status === 'pending') {
+        // Un échec ne rétrograde jamais un paiement déjà complété ni une commande déjà payée
+        await client.query(
+          `UPDATE payments SET status='failed', failed_at=NOW(), gateway_response=$2 WHERE id=$1`,
+          [payment_id, JSON.stringify(req.query)]
+        );
+        await client.query("UPDATE orders SET status='failed', updated_at=NOW() WHERE id=$1 AND status='pending'", [payment.order_id]);
+      }
     }
 
     await client.query('COMMIT');
@@ -112,16 +132,16 @@ async function satimCallback(req, res, next) {
       });
     }
 
-    const redirectUrl = success
+    const redirectUrl = paid
       ? `${process.env.FRONTEND_URL}/payment/success?order=${payment.order_id}`
       : `${process.env.FRONTEND_URL}/payment/fail?reason=declined`;
 
     res.redirect(redirectUrl);
   } catch (err) {
-    await client.query('ROLLBACK');
+    if (client) await client.query('ROLLBACK').catch(() => {});
     next(err);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 }
 
@@ -276,45 +296,6 @@ async function getMyPayments(req, res, next) {
     );
     res.json({ data: result.rows });
   } catch (err) { next(err); }
-}
-
-// ─── Helpers internes ────────────────────────────────────────────
-async function activateSubscriptionIfAny(client, orderId, userId) {
-  const subItem = await client.query(
-    `SELECT title FROM order_items WHERE order_id=$1 AND item_type='subscription' LIMIT 1`,
-    [orderId]
-  );
-  if (!subItem.rows.length) return null;
-  const match = subItem.rows[0].title.match(/Abonnement\s+(\w+)\s+\((\w+)\)/i);
-  if (!match) return null;
-  const plan = match[1];
-  const cycle = match[2];
-  const months = cycle === 'annual' ? 12 : 1;
-  const expires = new Date();
-  expires.setMonth(expires.getMonth() + months);
-  await client.query(
-    `UPDATE users SET subscription_plan=$1, subscription_expires_at=$2 WHERE id=$3`,
-    [plan, expires, userId]
-  );
-  await client.query(
-    `UPDATE subscriptions SET status='active', starts_at=NOW(), expires_at=$1
-     WHERE user_id=$2 AND status='pending' ORDER BY created_at DESC LIMIT 1`,
-    [expires, userId]
-  );
-  return { plan, billing_cycle: cycle, expires_at: expires };
-}
-
-async function unlockDownloads(client, orderId, userId) {
-  const items = await client.query('SELECT * FROM order_items WHERE order_id=$1', [orderId]);
-  for (const item of items.rows) {
-    if (item.item_type === 'product' && item.product_id) {
-      await client.query(
-        `INSERT INTO user_downloads (user_id, product_id, order_item_id)
-         VALUES ($1,$2,$3) ON CONFLICT DO NOTHING`,
-        [userId, item.product_id, item.id]
-      );
-    }
-  }
 }
 
 module.exports = { initiateSatim, satimCallback, initiateBaridiMob, redeemPrepaidCode, submitManualPayment, getMyPayments };

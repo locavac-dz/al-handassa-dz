@@ -37,12 +37,14 @@ function normalizeKey(key) {
 
 // db : objet exposant .query(sql, params) — un client pg (dans une transaction)
 // ou { query } avec la fonction query() de config/database.js.
+// Idempotent : un article de commande ayant déjà une licence n'en reçoit pas une seconde.
 async function issueSoftwareLicenses(db, orderId, userId) {
   const items = await db.query(
     `SELECT oi.id AS order_item_id, p.metadata
      FROM order_items oi
      JOIN products p ON p.id = oi.product_id
-     WHERE oi.order_id = $1 AND oi.item_type = 'product' AND p.metadata ? 'app_slug'`,
+     WHERE oi.order_id = $1 AND oi.item_type = 'product' AND p.metadata ? 'app_slug'
+       AND NOT EXISTS (SELECT 1 FROM software_licenses sl WHERE sl.order_item_id = oi.id)`,
     [orderId]
   );
 

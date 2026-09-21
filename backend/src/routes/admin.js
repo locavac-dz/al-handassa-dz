@@ -1,10 +1,12 @@
 const router = require('express').Router();
-const { query } = require('../config/database');
+const { query, getClient } = require('../config/database');
 const { authenticate, authorize } = require('../middleware/auth');
 const { AppError } = require('../middleware/errorHandler');
 const { paginate } = require('../utils/helpers');
 const { sendPaymentValidated, sendPaymentRejected, sendLicenseIssued } = require('../utils/email');
-const { issueSoftwareLicenses } = require('../utils/license');
+const { settleOrder } = require('../utils/fulfillment');
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // All routes require authenticate + authorize('admin')
 router.use(authenticate, authorize('admin'));
@@ -253,65 +255,62 @@ router.get('/payments', async (req, res, next) => {
 });
 
 // PATCH /api/admin/payments/:id/validate
+// Transactionnel et idempotent : le paiement est verrouillé, doit être 'pending', et la livraison
+// passe par settleOrder() (téléchargements, vidéos, abonnement, licences) — un double clic ou une
+// seconde validation sur la même commande ne duplique donc rien.
 router.patch('/payments/:id/validate', async (req, res, next) => {
+  let client;
   try {
     const { id } = req.params;
     const { notes } = req.body;
+    if (!UUID_RE.test(id)) throw new AppError('Paiement introuvable.', 404);
 
-    // Get payment with order info
-    const paymentResult = await query(
-      `SELECT p.*, o.id AS order_id, o.user_id
+    client = await getClient();
+    await client.query('BEGIN');
+
+    const paymentResult = await client.query(
+      `SELECT p.*, o.user_id AS order_user_id
        FROM payments p
        JOIN orders o ON o.id = p.order_id
-       WHERE p.id = $1`,
+       WHERE p.id = $1
+       FOR UPDATE OF p`,
       [id]
     );
-
-    if (!paymentResult.rows.length) {
-      return next(new AppError('Paiement introuvable.', 404));
-    }
+    if (!paymentResult.rows.length) throw new AppError('Paiement introuvable.', 404);
 
     const payment = paymentResult.rows[0];
+    if (payment.status !== 'pending') {
+      throw new AppError(`Paiement déjà traité (statut : ${payment.status}).`, 409);
+    }
 
-    // Update payment status to 'completed'
-    const updatedPaymentResult = await query(
+    const updatedPaymentResult = await client.query(
       `UPDATE payments
-       SET status = 'completed', notes = COALESCE($1, notes), updated_at = NOW()
+       SET status = 'completed', completed_at = NOW(), notes = COALESCE($1, notes), updated_at = NOW()
        WHERE id = $2
        RETURNING *`,
       [notes || null, id]
     );
 
-    // Update order status to 'paid'
-    await query(
-      `UPDATE orders SET status = 'paid', updated_at = NOW() WHERE id = $1`,
-      [payment.order_id]
-    );
+    const settled = await settleOrder(client, {
+      orderId: payment.order_id, userId: payment.order_user_id, paymentId: payment.id,
+    });
+    if (!settled.fulfilled) {
+      // Annule aussi la mise à jour du paiement ci-dessus : l'admin doit trancher (rejeter ce paiement, rembourser…)
+      throw new AppError('Commande non livrable : déjà payée, annulée ou remboursée. Paiement non validé.', 409);
+    }
 
-    // Insert user_downloads for product items
-    await query(
-      `INSERT INTO user_downloads (user_id, product_id, order_item_id)
-       SELECT o.user_id, oi.product_id, oi.id
-       FROM orders o
-       JOIN order_items oi ON oi.order_id = o.id
-       WHERE o.id = $1 AND oi.item_type = 'product'
-       ON CONFLICT DO NOTHING`,
-      [payment.order_id]
-    );
+    await client.query('COMMIT');
 
-    // Émettre les licences logicielles si la commande en contient
-    const issuedLicenses = await issueSoftwareLicenses({ query }, payment.order_id, payment.user_id);
-
-    // Email notification (non bloquant)
+    // Email notification (non bloquant, après COMMIT)
     const orderFull = await query('SELECT * FROM orders WHERE id=$1', [payment.order_id]);
-    const userInfo = await query('SELECT email, first_name FROM users WHERE id=$1', [payment.user_id]);
+    const userInfo = await query('SELECT email, first_name FROM users WHERE id=$1', [payment.order_user_id]);
     const orderItems = await query(
       'SELECT title, unit_price AS subtotal FROM order_items WHERE order_id=$1',
       [payment.order_id]
     );
     sendPaymentValidated(orderFull.rows[0], userInfo.rows[0], orderItems.rows).catch(() => {});
-    if (issuedLicenses.length) {
-      sendLicenseIssued(userInfo.rows[0], issuedLicenses).catch(() => {});
+    if (settled.licenses.length) {
+      sendLicenseIssued(userInfo.rows[0], settled.licenses).catch(() => {});
     }
 
     res.json({
@@ -319,44 +318,56 @@ router.patch('/payments/:id/validate', async (req, res, next) => {
       payment: updatedPaymentResult.rows[0],
     });
   } catch (err) {
+    if (client) await client.query('ROLLBACK').catch(() => {});
     next(err);
+  } finally {
+    if (client) client.release();
   }
 });
 
 // PATCH /api/admin/payments/:id/reject
+// Seul un paiement 'pending' peut être rejeté : rejeter un paiement déjà validé rétrograderait
+// à tort une commande payée et ferait perdre l'accès au client.
 router.patch('/payments/:id/reject', async (req, res, next) => {
+  let client;
   try {
     const { id } = req.params;
     const { notes } = req.body;
+    if (!UUID_RE.test(id)) throw new AppError('Paiement introuvable.', 404);
 
-    // Get payment with order info
-    const paymentResult = await query(
+    client = await getClient();
+    await client.query('BEGIN');
+
+    const paymentResult = await client.query(
       `SELECT p.*, o.id AS order_id
        FROM payments p
        JOIN orders o ON o.id = p.order_id
-       WHERE p.id = $1`,
+       WHERE p.id = $1
+       FOR UPDATE OF p`,
       [id]
     );
-
-    if (!paymentResult.rows.length) {
-      return next(new AppError('Paiement introuvable.', 404));
-    }
+    if (!paymentResult.rows.length) throw new AppError('Paiement introuvable.', 404);
 
     const payment = paymentResult.rows[0];
+    if (payment.status !== 'pending') {
+      throw new AppError(`Paiement déjà traité (statut : ${payment.status}).`, 409);
+    }
 
-    // Update payment status to 'failed'
-    await query(
+    await client.query(
       `UPDATE payments
-       SET status = 'failed', notes = COALESCE($1, notes), updated_at = NOW()
+       SET status = 'failed', failed_at = NOW(), notes = COALESCE($1, notes), updated_at = NOW()
        WHERE id = $2`,
       [notes || null, id]
     );
 
-    // Update order status to 'failed'
-    await query(
-      `UPDATE orders SET status = 'failed', updated_at = NOW() WHERE id = $1`,
+    // Une commande déjà payée (par un autre paiement) ou annulée ne change pas d'état
+    await client.query(
+      `UPDATE orders SET status = 'failed', updated_at = NOW()
+       WHERE id = $1 AND status IN ('pending', 'processing')`,
       [payment.order_id]
     );
+
+    await client.query('COMMIT');
 
     // Email notification (non bloquant)
     const orderFull = await query('SELECT * FROM orders WHERE id=$1', [payment.order_id]);
@@ -368,7 +379,10 @@ router.patch('/payments/:id/reject', async (req, res, next) => {
 
     res.json({ message: 'Paiement rejeté.' });
   } catch (err) {
+    if (client) await client.query('ROLLBACK').catch(() => {});
     next(err);
+  } finally {
+    if (client) client.release();
   }
 });
 
