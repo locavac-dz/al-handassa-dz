@@ -184,12 +184,15 @@ async function redeemPrepaidCode(req, res, next) {
   try {
     client = await getClient();
     await client.query('BEGIN');
-    const { code } = req.body;
+    const code = String(req.body.code || '').trim().toUpperCase();
 
+    // Consommation ATOMIQUE : un seul UPDATE conditionnel. L'ancien SELECT puis UPDATE laissait deux
+    // requêtes simultanées (ou deux comptes) valider le même code avant que l'un ne le marque utilisé.
     const codeRes = await client.query(
-      `SELECT * FROM prepaid_codes WHERE code=$1 AND is_used=FALSE
-       AND (expires_at IS NULL OR expires_at > NOW())`,
-      [code.toUpperCase()]
+      `UPDATE prepaid_codes SET is_used=TRUE, used_by=$1, used_at=NOW()
+       WHERE code=$2 AND is_used=FALSE AND (expires_at IS NULL OR expires_at > NOW())
+       RETURNING *`,
+      [req.user.id, code]
     );
     if (!codeRes.rows.length) throw new AppError('Code invalide ou déjà utilisé.', 400);
 
@@ -202,11 +205,6 @@ async function redeemPrepaidCode(req, res, next) {
     await client.query(
       `UPDATE users SET subscription_plan=$1, subscription_expires_at=$2 WHERE id=$3`,
       [prepaid.plan, expires, req.user.id]
-    );
-
-    await client.query(
-      'UPDATE prepaid_codes SET is_used=TRUE, used_by=$1, used_at=NOW() WHERE id=$2',
-      [req.user.id, prepaid.id]
     );
 
     await client.query(
