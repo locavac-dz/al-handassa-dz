@@ -1,7 +1,8 @@
 const { query, getClient } = require('../config/database');
 const { AppError } = require('../middleware/errorHandler');
 const { paginate } = require('../utils/helpers');
-const { sendOrderConfirmation } = require('../utils/email');
+const { sendOrderConfirmation, sendLicenseIssued } = require('../utils/email');
+const { settleOrder } = require('../utils/fulfillment');
 
 async function create(req, res, next) {
   let client;
@@ -175,36 +176,56 @@ async function adminList(req, res, next) {
   } catch (err) { next(err); }
 }
 
+// PATCH /api/orders/admin/:id/status
+// 'paid' passe par settleOrder() (même livraison idempotente que SATIM et la validation admin) ;
+// 'refunded' / 'cancelled' révoquent les licences et les accès vidéo de la commande (les téléchargements
+// de produits se contrôlent sur orders.status = 'paid', ils se ferment donc d'eux-mêmes).
 async function updateStatus(req, res, next) {
+  let client;
   try {
     const { id } = req.params;
     const { status } = req.body;
     const valid = ['pending','processing','paid','failed','refunded','cancelled'];
     if (!valid.includes(status)) throw new AppError('Statut invalide.', 400);
 
-    const result = await query(
-      'UPDATE orders SET status=$1 WHERE id=$2 RETURNING *',
-      [status, id]
-    );
-    if (!result.rows.length) throw new AppError('Commande introuvable.', 404);
+    client = await getClient();
+    await client.query('BEGIN');
 
-    // Si payé, déverrouiller les téléchargements
+    const current = await client.query('SELECT id, user_id, status FROM orders WHERE id=$1 FOR UPDATE', [id]);
+    if (!current.rows.length) throw new AppError('Commande introuvable.', 404);
+    const order = current.rows[0];
+
+    let licenses = [];
     if (status === 'paid') {
-      const items = await query('SELECT * FROM order_items WHERE order_id=$1', [id]);
-      for (const item of items.rows) {
-        if (item.item_type === 'product' && item.product_id) {
-          await query(
-            `INSERT INTO user_downloads (user_id, product_id, order_item_id)
-             SELECT user_id, $1, $2 FROM orders WHERE id=$3
-             ON CONFLICT DO NOTHING`,
-            [item.product_id, item.id, id]
-          );
-        }
+      const settled = await settleOrder(client, { orderId: id, userId: order.user_id, paymentId: null });
+      if (!settled.fulfilled && order.status !== 'paid') {
+        throw new AppError('Commande non payable depuis cet état (annulée ou remboursée).', 409);
+      }
+      licenses = settled.licenses;
+    } else {
+      await client.query('UPDATE orders SET status=$1, updated_at=NOW() WHERE id=$2', [status, id]);
+      if (status === 'refunded' || status === 'cancelled') {
+        await client.query(
+          `UPDATE software_licenses SET status='revoked'
+            WHERE order_item_id IN (SELECT id FROM order_items WHERE order_id=$1)`, [id]);
+        await client.query('DELETE FROM user_video_access WHERE order_id=$1', [id]);
       }
     }
 
+    const result = await client.query('SELECT * FROM orders WHERE id=$1', [id]);
+    await client.query('COMMIT');
+
+    if (licenses.length) {
+      const userRes = await query('SELECT email, first_name FROM users WHERE id=$1', [order.user_id]);
+      sendLicenseIssued(userRes.rows[0], licenses).catch(e => console.error('[EMAIL] sendLicenseIssued failed:', e.message));
+    }
     res.json({ data: result.rows[0] });
-  } catch (err) { next(err); }
+  } catch (err) {
+    if (client) await client.query('ROLLBACK').catch(() => {});
+    next(err);
+  } finally {
+    if (client) client.release();
+  }
 }
 
 module.exports = { create, getMyOrders, getOne, getMyPurchases, adminList, updateStatus };
