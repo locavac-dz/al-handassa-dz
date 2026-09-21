@@ -7,6 +7,7 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "migrate": "node migrations/run.js",
+    "test": "node tests/run.js",
     "seed": "node migrations/seed.js"
   },
   "dependencies": {

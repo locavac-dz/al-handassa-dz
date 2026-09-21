@@ -341,7 +341,9 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-if (!process.env.VERCEL) {
+// Les tests d'intégration importent l'application et l'écoutent eux-mêmes sur un port libre (tests/helpers.js).
+// Pas de garde `require.main === module` : PM2 (mode cluster) charge le script via require.
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
   start();
 }
 
