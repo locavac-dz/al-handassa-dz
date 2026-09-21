@@ -4,8 +4,9 @@ const { paginate } = require('../utils/helpers');
 const { sendOrderConfirmation } = require('../utils/email');
 
 async function create(req, res, next) {
-  const client = await getClient();
+  let client;
   try {
+    client = await getClient();
     await client.query('BEGIN');
 
     const { items, payment_method, coupon_code } = req.body;
@@ -88,10 +89,10 @@ async function create(req, res, next) {
 
     res.status(201).json({ data: fullOrder });
   } catch (err) {
-    await client.query('ROLLBACK');
+    if (client) await client.query('ROLLBACK').catch(() => {});
     next(err);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 }
 

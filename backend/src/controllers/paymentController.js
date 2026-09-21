@@ -180,8 +180,9 @@ async function initiateBaridiMob(req, res, next) {
 
 // ─── Code Prépayé ─────────────────────────────────────────────────
 async function redeemPrepaidCode(req, res, next) {
-  const client = await getClient();
+  let client;
   try {
+    client = await getClient();
     await client.query('BEGIN');
     const { code } = req.body;
 
@@ -221,10 +222,10 @@ async function redeemPrepaidCode(req, res, next) {
       plan: prepaid.plan,
     });
   } catch (err) {
-    await client.query('ROLLBACK');
+    if (client) await client.query('ROLLBACK').catch(() => {});
     next(err);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 }
 
@@ -234,8 +235,9 @@ async function redeemPrepaidCode(req, res, next) {
 // validé via PATCH /api/admin/payments/:id/validate — sans quoi n'importe qui
 // pourrait s'auto-attribuer gratuitement téléchargements/abonnements/licences.
 async function submitManualPayment(req, res, next) {
-  const client = await getClient();
+  let client;
   try {
+    client = await getClient();
     await client.query('BEGIN');
 
     const { order_id, method, reference, proof_note } = req.body;
@@ -276,10 +278,10 @@ async function submitManualPayment(req, res, next) {
       auto_validated: false,
     });
   } catch (err) {
-    await client.query('ROLLBACK');
+    if (client) await client.query('ROLLBACK').catch(() => {});
     next(err);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 }
 

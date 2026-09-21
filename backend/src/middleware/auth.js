@@ -20,7 +20,9 @@ async function authenticate(req, res, next) {
     next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') return res.status(401).json({ error: 'Session expirée, reconnectez-vous.' });
-    return res.status(401).json({ error: 'Token invalide.' });
+    if (err.name === 'JsonWebTokenError' || err.name === 'NotBeforeError') return res.status(401).json({ error: 'Token invalide.' });
+    // Autre erreur (base indisponible…) : ce n'est pas la faute du client, on ne le déconnecte pas avec un 401
+    return next(err);
   }
 }
 

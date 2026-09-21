@@ -7,7 +7,7 @@ const path = require('path');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 
-const { testConnection } = require('./config/database');
+const { testConnection, pool } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 const uploadsGuard = require('./middleware/uploadsGuard');
 
@@ -418,13 +418,34 @@ async function start() {
     console.error('Arrêt: impossible de se connecter à PostgreSQL.');
     process.exit(1);
   }
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`\n🚀 Al Handassa.dz API démarrée`);
     console.log(`   Port    : ${PORT}`);
     console.log(`   Env     : ${process.env.NODE_ENV}`);
     console.log(`   Docs    : http://localhost:${PORT}/health\n`);
   });
+
+  // Arrêt propre (Railway, pm2, Docker envoient SIGTERM) : finir les requêtes en cours, fermer le pool PostgreSQL
+  const shutdown = (signal) => {
+    console.log(`${signal} reçu — arrêt en cours…`);
+    server.close(() => pool.end().catch(() => {}).finally(() => process.exit(0)));
+    setTimeout(() => process.exit(1), 10000).unref();   // filet de sécurité si des connexions restent ouvertes
+  };
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 }
+
+// Express 4 n'intercepte pas les rejets des handlers async : sans ce garde-fou, une seule promesse
+// rejetée (ex. connexion PostgreSQL indisponible) arrête tout le service pour tous les utilisateurs.
+process.on('unhandledRejection', (reason) => {
+  console.error('[unhandledRejection]', reason instanceof Error ? reason.stack : reason);
+});
+// Exception synchrone non attrapée : l'état du processus est incertain → on journalise et on laisse
+// le superviseur (pm2, Railway) relancer proprement.
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException]', err.stack || err);
+  process.exit(1);
+});
 
 if (!process.env.VERCEL) {
   start();

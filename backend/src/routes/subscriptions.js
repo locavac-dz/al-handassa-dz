@@ -30,8 +30,9 @@ router.post('/', authenticate, [
   body('billing_cycle').isIn(['monthly','annual']),
   body('payment_method').isIn(['cib','dahabiya','baridimob','ccp_virement','code_prepaye']),
 ], validate, async (req, res, next) => {
-  const client = await getClient();
+  let client;
   try {
+    client = await getClient();
     await client.query('BEGIN');
     const { plan, billing_cycle, payment_method } = req.body;
     const amount = PLANS[plan][billing_cycle];
@@ -68,10 +69,10 @@ router.post('/', authenticate, [
       next_step: `/api/payment/${payment_method === 'cib' || payment_method === 'dahabiya' ? 'satim' : payment_method}/initiate`,
     });
   } catch (err) {
-    await client.query('ROLLBACK');
+    if (client) await client.query('ROLLBACK').catch(() => {});
     next(err);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 });
 
