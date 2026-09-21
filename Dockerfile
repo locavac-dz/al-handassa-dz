@@ -1,33 +1,34 @@
-# Multi-stage build for Al Handassa.dz
+# Image de production Al Handassa.dz — UNE seule image : Express sert l'API ET le front (racine du dépôt).
+# Le dossier backend/uploads (PDF, vidéos, images) n'est PAS dans l'image : le monter sur un stockage persistant
+# (Railway : volume monté sur /app/backend/uploads ; le mot-clé VOLUME est interdit par Railway).
+FROM node:20-bookworm-slim
 
-# Stage 1: Build frontend assets
-FROM node:20-alpine AS frontend-builder
+# Python + PyMuPDF : génération des aperçus PDF (backend/src/utils/generatePreview.js). Sans eux, l'upload d'un
+# produit fonctionne mais aucun aperçu n'est produit.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends python3 python3-pip \
+ && pip3 install --no-cache-dir --break-system-packages pymupdf \
+ && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+
+# Dépendances du backend d'abord : cette couche n'est reconstruite que si package*.json change
+COPY backend/package.json backend/package-lock.json ./backend/
+RUN cd backend && npm ci --omit=dev
+
+# Code (backend + pages du front). Le .dockerignore exclut .env, .git, uploads, node_modules, logs…
 COPY . .
-RUN npm run build 2>/dev/null || echo "No build script"
 
-# Stage 2: Production runtime
-FROM node:20-alpine
-WORKDIR /app
+ENV NODE_ENV=production \
+    PORT=5000
 
-# Install production dependencies
-COPY package*.json ./
-RUN npm ci --only=production
+# Exécution sans root ; uploads/ doit être inscriptible (le volume Railway hérite de ces droits)
+RUN mkdir -p backend/uploads && chown -R node:node /app
+USER node
 
-# Copy built files
-COPY --from=frontend-builder /app .
+EXPOSE 5000
 
-# Expose ports
-EXPOSE 3000 5000
-
-# Environment
-ENV NODE_ENV=production
-
-# Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:5000/api/products', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+  CMD node -e "require('http').get('http://127.0.0.1:'+(process.env.PORT||5000)+'/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 
-# Start both servers
-CMD ["sh", "-c", "npm run dev:backend & npm run dev:frontend & wait"]
+CMD ["node", "backend/src/app.js"]

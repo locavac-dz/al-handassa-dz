@@ -1,17 +1,11 @@
 require('dotenv').config();
-const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
+// Même connexion que l'application (DATABASE_URL ou DB_*, options SSL de config/database.js) : l'ancien Pool
+// local ignorait DATABASE_URL et SSL, donc ne pouvait pas migrer une base hébergée (Railway).
+const { pool } = require('../src/config/database');
 
 async function migrate() {
-  const pool = new Pool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  });
-
   try {
     // schema.sql n'est pas idempotent (CREATE TYPE/CREATE TABLE sans IF NOT
     // EXISTS) — c'est un bootstrap à usage unique pour une base neuve, pas une

@@ -1,0 +1,30 @@
+# Ne jamais embarquer de secrets, de données ni d'historique dans l'image
+.git
+.gitignore
+.claude
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+**/node_modules
+**/*.log
+**/log.txt
+
+# Contenu utilisateur (2,4 Go) : volume persistant, pas l'image
+uploads
+backend/uploads
+
+# Hors runtime
+deploy
+mobile
+api
+docs
+**/*.md
+*.py
+*.bat
+*.ps1
+backend/*.py
+backend/*.ps1
+Dockerfile
+.dockerignore
