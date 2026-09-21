@@ -253,7 +253,7 @@ const productApp = {
 
     if (p.is_free) {
       // Guide logiciels : CTA scroll vers la liste
-      if (!p.file_url && p.type === 'logiciels' && p.metadata?.software_list) {
+      if (!p.has_file && p.type === 'logiciels' && p.metadata?.software_list) {
         btn.className = 'btn-buy btn-free';
         btn.innerHTML = '<i class="fas fa-laptop-code"></i> Consulter le guide';
         btn.disabled = false;
@@ -262,7 +262,7 @@ const productApp = {
         };
         return;
       }
-      if (!p.file_url) {
+      if (!p.has_file) {
         btn.innerHTML = '<i class="fas fa-clock"></i> Bientôt disponible';
         btn.disabled = true;
         return;
@@ -381,7 +381,7 @@ const productApp = {
         '@type': 'Offer',
         price,
         priceCurrency: 'DZD',
-        availability: p.file_url
+        availability: p.has_file
           ? 'https://schema.org/InStock'
           : 'https://schema.org/PreOrder',
         url: `https://handassi.dz/product?slug=${p.slug}`,

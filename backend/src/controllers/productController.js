@@ -53,7 +53,7 @@ async function list(req, res, next) {
     params.push(limit, offset);
     const result = await query(
       `SELECT p.id, p.title, p.slug, p.type, p.study_level, p.price, p.discount_price,
-              p.is_free, p.is_active, p.file_url, p.preview_url, p.thumbnail_url, p.rating_avg, p.rating_count, p.downloads_count,
+              p.is_free, p.is_active, (p.file_url IS NOT NULL) AS has_file, p.preview_url, p.thumbnail_url, p.rating_avg, p.rating_count, p.downloads_count,
               p.tags, p.language, p.created_at,
               c.name_fr AS category_name, c.slug AS category_slug, c.icon AS category_icon,
               inst.display_name AS instructor_name,
@@ -89,7 +89,9 @@ async function getOne(req, res, next) {
     );
     if (!result.rows.length) throw new AppError('Produit introuvable.', 404);
 
-    const product = result.rows[0];
+    // file_url n'est jamais publié (le fichier payant ne se récupère que via /:id/download) : simple indicateur
+    const { file_url, ...product } = result.rows[0];
+    product.has_file = file_url != null;
 
     // Incrémenter vues
     query('UPDATE products SET views_count = views_count + 1 WHERE id = $1', [product.id]).catch(() => {});

@@ -172,7 +172,7 @@ function renderCard(p, theme) {
   const isCorrige = p.title?.toLowerCase().includes('corrigé');
   const isEnonce  = p.title?.toLowerCase().includes('exercice') || p.title?.toLowerCase().includes('énoncé');
   const sizeMb    = p.file_size_mb ? `${p.file_size_mb} Mo` : '';
-  const fileUrl   = p.file_url ? `http://localhost:5000${p.file_url}` : null;
+  const hasFile   = !!p.has_file;   // le fichier lui-même se télécharge depuis la fiche produit (connexion requise)
   const productUrl = `product.html?slug=${encodeURIComponent(p.slug)}`;
 
   const badgeHtml = isCorrige
@@ -204,7 +204,7 @@ function renderCard(p, theme) {
           <a href="${esc(productUrl)}" class="td-btn td-btn-outline">
             <i class="fas fa-eye"></i> Voir
           </a>
-          ${fileUrl ? `<a href="${esc(fileUrl)}" class="td-btn td-btn-primary" download>
+          ${hasFile ? `<a href="${esc(productUrl)}" class="td-btn td-btn-primary">
             <i class="fas fa-download"></i> Télécharger
           </a>` : ''}
         </div>

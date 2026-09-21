@@ -6,6 +6,10 @@ const { uploadVideo, uploadImage } = require('../middleware/upload');
 const { paginate, slugify } = require('../utils/helpers');
 const { AppError } = require('../middleware/errorHandler');
 const validate = require('../middleware/validate');
+const path = require('path');
+const { createMediaToken, verifyMediaToken } = require('../utils/mediaToken');
+
+const UPLOADS_DIR = path.resolve(__dirname, '../../uploads');
 
 // GET /api/videos
 router.get('/', optionalAuth, async (req, res, next) => {
@@ -31,7 +35,8 @@ router.get('/', optionalAuth, async (req, res, next) => {
 
     const result = await query(
       `SELECT v.id, v.title, v.slug, v.study_level, v.duration_seconds, v.thumbnail_url,
-              v.video_url, v.source, v.price, v.is_free, v.views_count, v.rating_avg, v.tags, v.language, v.published_at,
+              CASE WHEN v.is_free AND v.video_url NOT LIKE '/uploads/%' THEN v.video_url END AS video_url,
+              v.source, v.price, v.is_free, v.views_count, v.rating_avg, v.tags, v.language, v.published_at,
               v.chapters,
               c.name_fr AS category_name, c.slug AS category_slug, c.icon AS category_icon,
               inst.display_name AS instructor_name
@@ -46,6 +51,19 @@ router.get('/', optionalAuth, async (req, res, next) => {
     const total = parseInt(countRes.rows[0].count, 10);
     res.json({ data: result.rows, pagination: { page, limit, total, pages: Math.ceil(total/limit) } });
   } catch (err) { next(err); }
+});
+
+// GET /api/videos/stream/:token — lecture d'un fichier local via lien signé (Range supporté)
+router.get('/stream/:token', (req, res, next) => {
+  const rel = verifyMediaToken(req.params.token);
+  if (!rel || !rel.startsWith('videos/')) return next(new AppError('Lien invalide ou expiré.', 403));
+
+  const abs = path.resolve(UPLOADS_DIR, rel);
+  if (!abs.startsWith(UPLOADS_DIR + path.sep)) return next(new AppError('Lien invalide ou expiré.', 403));
+
+  res.sendFile(abs, { headers: { 'Cache-Control': 'private, max-age=3600' } }, err => {
+    if (err && !res.headersSent) next(new AppError('Vidéo introuvable.', err.status === 404 || err.code === 'ENOENT' ? 404 : 500));
+  });
 });
 
 // GET /api/videos/:slug
@@ -75,6 +93,12 @@ router.get('/:slug', optionalAuth, async (req, res, next) => {
         [req.user.id, video.id]
       );
       if (access.rows.length) videoUrl = video.video_url;
+    }
+
+    // Fichier hébergé localement : jamais d'URL statique, uniquement un lien signé à durée limitée
+    if (videoUrl && videoUrl.startsWith('/uploads/videos/')) {
+      const token = createMediaToken(videoUrl.slice('/uploads/'.length));
+      videoUrl = token ? `/api/videos/stream/${token}` : null;
     }
 
     res.json({ data: { ...video, video_url: videoUrl } });

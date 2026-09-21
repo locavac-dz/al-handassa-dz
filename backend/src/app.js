@@ -9,6 +9,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 
 const { testConnection } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
+const uploadsGuard = require('./middleware/uploadsGuard');
 
 // ── Routes ──
 const authRoutes = require('./routes/auth');
@@ -150,7 +151,8 @@ app.use('/uploads/images', express.static(path.join(__dirname, '../uploads/image
   etag: true,
   lastModified: true,
 }));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+// Les fichiers payants (produits, vidéos, originaux) ne sont jamais servis ici : voir middleware/uploadsGuard.js
+app.use('/uploads', uploadsGuard, express.static(path.join(__dirname, '../uploads'), {
   maxAge: '1h',
   etag: true,
 }));
