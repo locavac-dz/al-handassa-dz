@@ -2,7 +2,7 @@
    Al Handassa.dz — Espace Utilisateur
    ============================================= */
 
-const API_BASE = HDS_SERVER;
+const SERVER_BASE = HDS_SERVER;
 
 const TYPE_ICON = {
   ouvrage: '📚', cours_pdf: '📄', exercices: '✏️',
@@ -49,7 +49,7 @@ async function downloadFile(productId, title, btnEl) {
   btnEl.classList.add('loading');
   btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Préparation…';
   try {
-    const res = await fetch(`${API_BASE}/api/products/${productId}/download`, {
+    const res = await fetch(`${SERVER_BASE}/api/products/${productId}/download`, {
       headers: { Authorization: `Bearer ${Auth.getToken()}` },
     });
     if (!res.ok) {
@@ -282,7 +282,7 @@ const accountApp = {
           <div class="dl-card-top">
             <div class="dl-thumb">
               ${item.thumbnail_url
-                ? `<img src="${API_BASE}${esc(item.thumbnail_url)}" alt="${esc(item.title)}">`
+                ? `<img src="${SERVER_BASE}${esc(item.thumbnail_url)}" alt="${esc(item.title)}">`
                 : (TYPE_ICON[item.type] || '📄')}
             </div>
             <div class="dl-info">
@@ -434,7 +434,7 @@ const accountApp = {
           <a href="${item.item_type === 'video' ? 'index.html#videos' : `product?slug=${esc(item.slug)}`}" class="wl-card">
             <div class="wl-thumb">
               ${TYPE_ICON[item.type] || '📄'}
-              ${item.thumbnail_url ? `<img src="${API_BASE}${esc(item.thumbnail_url)}" alt="${esc(item.title)}">` : ''}
+              ${item.thumbnail_url ? `<img src="${SERVER_BASE}${esc(item.thumbnail_url)}" alt="${esc(item.title)}">` : ''}
             </div>
             <div class="wl-body">
               <div class="wl-type">${TYPE_LABEL[item.type] || item.item_type}</div>
@@ -675,7 +675,7 @@ const accountApp = {
 async function http(method, path, body) {
   const headers = { 'Content-Type': 'application/json' };
   if (Auth.getToken()) headers['Authorization'] = `Bearer ${Auth.getToken()}`;
-  const res = await fetch(`${API_BASE}/api${path}`, {
+  const res = await fetch(`${SERVER_BASE}/api${path}`, {
     method, headers,
     body: body ? JSON.stringify(body) : undefined,
   });
