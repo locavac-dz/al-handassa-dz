@@ -154,7 +154,7 @@ async function create(req, res, next) {
             [prevUrl, nbPages, prodId]
           );
         } catch (e) { console.warn('[Preview] DB update error:', e.message); }
-      });
+      }, { maxPages: product.is_free ? 0 : undefined });   // gratuit : aperçu complet ; payant : PREVIEW_MAX_PAGES premières pages
     }
 
     res.status(201).json({ data: product });

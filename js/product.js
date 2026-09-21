@@ -532,7 +532,7 @@ const productApp = {
         </div>
         <div class="pdf-preview-footer">
           <i class="fas fa-eye" style="color:#b45309"></i>
-          <strong>Aperçu complet gratuit</strong> — ${pages} pages consultables.
+          <strong>Aperçu gratuit</strong> — ${p.is_free ? `document complet (${pages} pages)` : `${pages} premières pages`} consultables.
           Téléchargez le fichier complet pour travailler hors ligne.
         </div>
       </div>`;
