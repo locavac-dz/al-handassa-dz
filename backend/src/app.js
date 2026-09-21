@@ -37,6 +37,14 @@ const referralRoutes     = require('./routes/referral');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Derrière un reverse proxy (Railway, Vercel, nginx) req.ip doit être l'IP du client et non celle du proxy,
+// sinon tous les visiteurs partagent un même compteur de rate limiting. TRUST_PROXY = nombre de proxys de
+// confiance devant l'app (1 par défaut en production ; ne jamais mettre `true` : X-Forwarded-For deviendrait falsifiable).
+const trustProxyHops = process.env.TRUST_PROXY !== undefined
+  ? parseInt(process.env.TRUST_PROXY, 10)
+  : (process.env.NODE_ENV === 'production' ? 1 : 0);
+if (trustProxyHops > 0) app.set('trust proxy', trustProxyHops);
+
 // ── Security ──
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -86,14 +94,54 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Trop de requêtes, réessayez dans quelques minutes.' },
-  skip: (req) => req.ip === '127.0.0.1' || req.ip === '::1', // pas de limite en local
+  // Pas de limite pour le développement local seulement : en production un proxy local ne doit pas tout exempter
+  skip: (req) => process.env.NODE_ENV !== 'production' && (req.ip === '127.0.0.1' || req.ip === '::1'),
 });
 app.use('/api/', limiter);
 
-const authLimiter = rateLimit({
+// Connexion : on ne compte que les échecs (un utilisateur légitime n'est jamais bloqué par ses connexions réussies).
+// Un compteur par IP ET un par adresse email (contre une attaque répartie sur plusieurs IP).
+const loginIpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Trop de tentatives de connexion, réessayez dans 15 minutes.' },
+});
+const loginEmailLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `email:${String(req.body?.email || '').trim().toLowerCase().slice(0, 254) || req.ip}`,
+  message: { error: 'Trop de tentatives pour ce compte, réessayez dans 15 minutes.' },
+});
+// Inscription, mots de passe, renvoi de vérification : déclenchent des emails et des écritures
+const accountLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Trop de demandes, réessayez dans 15 minutes.' },
+});
+// Paiements : créations de paiements (POST) ; le retour SATIM (GET) reste couvert par le limiteur général
+const paymentLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 30,
-  message: { error: 'Trop de tentatives de connexion, réessayez dans 15 minutes.' },
+  skip: (req) => req.method !== 'POST',
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Trop de requêtes de paiement, réessayez dans quelques minutes.' },
+});
+// Codes prépayés : anti force brute
+const prepaidLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Trop de tentatives de code, réessayez dans 15 minutes.' },
 });
 
 // ── Body Parsing ──
@@ -267,12 +315,15 @@ ${urlNodes}
 });
 
 // ── API Routes ──
-app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/auth/login', loginIpLimiter, loginEmailLimiter);
+app.use(['/api/auth/register', '/api/auth/forgot-password', '/api/auth/reset-password', '/api/auth/resend-verification'], accountLimiter);
+app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/payment', paymentRoutes);
+app.use('/api/payment/prepaid', prepaidLimiter);
+app.use('/api/payment', paymentLimiter, paymentRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/newsletter', newsletterRoutes);
