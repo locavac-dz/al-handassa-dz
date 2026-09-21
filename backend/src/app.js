@@ -113,9 +113,24 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // ── Static Files (Frontend) ──
-// Serve all frontend files from project root
-const frontendPath = process.cwd();
-app.use(express.static(frontendPath, {
+// Le front est servi depuis la racine du dépôt, mais UNIQUEMENT via une liste blanche :
+// servir tout le dossier exposerait backend/ (code, scripts, uploads payants), .git, package.json…
+const frontendPath = path.resolve(__dirname, '../..');
+const FRONT_PUBLIC_DIRS = new Set(['css', 'js', 'img', 'assets', 'admin']);
+const FRONT_ROOT_FILE = /^(?:[\w-]+\.html|[\w-]+\.(?:png|jpe?g|webp|gif|svg|ico)|manifest\.json|sw\.js|robots\.txt|sitemap[\w-]*\.xml)$/i;
+
+function isPublicFrontPath(reqPath) {
+  let p;
+  try { p = decodeURIComponent(reqPath); } catch { return false; }
+  if (p.includes('\0') || p.includes('\\')) return false;
+  const parts = p.split('/').filter(Boolean);
+  if (parts.some(s => s.startsWith('.'))) return false;   // dotfiles et segments ".."
+  if (parts.length === 0) return true;                     // "/" → index.html
+  if (parts.length === 1) return FRONT_ROOT_FILE.test(parts[0]) || FRONT_PUBLIC_DIRS.has(parts[0]);
+  return FRONT_PUBLIC_DIRS.has(parts[0]);
+}
+
+const frontStatic = express.static(frontendPath, {
   maxAge: '1h',
   etag: true,
   setHeaders: (res, filePath) => {
@@ -125,7 +140,8 @@ app.use(express.static(frontendPath, {
       res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year for assets
     }
   }
-}));
+});
+app.use((req, res, next) => (isPublicFrontPath(req.path) ? frontStatic(req, res, next) : next()));
 
 // ── Static Files (uploads) ──
 // Les miniatures sont cachées 7 jours, les autres uploads 1 heure
