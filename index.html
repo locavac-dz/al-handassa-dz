@@ -1,55 +1,282 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Al Handassa.dz - Plateforme E-commerce Génie Civil</title>
+  <title>Al Handassa.dz — Ressources Génie Civil & Architecture en Algérie</title>
+  <meta name="description" content="Cours, TD, ouvrages, normes et logiciels de génie civil et d'architecture, annuaire d'entreprises, appels d'offres et offres d'emploi en Algérie.">
+  <link rel="icon" href="img/favicon.ico">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f7fa; color: #333; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-    .header { background: linear-gradient(135deg, #1B3A6B 0%, #2d5a8c 100%); color: white; padding: 60px 20px; text-align: center; margin-bottom: 40px; border-radius: 8px; }
-    .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-    .header p { font-size: 1.2em; opacity: 0.9; }
-    .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 40px 0; }
-    .product { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .product h3 { color: #1B3A6B; margin-bottom: 10px; }
-    .product .price { font-size: 1.5em; color: #27ae60; font-weight: bold; margin: 10px 0; }
-    .product .rating { color: #f39c12; }
-    .btn { display: inline-block; background: #1B3A6B; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-top: 10px; }
-    .btn:hover { background: #152d52; }
-    .loading { text-align: center; padding: 40px; }
+    :root { --navy:#1B3A6B; --navy-dark:#152d52; --gold:#C8A142; --bg:#f5f7fa; --text:#1e293b; --muted:#64748b; --card:#fff; --border:#e2e8f0; --ok:#059669; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; scroll-padding-top:72px; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+    a { color:inherit; }
+    .container { max-width:1200px; margin:0 auto; padding:0 20px; }
+
+    /* Navigation */
+    .topbar { position:sticky; top:0; z-index:10; background:var(--navy); color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+    .topbar .container { display:flex; align-items:center; gap:20px; min-height:60px; flex-wrap:wrap; padding-top:6px; padding-bottom:6px; }
+    .brand { font-weight:800; font-size:1.25rem; text-decoration:none; letter-spacing:-.3px; }
+    .brand span { color:var(--gold); }
+    .topbar nav { display:flex; gap:4px 16px; flex-wrap:wrap; flex:1; }
+    .topbar nav a { text-decoration:none; font-size:.92rem; opacity:.9; padding:6px 2px; }
+    .topbar nav a:hover { opacity:1; text-decoration:underline; }
+    .btn { display:inline-block; background:var(--navy); color:#fff; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600; font-size:.92rem; border:0; cursor:pointer; }
+    .btn:hover { background:var(--navy-dark); }
+    .btn.gold { background:var(--gold); color:#1e293b; }
+    .btn.outline { background:transparent; color:var(--navy); border:2px solid var(--navy); }
+    .topbar .btn { background:var(--gold); color:#1e293b; padding:8px 16px; }
+
+    /* Hero */
+    .hero { background:linear-gradient(135deg,var(--navy) 0%,#2d5a8c 100%); color:#fff; padding:64px 0 56px; text-align:center; }
+    .hero h1 { font-size:clamp(1.8rem,4.5vw,2.8rem); margin-bottom:10px; }
+    .hero p { font-size:1.1rem; opacity:.9; max-width:640px; margin:0 auto 26px; }
+    .search { display:flex; gap:8px; max-width:560px; margin:0 auto; }
+    .search input { flex:1; padding:14px 16px; border-radius:8px; border:0; font-size:1rem; min-width:0; }
+
+    /* Accès rapides */
+    .quick { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin:-28px auto 8px; position:relative; }
+    .quick a { background:var(--card); border-radius:10px; padding:18px 14px; text-align:center; text-decoration:none; box-shadow:0 4px 14px rgba(0,0,0,.08); font-weight:600; color:var(--navy); }
+    .quick a:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.12); }
+    .quick small { display:block; font-weight:400; color:var(--muted); margin-top:4px; font-size:.8rem; }
+
+    section { padding:44px 0 8px; }
+    h2 { color:var(--navy); font-size:1.6rem; margin-bottom:6px; }
+    .sub { color:var(--muted); margin-bottom:20px; }
+
+    /* Catalogue */
+    .chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+    .chip { background:var(--card); border:1px solid var(--border); border-radius:999px; padding:7px 14px; font-size:.85rem; cursor:pointer; color:var(--text); }
+    .chip.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:18px; }
+    .card { background:var(--card); border-radius:10px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,.08); display:flex; flex-direction:column; text-decoration:none; }
+    .card:hover { box-shadow:0 6px 18px rgba(0,0,0,.14); }
+    .thumb { aspect-ratio:16/10; background:#e8edf5; display:flex; align-items:center; justify-content:center; font-size:2.4rem; overflow:hidden; }
+    .thumb img { width:100%; height:100%; object-fit:cover; }
+    .card-body { padding:14px; display:flex; flex-direction:column; gap:6px; flex:1; }
+    .card h3 { font-size:1rem; color:var(--navy); }
+    .meta { color:var(--muted); font-size:.8rem; }
+    .price { margin-top:auto; font-weight:700; color:var(--ok); }
+    .price.paid { color:var(--navy); }
+    .more { text-align:center; margin:24px 0 4px; }
+    .status { text-align:center; color:var(--muted); padding:28px 0; grid-column:1/-1; }
+
+    /* Tarifs */
+    .plans { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; }
+    .plan { background:var(--card); border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,.08); border-top:4px solid var(--border); }
+    .plan.pro { border-top-color:var(--gold); }
+    .plan h3 { color:var(--navy); }
+    .plan .amount { font-size:1.8rem; font-weight:800; margin:8px 0 2px; }
+    .plan ul { list-style:none; margin:14px 0 18px; display:grid; gap:6px; font-size:.92rem; }
+    .plan li::before { content:"✓ "; color:var(--ok); font-weight:700; }
+
+    footer { margin-top:56px; background:var(--navy); color:#cbd5e1; padding:28px 0; font-size:.88rem; }
+    footer .container { display:flex; gap:12px 24px; flex-wrap:wrap; justify-content:space-between; }
+    footer a { text-decoration:none; margin-right:14px; }
+    footer a:hover { text-decoration:underline; }
+
+    @media (max-width:640px) { .topbar nav { order:3; flex-basis:100%; } .hero { padding:44px 0 48px; } .search { flex-direction:column; } }
   </style>
+  <script src="js/config.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>Al Handassa.dz</h1>
-      <p>Plateforme E-commerce Ressources Génie Civil Algérie</p>
-    </div>
-    <div id="products" class="products">
-      <div class="loading">Chargement des produits...</div>
-    </div>
-  </div>
   <script>
-    fetch('/api/products')
-      .then(r => r.json())
-      .then(data => {
-        const html = (data.data || []).slice(0, 6).map(p => `
-          <div class="product">
-            <h3>${p.title || 'Produit'}</h3>
-            <p>${p.description || ''}</p>
-            <div class="price">${p.price || 0} DA</div>
-            <div class="rating">★ ${p.rating_avg || 'N/A'}</div>
-            <a href="/product.html?id=${p.id}" class="btn">Voir plus</a>
-          </div>
-        `).join('');
-        document.getElementById('products').innerHTML = html || '<p style="grid-column: 1/-1;">Aucun produit pour le moment.</p>';
-      })
-      .catch(e => {
-        console.error('Erreur:', e);
-        document.getElementById('products').innerHTML = '<p style="grid-column: 1/-1;">Erreur lors du chargement des produits.</p>';
-      });
+    // Anciennes ancres de connexion/inscription (liens « index.html#login », « #register »…) : la connexion a sa propre page
+    (function () {
+      var h = location.hash;
+      if (h === '#login' || h === '#auth') location.replace('login.html');
+      else if (h === '#register') location.replace('login.html?tab=register');
+    })();
+  </script>
+
+  <header class="topbar">
+    <div class="container">
+      <a class="brand" href="index.html">Al Handassa<span>.dz</span></a>
+      <nav aria-label="Navigation principale">
+        <a href="#products">Catalogue</a>
+        <a href="td.html">Cours &amp; TD</a>
+        <a href="logiciels.html">Logiciels</a>
+        <a href="annuaire.html">Annuaire</a>
+        <a href="appels-offres.html">Appels d'offres</a>
+        <a href="recrutement.html">Emploi</a>
+        <a href="#videos">Vidéos</a>
+        <a href="#articles">Articles</a>
+        <a href="#pricing">Tarifs</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a class="btn" id="account-link" href="login.html">Connexion</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="container">
+        <h1>Le génie civil et l'architecture, en un seul endroit</h1>
+        <p>Cours, TD, ouvrages, normes et logiciels pour les étudiants et les professionnels du bâtiment en Algérie.</p>
+        <form class="search" action="search.html" method="get" role="search">
+          <input type="search" name="q" placeholder="Rechercher un cours, une norme, un logiciel…" aria-label="Rechercher" minlength="2" required>
+          <button class="btn gold" type="submit">Rechercher</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="quick">
+        <a href="td.html">📚 Cours &amp; TD<small>Ressources par thème</small></a>
+        <a href="logiciels.html">💾 Logiciels<small>Outils du BTP</small></a>
+        <a href="annuaire.html">🏗️ Annuaire<small>Professionnels</small></a>
+        <a href="entreprises.html">🏢 Entreprises<small>Répertoire</small></a>
+        <a href="appels-offres.html">📋 Appels d'offres<small>Marchés en cours</small></a>
+        <a href="recrutement.html">💼 Emploi<small>Offres du secteur</small></a>
+      </div>
+
+      <section id="products">
+        <h2>Catalogue</h2>
+        <p class="sub">Les dernières ressources publiées.</p>
+        <div class="chips" id="type-chips" role="group" aria-label="Filtrer par type"></div>
+        <div class="grid" id="products-grid"><div class="status">Chargement…</div></div>
+        <div class="more" id="products-more" hidden><button class="btn outline" id="more-btn" type="button">Voir plus</button></div>
+      </section>
+
+      <section id="videos">
+        <h2>Vidéos</h2>
+        <p class="sub">Formations et tutoriels vidéo.</p>
+        <div class="grid" id="videos-grid"><div class="status">Chargement…</div></div>
+      </section>
+
+      <section id="articles">
+        <h2>Articles</h2>
+        <p class="sub">Dossiers techniques et analyses.</p>
+        <div class="grid" id="articles-grid"><div class="status">Chargement…</div></div>
+      </section>
+
+      <section id="pricing">
+        <h2>Abonnements</h2>
+        <p class="sub">Téléchargez sans limite avec un abonnement.</p>
+        <div class="plans" id="plans-grid"><div class="status">Chargement…</div></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div>© Al Handassa.dz — Génie civil &amp; architecture, Algérie</div>
+      <div><a href="about.html">À propos</a><a href="contact.html">Contact</a><a href="cgu.html">Conditions d'utilisation</a></div>
+    </div>
+  </footer>
+
+  <script>
+    const API = HDS_SERVER + '/api';
+    const PAGE_SIZE = 12;
+    const TYPES = {
+      '': 'Tout', cours_pdf: 'Cours', td_pdf: 'TD', tp_pdf: 'TP', tuto_pdf: 'Tutoriels', exercices: 'Exercices',
+      sujet: "Sujets d'examen", ouvrage: 'Ouvrages', normes: 'Normes', logiciels: 'Logiciels', pack: 'Packs',
+    };
+    const ICONS = { logiciels: '💾', ouvrage: '📚', normes: '📋', pack: '📦' };
+
+    // Toute donnée venant de l'API est échappée avant d'être insérée dans le HTML
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fmt = (n) => Number(n || 0).toLocaleString('fr-DZ');
+    const imgUrl = (u) => (!u ? '' : /^https?:\/\//i.test(u) ? u : HDS_SERVER + u);
+    const thumb = (u, fallback) => u
+      ? `<img src="${esc(imgUrl(u))}" alt="" loading="lazy" onerror="this.remove()">`
+      : fallback;
+
+    async function getJSON(path) {
+      const res = await fetch(API + path);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }
+    const failed = (id, what) => { document.getElementById(id).innerHTML = `<div class="status">${what} indisponible(s) pour le moment.</div>`; };
+
+    // ── Compte ──
+    if (localStorage.getItem('hds_token')) {
+      const a = document.getElementById('account-link');
+      a.textContent = 'Mon compte'; a.href = 'account.html';
+    }
+
+    // ── Catalogue ──
+    const state = { type: '', page: 1, pages: 1, busy: false };
+
+    function productCard(p) {
+      const price = p.is_free ? '<div class="price">Gratuit</div>' : `<div class="price paid">${fmt(p.effective_price ?? p.price)} DA</div>`;
+      return `<a class="card" href="product.html?slug=${encodeURIComponent(p.slug)}">
+        <div class="thumb">${thumb(p.thumbnail_url, ICONS[p.type] || '📄')}</div>
+        <div class="card-body">
+          <h3>${esc(p.title)}</h3>
+          <div class="meta">${esc(TYPES[p.type] || p.type)}${p.category_name ? ' · ' + esc(p.category_name) : ''}</div>
+          ${price}
+        </div></a>`;
+    }
+
+    async function loadProducts(reset) {
+      if (state.busy) return;
+      state.busy = true;
+      const grid = document.getElementById('products-grid');
+      if (reset) { state.page = 1; grid.innerHTML = '<div class="status">Chargement…</div>'; }
+      try {
+        const q = new URLSearchParams({ page: state.page, limit: PAGE_SIZE, sort: 'newest' });
+        if (state.type) q.set('type', state.type);
+        const r = await getJSON('/products?' + q);
+        state.pages = r.pagination ? r.pagination.pages : 1;
+        const cards = (r.data || []).map(productCard).join('');
+        if (reset) grid.innerHTML = cards || '<div class="status">Aucune ressource dans cette catégorie pour le moment.</div>';
+        else grid.insertAdjacentHTML('beforeend', cards);
+        document.getElementById('products-more').hidden = state.page >= state.pages;
+      } catch (e) { if (reset) failed('products-grid', 'Catalogue'); }
+      state.busy = false;
+    }
+
+    const chips = document.getElementById('type-chips');
+    chips.innerHTML = Object.entries(TYPES).map(([k, v], i) =>
+      `<button class="chip${i === 0 ? ' active' : ''}" type="button" data-type="${esc(k)}">${esc(v)}</button>`).join('');
+    chips.addEventListener('click', (e) => {
+      const b = e.target.closest('.chip'); if (!b) return;
+      chips.querySelectorAll('.chip').forEach((c) => c.classList.toggle('active', c === b));
+      state.type = b.dataset.type; loadProducts(true);
+    });
+    document.getElementById('more-btn').addEventListener('click', () => { state.page += 1; loadProducts(false); });
+    loadProducts(true);
+
+    // ── Vidéos (les liens ne sont fournis par l'API que pour les vidéos gratuites hébergées ailleurs) ──
+    getJSON('/videos?limit=6').then((r) => {
+      const list = r.data || [];
+      document.getElementById('videos-grid').innerHTML = list.length ? list.map((v) => {
+        const free = v.is_free && v.video_url;
+        const inner = `<div class="thumb">${thumb(v.thumbnail_url, '🎬')}</div>
+          <div class="card-body"><h3>${esc(v.title)}</h3>
+          <div class="meta">${esc(v.category_name || 'Vidéo')}${v.instructor_name ? ' · ' + esc(v.instructor_name) : ''}</div>
+          <div class="price ${free ? '' : 'paid'}">${free ? 'Regarder (gratuit)' : v.is_free ? 'Gratuit' : 'Réservé aux abonnés'}</div></div>`;
+        return free && /^https?:\/\//i.test(v.video_url)
+          ? `<a class="card" href="${esc(v.video_url)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+          : `<a class="card" href="login.html?tab=register">${inner}</a>`;
+      }).join('') : '<div class="status">Aucune vidéo pour le moment.</div>';
+    }).catch(() => failed('videos-grid', 'Vidéos'));
+
+    // ── Articles ──
+    getJSON('/articles?limit=3').then((r) => {
+      const list = r.data || [];
+      document.getElementById('articles-grid').innerHTML = list.length ? list.map((a) => `
+        <a class="card" href="article.html?slug=${encodeURIComponent(a.slug)}">
+          <div class="thumb">${thumb(a.thumbnail_url, '📰')}</div>
+          <div class="card-body"><h3>${esc(a.title)}</h3>
+            <div class="meta">${esc(a.excerpt || '').slice(0, 110)}</div>
+            <div class="price ${a.is_free ? '' : 'paid'}">${a.is_free ? 'Gratuit' : fmt(a.price) + ' DA'}</div></div></a>`).join('')
+        : '<div class="status">Aucun article publié pour le moment.</div>';
+    }).catch(() => failed('articles-grid', 'Articles'));
+
+    // ── Tarifs ──
+    getJSON('/subscriptions/plans').then((r) => {
+      document.getElementById('plans-grid').innerHTML = (r.plans || []).map((p) => `
+        <div class="plan${p.id === 'pro' ? ' pro' : ''}">
+          <h3>${esc(p.name)}</h3>
+          <div class="amount">${p.prices.monthly ? fmt(p.prices.monthly) + ' DA' : 'Gratuit'}</div>
+          <div class="meta">${p.prices.monthly ? 'par mois · ' + fmt(p.prices.annual) + ' DA par an' : 'sans engagement'}</div>
+          <ul>${(p.features || []).map((f) => `<li>${esc(f)}</li>`).join('')}</ul>
+          <a class="btn${p.id === 'pro' ? ' gold' : ''}" href="${p.prices.monthly ? 'login.html?tab=register&redirect=' + encodeURIComponent('account.html') : 'login.html?tab=register'}">${p.prices.monthly ? 'Choisir ' + esc(p.name) : 'Créer un compte'}</a>
+        </div>`).join('');
+    }).catch(() => failed('plans-grid', 'Tarifs'));
   </script>
 </body>
 </html>

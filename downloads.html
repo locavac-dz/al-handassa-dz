@@ -82,6 +82,19 @@
 <script>
 const API = HDS_SERVER + '/api';
 
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function showState(icon, title, text, linkHtml = '') {
+  document.getElementById('downloads-content').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">${icon}</div>
+      <h2 class="empty-title">${esc(title)}</h2>
+      <p class="empty-text">${esc(text)}</p>
+      ${linkHtml}
+    </div>`;
+}
+
+// Achats payés : GET /api/orders/purchases (une ligne par produit acheté ; has_file indique qu'un fichier existe)
 async function loadDownloads() {
   const token = localStorage.getItem('hds_token');
   if (!token) {
@@ -90,67 +103,69 @@ async function loadDownloads() {
   }
 
   try {
-    const res = await fetch(API + '/orders', {
-      headers: { Authorization: 'Bearer ' + token }
-    });
+    const res = await fetch(API + '/orders/purchases', { headers: { Authorization: 'Bearer ' + token } });
+    if (res.status === 401) { localStorage.removeItem('hds_token'); location.href = 'login.html?redirect=downloads.html'; return; }
     const data = await res.json();
+    if (!res.ok || !Array.isArray(data.data)) throw new Error('Erreur lors du chargement de vos achats.');
 
-    if (!res.ok || !data.data) throw new Error('Erreur lors du chargement');
-
-    const orders = data.data.filter(o => o.status === 'completed');
-
-    if (orders.length === 0) {
-      document.getElementById('downloads-content').innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">🛍️</div>
-          <h2 class="empty-title">Aucun achat encore</h2>
-          <p class="empty-text">Explorez notre catalogue et achetez vos premières ressources.</p>
-          <a href="index.html" class="btn-back">Voir le catalogue</a>
-        </div>
-      `;
+    const purchases = data.data;
+    if (purchases.length === 0) {
+      showState('🛍️', 'Aucun achat encore', 'Explorez notre catalogue et achetez vos premières ressources.',
+        '<a href="index.html#products" class="btn-back">Voir le catalogue</a>');
       return;
     }
 
-    let html = '<div class="downloads-list">';
-    orders.forEach(order => {
-      if (order.product) {
-        html += `
-          <div class="download-item">
-            <div class="download-icon">📄</div>
-            <div class="download-info">
-              <div class="download-title">${order.product.title || 'Ressource'}</div>
-              <div class="download-meta">
-                Acheté le ${new Date(order.created_at).toLocaleDateString('fr-DZ')}
-                ${order.product.file_url ? '• Taille: ' + (Math.random() * 50 | 0) + ' MB' : ''}
-              </div>
-            </div>
-            ${order.product.file_url
-              ? `<a href="${API.replace('/api','')}/download${order.product.file_url}"
-                  class="download-btn"
-                  download="${order.product.slug || 'fichier'}.pdf">
-                  📥 Télécharger
-                </a>`
-              : '<span style="color:#ccc">Indisponible</span>'}
+    document.getElementById('downloads-content').innerHTML = '<div class="downloads-list">' + purchases.map((p) => `
+      <div class="download-item">
+        <div class="download-icon">📄</div>
+        <div class="download-info">
+          <div class="download-title">${esc(p.title || 'Ressource')}</div>
+          <div class="download-meta">
+            <a href="product.html?slug=${encodeURIComponent(p.slug)}" style="color:inherit">Voir la fiche</a>
+            • Acheté le ${esc(new Date(p.purchased_at).toLocaleDateString('fr-DZ'))} • Commande ${esc(p.order_number)}
           </div>
-        `;
-      }
-    });
-    html += '</div>';
-    document.getElementById('downloads-content').innerHTML = html;
+        </div>
+        ${p.has_file
+          ? `<button type="button" class="download-btn" data-id="${esc(p.id)}" data-title="${esc(p.title)}">📥 Télécharger</button>`
+          : '<span style="color:#ccc">Indisponible</span>'}
+      </div>`).join('') + '</div>';
   } catch (err) {
-    document.getElementById('downloads-content').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">⚠️</div>
-        <h2 class="empty-title">Erreur</h2>
-        <p class="empty-text">${err.message}</p>
-        <a href="index.html" class="btn-back">Retour à l'accueil</a>
-      </div>
-    `;
+    showState('⚠️', 'Erreur', err.message, '<a href="index.html" class="btn-back">Retour à l\'accueil</a>');
   }
 }
 
+// Le fichier est servi par GET /api/products/:id/download (contrôle d'accès côté serveur) : on le récupère avec le
+// jeton puis on le propose au téléchargement — il n'existe plus d'URL directe vers les fichiers payants.
+document.getElementById('downloads-content').addEventListener('click', async (e) => {
+  const btn = e.target.closest('.download-btn');
+  if (!btn) return;
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = '⏳ Préparation…';
+  try {
+    const res = await fetch(`${API}/products/${encodeURIComponent(btn.dataset.id)}/download`, {
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('hds_token') },
+    });
+    if (res.status === 403) throw new Error('Accès refusé à ce fichier.');
+    if (!res.ok) throw new Error('Téléchargement impossible pour le moment.');
+    // Nom de fichier fourni par le serveur (Content-Disposition), sinon titre + .pdf
+    const cd = res.headers.get('Content-Disposition') || '';
+    const m = cd.match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/i);
+    const filename = m ? decodeURIComponent(m[1]) : (btn.dataset.title || 'fichier').replace(/[^\w\s.-]/g, '') + '.pdf';
+    const url = URL.createObjectURL(await res.blob());
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = label;
+  }
+});
+
 function handleLogout() {
   localStorage.removeItem('hds_token');
+  localStorage.removeItem('hds_refresh');
   localStorage.removeItem('hds_user');
   location.href = 'index.html';
 }
