@@ -39,6 +39,17 @@ Windows : `Lancer_AlHandassa.bat`.
 - `sitemap.xml` (88 Ko) et `robots.txt` sont maintenus pour le SEO — les régénérer après tout ajout de pages.
 - `backend/migrations/run.js` (`npm run migrate`) applique `schema.sql` (une fois, à la création de la base) puis toutes les migrations numérotées dans l'ordre — écrire toute nouvelle migration en idempotent (`IF NOT EXISTS` / `ON CONFLICT DO NOTHING`) pour qu'elle reste sûre à ré-appliquer.
 
+## Invariants ajoutés après l'audit du 21/09/2026
+
+- **Fichiers payants** : `file_url` / `video_url` ne sont **jamais** renvoyés par les API publiques (`has_file` à la place) ; un fichier payant ne se récupère que par `GET /api/products/:id/download` (achat/abonnement) ou, pour une vidéo hébergée, par le lien signé `/api/videos/stream/:token` (`utils/mediaToken.js`, 4 h). `/uploads` passe par `middleware/uploadsGuard.js` : seuls images, `previews/`, `ecotec/` et les fichiers référencés comme `preview_url` (jamais comme `file_url`) sont publics. **Décision ouverte** : `previews/preview_*.pdf` (généré par `generatePreview.js`) est une copie *complète* du PDF, donc publique — à tronquer/filigraner si le contenu doit rester payant.
+- **Front servi par Express** (`backend/src/app.js`) : liste blanche (`isPublicFrontPath`) — pages `*.html` et images à la racine, `manifest.json`, `sw.js`, `robots.txt`, `sitemap*.xml`, dossiers `css/ js/ img/ assets/ admin/`. Ne jamais revenir à `express.static(process.cwd())` (exposait `backend/`, `.git`, `package.json`).
+- **Livraison d'une commande payée** : un seul point d'entrée, `settleOrder()` (`utils/fulfillment.js`), appelé par `satimCallback` et `PATCH /api/admin/payments/:id/validate`. Idempotent grâce au verrou `UPDATE orders … WHERE status IN (pending, processing, failed)` ; ne pas dupliquer cette logique ailleurs. Index unique `software_licenses(order_item_id)` (migration 028). Validation/rejet admin : uniquement sur un paiement `pending` (409 sinon). `orderController.updateStatus` (PATCH statut → `paid`) ne passe **pas** encore par `settleOrder` : à corriger.
+- **Rate limiting** : `TRUST_PROXY` (nombre de proxys, 1 en production) — sans lui tous les clients partagent une IP. Limiteurs dédiés : connexion (échecs par IP et par email), inscription/mot de passe, paiements, codes prépayés.
+- **Front** : l'URL du serveur vient de `js/config.js` (`HDS_SERVER`) — ne plus écrire `http://localhost:5000` en dur. Le panneau admin réellement servi est `admin/index.html` (script inline, `esc()` obligatoire pour toute donnée injectée ; boutons Modifier via le registre `REG`) ; `admin/js/*` et `js/admin.js` ne sont chargés par aucune page.
+- **Comptes admin** : `backend/reset-admin-password.js <email> <mot_de_passe>` (aucun secret dans le dépôt, qui est public).
+- `/api/affiliate` et `/api/referral` sont volontairement **non montés** (tables absentes, failles de fraude) ; `analytics.js` / `advancedAnalytics.js` réservés admin, en partie cassés (colonne `orders.payment_status` inexistante).
+- **Connu et non traité** : CSP Helmet bloquant les `onclick` inline quand le front est servi par Express ; `rejectUnauthorized:false` (SMTP, base) ; nodemailer ≤ 9.1 (correctif en 10.x) ; Dockerfile/railway.json/nginx à revoir ; `.git` alourdi par ~2 Go d'objets orphelins (`git prune` + `git gc`) et `backend/uploads/ecotec` suivi par Git.
+
 ## Consignes
 
 - `.env`, `node_modules/` et `*.log` sont ignorés par Git. Vérifier que `uploads/` l'est aussi avant tout commit.
