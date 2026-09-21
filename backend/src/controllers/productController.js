@@ -249,6 +249,12 @@ async function addReview(req, res, next) {
     const { id } = req.params;
     const { rating, comment } = req.body;
 
+    // Seul un utilisateur ayant reçu le produit (achat payé, abonnement ou téléchargement d'une ressource gratuite —
+    // dans tous les cas une ligne user_downloads) peut le noter : sans cela, n'importe quel compte gonflait ou
+    // dégradait la note de n'importe quel produit.
+    const owned = await query('SELECT 1 FROM user_downloads WHERE user_id=$1 AND product_id=$2 LIMIT 1', [req.user.id, id]);
+    if (!owned.rows.length) throw new AppError('Vous devez avoir acheté ou téléchargé ce produit pour donner un avis.', 403);
+
     // Vérifier doublon
     const existing = await query('SELECT id FROM reviews WHERE user_id=$1 AND product_id=$2', [req.user.id, id]);
     if (existing.rows.length) throw new AppError('Vous avez déjà donné un avis pour ce produit.', 409);

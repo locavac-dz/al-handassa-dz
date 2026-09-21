@@ -791,7 +791,7 @@ const productApp = {
     const comment = document.getElementById('review-comment').value.trim();
     try {
       await api.addReview(productId, this._reviewRating, comment);
-      toast('Avis soumis. Il sera visible après modération.', 'ok');
+      toast('Merci pour votre avis !', 'ok');
       document.getElementById('review-form-zone').innerHTML =
         `<div class="review-form-wrap"><p style="text-align:center;color:#15803d"><i class="fas fa-check-circle"></i> Merci pour votre avis !</p></div>`;
     } catch (ex) {
