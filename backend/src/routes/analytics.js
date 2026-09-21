@@ -2,85 +2,97 @@ const router = require('express').Router();
 const { authenticate, authorize } = require('../middleware/auth');
 const { query } = require('../config/database');
 
-// Analytics Dashboard (Admin only) - REAL DATA
+// Toutes les statistiques sont calculées en base. Le chiffre d'affaires ne compte que les commandes
+// payées (orders.status = 'paid') ; il n'existe pas de colonne orders.payment_status.
+
+// Variation en % entre la période courante et la précédente (null si la précédente est vide)
+function pctChange(current, previous) {
+  const c = parseFloat(current) || 0;
+  const p = parseFloat(previous) || 0;
+  if (p === 0) return c === 0 ? 0 : null;
+  return ((c - p) / p) * 100;
+}
+
+// GET /api/analytics/dashboard
 router.get('/dashboard', authenticate, authorize('admin'), async (req, res, next) => {
   try {
-    const [revenueResult, ordersResult, usersResult, monthlyResult, recentOrdersResult] = await Promise.all([
-      query(`SELECT SUM(COALESCE(total_amount, 0)) as total FROM orders WHERE payment_status = 'completed'`),
-      query(`SELECT COUNT(*) as count FROM orders`),
-      query(`SELECT COUNT(*) as count FROM users`),
-      query(`
-        SELECT
-          DATE_TRUNC('month', created_at) as month,
-          SUM(COALESCE(total_amount, 0)) as amount
-        FROM orders
-        WHERE payment_status = 'completed'
-        GROUP BY DATE_TRUNC('month', created_at)
-        ORDER BY month DESC
-        LIMIT 12
-      `),
-      query(`SELECT id, total_amount, payment_status, created_at FROM orders ORDER BY created_at DESC LIMIT 10`)
+    const [totals, monthly, growth, recent, periods] = await Promise.all([
+      query(`SELECT
+               (SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE status = 'paid') AS revenue,
+               (SELECT COUNT(*) FROM orders) AS orders,
+               (SELECT COUNT(*) FROM users) AS users,
+               (SELECT COUNT(DISTINCT user_id) FROM orders WHERE status = 'paid') AS buyers`),
+      query(`SELECT DATE_TRUNC('month', created_at) AS month, COALESCE(SUM(total_amount), 0) AS amount
+               FROM orders WHERE status = 'paid' AND created_at > NOW() - interval '12 months'
+              GROUP BY 1 ORDER BY 1`),
+      query(`SELECT DATE_TRUNC('month', created_at) AS month, COUNT(*) AS users
+               FROM users WHERE created_at > NOW() - interval '12 months'
+              GROUP BY 1 ORDER BY 1`),
+      query(`SELECT o.id, o.order_number, o.total_amount, o.status, o.created_at, u.first_name, u.last_name
+               FROM orders o JOIN users u ON u.id = o.user_id
+              ORDER BY o.created_at DESC LIMIT 10`),
+      // 30 derniers jours contre les 30 jours précédents
+      query(`SELECT
+               COALESCE(SUM(total_amount) FILTER (WHERE status = 'paid' AND created_at > NOW() - interval '30 days'), 0) AS rev_cur,
+               COALESCE(SUM(total_amount) FILTER (WHERE status = 'paid' AND created_at <= NOW() - interval '30 days' AND created_at > NOW() - interval '60 days'), 0) AS rev_prev,
+               COUNT(*) FILTER (WHERE created_at > NOW() - interval '30 days') AS ord_cur,
+               COUNT(*) FILTER (WHERE created_at <= NOW() - interval '30 days' AND created_at > NOW() - interval '60 days') AS ord_prev,
+               (SELECT COUNT(*) FROM users WHERE created_at > NOW() - interval '30 days') AS usr_cur,
+               (SELECT COUNT(*) FROM users WHERE created_at <= NOW() - interval '30 days' AND created_at > NOW() - interval '60 days') AS usr_prev
+             FROM orders`),
     ]);
 
-    const totalRevenue = parseFloat(revenueResult.rows[0]?.total) || 0;
-    const totalOrders = parseInt(ordersResult.rows[0]?.count) || 0;
-    const totalUsers = parseInt(usersResult.rows[0]?.count) || 0;
+    const t = totals.rows[0];
+    const p = periods.rows[0];
+    const totalUsers = parseInt(t.users, 10) || 0;
+    const fmtMonth = (d) => new Date(d).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
 
-    const monthlyRevenue = monthlyResult.rows
-      .reverse()
-      .map(row => ({
-        month: new Date(row.month).toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' }),
-        amount: parseFloat(row.amount) || 0
-      }));
-
-    const recentOrders = recentOrdersResult.rows.map(order => ({
-      id: order.id,
-      customer_name: `Order #${order.id}`,
-      total_amount: parseFloat(order.total_amount) || 0,
-      status: order.payment_status,
-      created_at: order.created_at
-    }));
-
-    const analytics = {
-      totalRevenue,
-      totalOrders,
+    res.json({
+      totalRevenue: parseFloat(t.revenue) || 0,
+      totalOrders: parseInt(t.orders, 10) || 0,
       totalUsers,
-      conversionRate: totalUsers > 0 ? (totalOrders / totalUsers) : 0,
-      monthlyRevenue,
-      userGrowth: [{ month: 'This Month', users: totalUsers }],
-      recentOrders,
-      revenueChange: 12.5,
-      ordersChange: 8.3,
-      usersChange: 5.2
-    };
-
-    res.json(analytics);
+      // part des utilisateurs ayant au moins une commande payée
+      conversionRate: totalUsers > 0 ? (parseInt(t.buyers, 10) || 0) / totalUsers : 0,
+      monthlyRevenue: monthly.rows.map(r => ({ month: fmtMonth(r.month), amount: parseFloat(r.amount) || 0 })),
+      userGrowth: growth.rows.map(r => ({ month: fmtMonth(r.month), users: parseInt(r.users, 10) || 0 })),
+      recentOrders: recent.rows.map(o => ({
+        id: o.id,
+        order_number: o.order_number,
+        customer_name: `${o.first_name} ${o.last_name}`.trim(),
+        total_amount: parseFloat(o.total_amount) || 0,
+        status: o.status,
+        created_at: o.created_at,
+      })),
+      revenueChange: pctChange(p.rev_cur, p.rev_prev),
+      ordersChange: pctChange(p.ord_cur, p.ord_prev),
+      usersChange: pctChange(p.usr_cur, p.usr_prev),
+    });
   } catch (err) { next(err); }
 });
 
-// Revenue Chart Data
-router.get('/revenue', authenticate, authorize('admin'), (req, res) => {
-  const monthlyRevenue = [
-    { month: 'Jan', revenue: 98000 },
-    { month: 'Feb', revenue: 102000 },
-    { month: 'Mar', revenue: 115000 },
-    { month: 'Apr', revenue: 128000 },
-    { month: 'May', revenue: 134000 },
-    { month: 'Jun', revenue: 125000 }
-  ];
-  res.json({ data: monthlyRevenue });
+// GET /api/analytics/revenue — chiffre d'affaires mensuel (12 derniers mois, commandes payées)
+router.get('/revenue', authenticate, authorize('admin'), async (req, res, next) => {
+  try {
+    const result = await query(
+      `SELECT TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') AS month, COALESCE(SUM(total_amount), 0) AS revenue
+         FROM orders WHERE status = 'paid' AND created_at > NOW() - interval '12 months'
+        GROUP BY 1 ORDER BY 1`
+    );
+    res.json({ data: result.rows.map(r => ({ month: r.month, revenue: parseFloat(r.revenue) || 0 })) });
+  } catch (err) { next(err); }
 });
 
-// User Growth
-router.get('/users', authenticate, authorize('admin'), (req, res) => {
-  const userGrowth = [
-    { date: '2026-06-01', total: 5000 },
-    { date: '2026-06-15', total: 6200 },
-    { date: '2026-07-01', total: 7500 },
-    { date: '2026-07-15', total: 8200 },
-    { date: '2026-08-01', total: 8943 }
-  ];
-  res.json({ data: userGrowth });
+// GET /api/analytics/users — nombre cumulé d'inscrits à la fin de chaque mois (12 derniers mois)
+router.get('/users', authenticate, authorize('admin'), async (req, res, next) => {
+  try {
+    const result = await query(
+      `SELECT TO_CHAR(m.month, 'YYYY-MM-DD') AS date,
+              (SELECT COUNT(*) FROM users u WHERE u.created_at < m.month + interval '1 month') AS total
+         FROM generate_series(DATE_TRUNC('month', NOW()) - interval '11 months', DATE_TRUNC('month', NOW()), interval '1 month') AS m(month)
+        ORDER BY m.month`
+    );
+    res.json({ data: result.rows.map(r => ({ date: r.date, total: parseInt(r.total, 10) || 0 })) });
+  } catch (err) { next(err); }
 });
 
 module.exports = router;

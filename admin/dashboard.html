@@ -209,6 +209,10 @@
     </div>
 
     <script>
+        function escHtml(s) {
+            return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
         let revenueChartInstance = null;
         let usersChartInstance = null;
 
@@ -216,7 +220,7 @@
             try {
                 const response = await fetch('/api/analytics/dashboard', {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${localStorage.getItem('hds_token')}`
                     }
                 });
 
@@ -230,12 +234,11 @@
                 document.getElementById('conversionRate').textContent =
                     `${(data.conversionRate * 100).toFixed(1)}%`;
 
-                document.getElementById('revenueChange').textContent =
-                    `${data.revenueChange >= 0 ? '↑' : '↓'} ${Math.abs(data.revenueChange).toFixed(1)}%`;
-                document.getElementById('ordersChange').textContent =
-                    `${data.ordersChange >= 0 ? '↑' : '↓'} ${Math.abs(data.ordersChange).toFixed(1)}%`;
-                document.getElementById('usersChange').textContent =
-                    `${data.usersChange >= 0 ? '↑' : '↓'} ${Math.abs(data.usersChange).toFixed(1)}%`;
+                // Variation sur 30 jours contre les 30 précédents ; null = pas de période précédente comparable
+                const fmtChange = v => v === null ? 'nouveau' : `${v >= 0 ? '↑' : '↓'} ${Math.abs(v).toFixed(1)}%`;
+                document.getElementById('revenueChange').textContent = fmtChange(data.revenueChange);
+                document.getElementById('ordersChange').textContent = fmtChange(data.ordersChange);
+                document.getElementById('usersChange').textContent = fmtChange(data.usersChange);
 
                 // Update charts
                 updateRevenueChart(data.monthlyRevenue);
@@ -321,10 +324,10 @@
             const tbody = document.getElementById('ordersTable');
             tbody.innerHTML = orders.map(order => `
                 <tr>
-                    <td>#${order.id}</td>
-                    <td>${order.customer_name}</td>
+                    <td>${escHtml(order.order_number || order.id)}</td>
+                    <td>${escHtml(order.customer_name)}</td>
                     <td>${order.total_amount.toLocaleString()} DA</td>
-                    <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+                    <td><span class="status-badge status-${escHtml(order.status)}">${escHtml(order.status)}</span></td>
                     <td>${new Date(order.created_at).toLocaleDateString('fr-FR')}</td>
                 </tr>
             `).join('');

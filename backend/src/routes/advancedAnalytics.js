@@ -2,10 +2,9 @@ const router = require('express').Router();
 const { authenticate, authorize } = require('../middleware/auth');
 const { query } = require('../config/database');
 const ExcelJS = require('exceljs');
-const PDFDocument = require('pdfkit');
 
 // Cohort analysis
-router.get('/cohorts', authenticate, authorize('admin'), async (req, res) => {
+router.get('/cohorts', authenticate, authorize('admin'), async (req, res, next) => {
   try {
     const result = await query(`
       SELECT
@@ -14,7 +13,7 @@ router.get('/cohorts', authenticate, authorize('admin'), async (req, res) => {
         COUNT(DISTINCT CASE WHEN DATE_TRUNC('month', o.created_at) = DATE_TRUNC('month', u.created_at) THEN o.id END) as month_0,
         COUNT(DISTINCT CASE WHEN DATE_TRUNC('month', o.created_at) = DATE_TRUNC('month', u.created_at) + interval '1 month' THEN o.id END) as month_1
       FROM users u
-      LEFT JOIN orders o ON u.id = o.user_id
+      LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'paid'
       GROUP BY DATE_TRUNC('month', u.created_at)
       ORDER BY cohort_month DESC
       LIMIT 12
@@ -22,12 +21,12 @@ router.get('/cohorts', authenticate, authorize('admin'), async (req, res) => {
 
     res.json({ cohorts: result.rows });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 });
 
-// Churn prediction
-router.get('/churn-prediction', authenticate, authorize('admin'), async (req, res) => {
+// Churn prediction — clients dont le dernier achat payé date de plus de 90 jours (ou qui n'ont jamais acheté)
+router.get('/churn-prediction', authenticate, authorize('admin'), async (req, res, next) => {
   try {
     const result = await query(`
       SELECT
@@ -36,40 +35,40 @@ router.get('/churn-prediction', authenticate, authorize('admin'), async (req, re
         EXTRACT(DAY FROM NOW() - MAX(o.created_at)) as days_since_purchase,
         COUNT(o.id) as total_orders
       FROM users u
-      LEFT JOIN orders o ON u.id = o.user_id
+      LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'paid'
       GROUP BY u.id, u.email, u.first_name
       HAVING MAX(o.created_at) < NOW() - interval '90 days' OR MAX(o.created_at) IS NULL
-      ORDER BY last_purchase DESC
+      ORDER BY last_purchase DESC NULLS LAST
+      LIMIT 500
     `);
 
     const atriskUsers = result.rows.map(user => ({
       ...user,
-      churnRisk: user.days_since_purchase > 180 ? 'high' : user.days_since_purchase > 90 ? 'medium' : 'low'
+      churnRisk: user.days_since_purchase === null ? 'never_purchased'
+        : user.days_since_purchase > 180 ? 'high' : 'medium'
     }));
 
     res.json({ atriskUsers });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 });
 
 // Revenue forecasting (simple linear regression)
-router.get('/forecast', authenticate, authorize('admin'), async (req, res) => {
+router.get('/forecast', authenticate, authorize('admin'), async (req, res, next) => {
   try {
+    // 90 jours consécutifs, jours sans vente à 0 : la pente reflète le temps réel
     const result = await query(`
-      SELECT
-        DATE_TRUNC('day', created_at) as date,
-        SUM(total_amount) as revenue
-      FROM orders
-      WHERE payment_status = 'completed'
-      AND created_at > NOW() - interval '90 days'
-      GROUP BY DATE_TRUNC('day', created_at)
-      ORDER BY date
+      SELECT d.day::date as date, COALESCE(SUM(o.total_amount), 0) as revenue
+      FROM generate_series(DATE_TRUNC('day', NOW()) - interval '89 days', DATE_TRUNC('day', NOW()), interval '1 day') AS d(day)
+      LEFT JOIN orders o ON DATE_TRUNC('day', o.created_at) = d.day AND o.status = 'paid'
+      GROUP BY d.day
+      ORDER BY d.day
     `);
 
     const data = result.rows;
 
-    // Simple linear regression
+    // Régression linéaire simple
     const n = data.length;
     const x = Array.from({ length: n }, (_, i) => i);
     const y = data.map(d => parseFloat(d.revenue) || 0);
@@ -79,8 +78,9 @@ router.get('/forecast', authenticate, authorize('admin'), async (req, res) => {
     const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i], 0);
     const sumX2 = x.reduce((sum, xi) => sum + xi * xi, 0);
 
-    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-    const intercept = (sumY - slope * sumX) / n;
+    const denom = n * sumX2 - sumX * sumX;
+    const slope = denom === 0 ? 0 : (n * sumXY - sumX * sumY) / denom;
+    const intercept = n === 0 ? 0 : (sumY - slope * sumX) / n;
 
     // Forecast next 30 days
     const forecast = Array.from({ length: 30 }, (_, i) => ({
@@ -91,18 +91,18 @@ router.get('/forecast', authenticate, authorize('admin'), async (req, res) => {
     res.json({
       historical: data,
       forecast,
-      trend: slope > 0 ? 'growing' : 'declining'
+      trend: slope > 0 ? 'growing' : slope < 0 ? 'declining' : 'flat'
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 });
 
 // Export as Excel
-router.get('/export/excel', authenticate, authorize('admin'), async (req, res) => {
+router.get('/export/excel', authenticate, authorize('admin'), async (req, res, next) => {
   try {
     const ordersResult = await query(`
-      SELECT o.*, u.email, u.first_name
+      SELECT o.id, o.order_number, o.total_amount, o.status, o.created_at, u.email, u.first_name
       FROM orders o
       JOIN users u ON o.user_id = u.id
       ORDER BY o.created_at DESC
@@ -113,11 +113,11 @@ router.get('/export/excel', authenticate, authorize('admin'), async (req, res) =
     const worksheet = workbook.addWorksheet('Orders');
 
     worksheet.columns = [
-      { header: 'Order ID', key: 'id', width: 12 },
+      { header: 'Order', key: 'order_number', width: 16 },
       { header: 'Customer', key: 'first_name', width: 20 },
       { header: 'Email', key: 'email', width: 25 },
       { header: 'Amount', key: 'total_amount', width: 12 },
-      { header: 'Status', key: 'payment_status', width: 12 },
+      { header: 'Status', key: 'status', width: 12 },
       { header: 'Date', key: 'created_at', width: 15 }
     ];
 
@@ -130,7 +130,7 @@ router.get('/export/excel', authenticate, authorize('admin'), async (req, res) =
     res.end();
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 });
 
@@ -154,7 +154,7 @@ const REPORT_COLUMNS = {
 const ORDER_STATUSES = ['pending', 'processing', 'paid', 'failed', 'refunded', 'cancelled'];
 const REPORT_MAX_ROWS = 10000;
 
-router.post('/custom-report', authenticate, authorize('admin'), async (req, res) => {
+router.post('/custom-report', authenticate, authorize('admin'), async (req, res, next) => {
   try {
     const { columns, filters = {}, format = 'json' } = req.body || {};
 
@@ -219,41 +219,43 @@ router.post('/custom-report', authenticate, authorize('admin'), async (req, res)
     }
 
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 });
 
-// Segment analytics
-router.get('/segments/:segment', authenticate, authorize('admin'), async (req, res) => {
+// Segment analytics — clients selon leurs achats PAYÉS
+const SEGMENT_HAVING = {
+  'all': '',
+  'high-value': 'HAVING COALESCE(SUM(o.total_amount), 0) > 10000',
+  'frequent-buyers': 'HAVING COUNT(o.id) > 5',
+  'dormant': "HAVING MAX(o.created_at) < NOW() - interval '6 months'",
+};
+router.get('/segments/:segment', authenticate, authorize('admin'), async (req, res, next) => {
   try {
     const { segment } = req.params;
-
-    let where = '';
-    if (segment === 'high-value') {
-      where = 'WHERE total_purchases > 10000';
-    } else if (segment === 'frequent-buyers') {
-      where = 'WHERE purchase_count > 5';
-    } else if (segment === 'dormant') {
-      where = 'WHERE last_purchase < NOW() - interval \'6 months\'';
+    if (!Object.hasOwn(SEGMENT_HAVING, segment)) {
+      return res.status(400).json({ error: 'Segment inconnu.', allowed: Object.keys(SEGMENT_HAVING) });
     }
 
+    // Les alias (total_purchases…) ne sont pas utilisables dans WHERE : filtre sur agrégats via HAVING
     const result = await query(`
       SELECT
         u.id, u.email, u.first_name,
         COUNT(o.id) as purchase_count,
-        SUM(o.total_amount) as total_purchases,
+        COALESCE(SUM(o.total_amount), 0) as total_purchases,
         AVG(o.total_amount) as avg_order_value,
         MAX(o.created_at) as last_purchase
       FROM users u
-      LEFT JOIN orders o ON u.id = o.user_id
+      LEFT JOIN orders o ON u.id = o.user_id AND o.status = 'paid'
       GROUP BY u.id, u.email, u.first_name
-      ${where}
+      ${SEGMENT_HAVING[segment]}
       ORDER BY total_purchases DESC
+      LIMIT 500
     `);
 
     res.json({ segment, users: result.rows });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 });
 
