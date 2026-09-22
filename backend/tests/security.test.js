@@ -128,7 +128,11 @@ describe('sécurité : limitation de débit, fichiers du dépôt, en-têtes', ()
       const page = await ctx.call('GET', '/index.html');
       const csp = page.headers.get('content-security-policy');
       assert.ok(csp && !/default-src 'none'/.test(csp));
-      assert.match(csp, /script-src[^;]*'unsafe-inline'/);   // nécessaire aux pages actuelles (voir CLAUDE.md)
+      assert.match(csp, /script-src[^;]*'unsafe-inline'/);   // nécessaire aux <script> inline (voir CLAUDE.md)
+      // Plus un seul attribut onclick=/onchange=/etc. sur le site (migrés vers addEventListener le 22/09/2026) :
+      // scriptSrcAttr doit rester 'none'. Une régression ici repasserait inaperçue (une CSP violée ne lève
+      // aucune erreur JS, le gestionnaire est juste silencieusement ignoré) sans ce test.
+      assert.match(csp, /script-src-attr 'none'/);
     });
 
     it('/health répond sans authentification et confirme que la base répond', async () => {
