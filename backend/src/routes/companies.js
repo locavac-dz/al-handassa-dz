@@ -186,6 +186,16 @@ router.patch('/admin/:id', authMiddleware, adminMiddleware, upload.fields([{ nam
     const specs = specialties ? (Array.isArray(specialties) ? specialties : [specialties]) : c.specialties;
     const wils  = wilayas ? (Array.isArray(wilayas) ? wilayas.map(Number) : [Number(wilayas)]) : c.wilayas;
 
+    // wilaya_siege/founded_year (INTEGER) arrivent du FormData comme des chaînes toujours définies (même
+    // vides) : ??, qui ne réagit qu'à null/undefined, laissait passer une chaîne vide telle quelle vers une
+    // colonne entière -> erreur PostgreSQL (syntaxe en entrée invalide), reproduit en éditant une entreprise
+    // sans wilaya/année renseignée. Même motif que la route PATCH de professionals.js : champ absent -> valeur
+    // actuelle conservée ; champ présent mais vide -> NULL ; champ présent et non vide -> converti en entier.
+    // size_range (VARCHAR) n'a pas ce problème (colonne texte) et garde ?? comme tagline/description/email/…
+    // juste en dessous : une chaîne vide y est une valeur valide, pas un cas à distinguer de "champ absent".
+    const wilayaSiege = wilaya_siege !== undefined ? (wilaya_siege ? parseInt(wilaya_siege) : null) : c.wilaya_siege;
+    const foundedYear = founded_year !== undefined ? (founded_year ? parseInt(founded_year) : null) : c.founded_year;
+
     const { rows } = await query(`
       UPDATE companies SET
         name=$1, logo_url=$2, cover_url=$3, tagline=$4, description=$5,
@@ -194,8 +204,8 @@ router.patch('/admin/:id', authMiddleware, adminMiddleware, upload.fields([{ nam
         agrement=$15, is_verified=$16, is_premium=$17, is_active=$18, updated_at=NOW()
       WHERE id=$19 RETURNING *`,
       [name||c.name, logo_url, cover_url, tagline??c.tagline, description??c.description,
-       specs, wils, wilaya_siege??c.wilaya_siege, size_range??c.size_range,
-       founded_year??c.founded_year, email??c.email, phone??c.phone,
+       specs, wils, wilayaSiege, size_range??c.size_range,
+       foundedYear, email??c.email, phone??c.phone,
        website??c.website, address??c.address, agrement??c.agrement,
        is_verified!==undefined ? is_verified==='true' : c.is_verified,
        is_premium!==undefined  ? is_premium==='true'  : c.is_premium,
