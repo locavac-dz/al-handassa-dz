@@ -126,9 +126,8 @@ tr:hover td{background:#fafbfc}
     <div class="login-logo">⚙ Al Handassa<span>.dz</span></div>
     <div class="login-sub">Administration</div>
     <input class="login-input" type="email"    id="email" value="admin@handassi.dz" placeholder="Email"/>
-    <input class="login-input" type="password" id="pass"  placeholder="Mot de passe"
-           onkeydown="if(event.key==='Enter')doLogin()"/>
-    <button class="login-btn" onclick="doLogin()" id="login-btn">
+    <input class="login-input" type="password" id="pass"  placeholder="Mot de passe"/>
+    <button class="login-btn" id="login-btn">
       <i class="fas fa-lock"></i> Se connecter
     </button>
     <div class="login-msg" id="login-msg"></div>
@@ -143,27 +142,27 @@ tr:hover td{background:#fafbfc}
            <div class="sidebar-sub">Administration</div></div>
     </div>
     <div style="padding:12px 8px;flex:1">
-      <button class="nav-btn active" onclick="loadPage('dashboard')"><i class="fas fa-chart-line"></i> Tableau de bord</button>
+      <button class="nav-btn active" data-page="dashboard"><i class="fas fa-chart-line"></i> Tableau de bord</button>
       <div class="nav-section">Transactions</div>
-      <button class="nav-btn" onclick="loadPage('payments')"><i class="fas fa-credit-card"></i> Paiements <span class="nav-badge" id="badge-pay" style="display:none">0</span></button>
-      <button class="nav-btn" onclick="loadPage('orders')"><i class="fas fa-shopping-bag"></i> Commandes</button>
-      <button class="nav-btn" onclick="loadPage('users')"><i class="fas fa-users"></i> Utilisateurs</button>
+      <button class="nav-btn" data-page="payments"><i class="fas fa-credit-card"></i> Paiements <span class="nav-badge" id="badge-pay" style="display:none">0</span></button>
+      <button class="nav-btn" data-page="orders"><i class="fas fa-shopping-bag"></i> Commandes</button>
+      <button class="nav-btn" data-page="users"><i class="fas fa-users"></i> Utilisateurs</button>
       <div class="nav-section">Contenu</div>
-      <button class="nav-btn" onclick="loadPage('products')"><i class="fas fa-box"></i> Produits & Ressources</button>
-      <button class="nav-btn" onclick="loadPage('videos')"><i class="fas fa-play-circle"></i> Vidéos</button>
-      <button class="nav-btn" onclick="loadPage('articles')"><i class="fas fa-newspaper"></i> Articles</button>
+      <button class="nav-btn" data-page="products"><i class="fas fa-box"></i> Produits & Ressources</button>
+      <button class="nav-btn" data-page="videos"><i class="fas fa-play-circle"></i> Vidéos</button>
+      <button class="nav-btn" data-page="articles"><i class="fas fa-newspaper"></i> Articles</button>
       <div class="nav-section">Catalogue</div>
-      <button class="nav-btn" onclick="loadPage('categories')"><i class="fas fa-folder-open"></i> Catégories</button>
-      <button class="nav-btn" onclick="loadPage('niveaux')"><i class="fas fa-graduation-cap"></i> Niveaux de formation</button>
+      <button class="nav-btn" data-page="categories"><i class="fas fa-folder-open"></i> Catégories</button>
+      <button class="nav-btn" data-page="niveaux"><i class="fas fa-graduation-cap"></i> Niveaux de formation</button>
       <div class="nav-section">Espace Entreprise</div>
-      <button class="nav-btn" onclick="loadPage('companies')"><i class="fas fa-building"></i> Entreprises</button>
-      <button class="nav-btn" onclick="loadPage('jobs')"><i class="fas fa-briefcase"></i> Recrutement</button>
-      <button class="nav-btn" onclick="loadPage('tenders')"><i class="fas fa-file-contract"></i> Appels d'offres</button>
-      <button class="nav-btn" onclick="loadPage('professionals')"><i class="fas fa-id-card"></i> Annuaire Pro</button>
+      <button class="nav-btn" data-page="companies"><i class="fas fa-building"></i> Entreprises</button>
+      <button class="nav-btn" data-page="jobs"><i class="fas fa-briefcase"></i> Recrutement</button>
+      <button class="nav-btn" data-page="tenders"><i class="fas fa-file-contract"></i> Appels d'offres</button>
+      <button class="nav-btn" data-page="professionals"><i class="fas fa-id-card"></i> Annuaire Pro</button>
     </div>
     <div class="sidebar-bottom">
       <a class="sidebar-link" href="../index.html" target="_blank"><i class="fas fa-external-link-alt"></i> Voir le site</a>
-      <button class="sidebar-link" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+      <button class="sidebar-link" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
     </div>
   </aside>
   <div class="main">
@@ -175,8 +174,8 @@ tr:hover td{background:#fafbfc}
   </div>
 </div>
 
-<div id="modal"><div class="modal-box" onclick="event.stopPropagation()">
-  <div class="modal-hdr"><h3 id="modal-title"></h3><button onclick="closeModal()">✕</button></div>
+<div id="modal"><div class="modal-box">
+  <div class="modal-hdr"><h3 id="modal-title"></h3><button id="modal-close-btn">✕</button></div>
   <div class="modal-body" id="modal-body"></div>
   <div class="modal-foot" id="modal-foot"></div>
 </div></div>
@@ -287,7 +286,7 @@ const titles = { dashboard:'Tableau de bord', payments:'Paiements', orders:'Comm
                  companies:'Entreprises', jobs:'Recrutement', tenders:"Appels d'offres", professionals:'Annuaire Pro' };
 async function loadPage(name) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('.nav-btn[onclick="loadPage(\''+name+'\')"]')?.classList.add('active');
+  document.querySelector('.nav-btn[data-page="'+name+'"]')?.classList.add('active');
   document.getElementById('page-title').textContent = titles[name] || name;
   document.getElementById('page').innerHTML = '<div style="text-align:center;padding:60px;color:#94a3b8"><i class="fas fa-spinner fa-spin fa-2x"></i></div>';
   const fns = { dashboard:pgDashboard, payments:pgPayments, orders:pgOrders,
@@ -314,7 +313,7 @@ async function pgDashboard() {
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div class="card">
-        <div class="card-hdr"><h3>🛒 Commandes récentes</h3><button class="btn btn-b" onclick="loadPage('payments')">Voir paiements</button></div>
+        <div class="card-hdr"><h3>🛒 Commandes récentes</h3><button class="btn btn-b" data-action="load-page" data-page="payments">Voir paiements</button></div>
         <table><thead><tr><th>Client</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead>
         <tbody>${(s.recent_orders||[]).map(o=>`<tr>
           <td><strong>${esc(o.first_name)} ${esc(o.last_name)}</strong><br><small style="color:#94a3b8">${esc(o.email)}</small></td>
@@ -350,8 +349,8 @@ async function pgPayments() {
             ${p.proof_note?'<br><small style="color:#64748b">'+esc(p.proof_note)+'</small>':''}</td>
         <td>${dt(p.initiated_at)}</td>
         <td style="display:flex;gap:6px">
-          <button class="btn btn-g" onclick="validatePay('${esc(p.id)}','${esc(p.order_id)}')"><i class="fas fa-check"></i> Valider</button>
-          <button class="btn btn-r" onclick="rejectPay('${esc(p.id)}')"><i class="fas fa-times"></i> Rejeter</button>
+          <button class="btn btn-g" data-action="validate-pay" data-id="${esc(p.id)}" data-order="${esc(p.order_id)}"><i class="fas fa-check"></i> Valider</button>
+          <button class="btn btn-r" data-action="reject-pay" data-id="${esc(p.id)}"><i class="fas fa-times"></i> Rejeter</button>
         </td>
       </tr>`).join('') || '<tr><td colspan="6" class="no-data">✅ Aucun paiement en attente</td></tr>'}</tbody></table>
     </div>`;
@@ -380,13 +379,13 @@ async function pgOrders() {
   const pays = r.data || [];
   document.getElementById('page').innerHTML = `
     <div class="filters">
-      <select id="os" onchange="filterTable('ot','os','data-status')">
+      <select id="os" data-filter-table="ot" data-filter-attr="data-status">
         <option value="">Tous statuts</option>
         <option value="pending">En attente</option>
         <option value="completed">Validés</option>
         <option value="failed">Rejetés</option>
       </select>
-      <input placeholder="Rechercher…" oninput="filterTable('ot',null,null,this.value)">
+      <input placeholder="Rechercher…" data-filter-table="ot">
     </div>
     <div class="card"><div class="card-hdr"><h3>📋 Toutes les commandes (${pays.length})</h3></div>
     <table><thead><tr><th>Client</th><th>Méthode</th><th>Montant</th><th>Statut</th><th>Date</th><th>Action</th></tr></thead>
@@ -396,7 +395,7 @@ async function pgOrders() {
       <td><strong>${fmt(p.amount)} DZD</strong></td>
       <td>${bdg(p.status)}</td>
       <td>${dt(p.initiated_at)}</td>
-      <td>${p.status==='pending'?'<button class="btn btn-g" onclick="validatePay(\''+esc(p.id)+'\',\''+esc(p.order_id)+'\')"><i class="fas fa-check"></i> Valider</button>':''}</td>
+      <td>${p.status==='pending'?'<button class="btn btn-g" data-action="validate-pay" data-id="'+esc(p.id)+'" data-order="'+esc(p.order_id)+'"><i class="fas fa-check"></i> Valider</button>':''}</td>
     </tr>`).join('')}</tbody></table></div>`;
 }
 
@@ -457,11 +456,11 @@ async function pgProducts() {
   const catMap = Object.fromEntries(_cats.map(c=>[c.id, c.name_fr||c.name]));
   document.getElementById('page').innerHTML = `
     <div class="filters">
-      <select id="pt" onchange="filterTable('prod-tbl','pt','data-type')">
+      <select id="pt" data-filter-table="prod-tbl" data-filter-attr="data-type">
         <option value="">Tous types</option>${types.map(t=>'<option value="'+esc(t)+'">'+esc(t)+'</option>').join('')}
       </select>
-      <input placeholder="Rechercher titre, catégorie…" oninput="filterTable('prod-tbl',null,null,this.value)">
-      <button class="btn btn-p" onclick="showUpload()"><i class="fas fa-plus"></i> Ajouter une ressource</button>
+      <input placeholder="Rechercher titre, catégorie…" data-filter-table="prod-tbl">
+      <button class="btn btn-p" data-action="show-upload"><i class="fas fa-plus"></i> Ajouter une ressource</button>
     </div>
     <div class="card"><div class="card-hdr"><h3>📦 Produits (${prods.length})</h3></div>
     <table><thead><tr><th>Titre</th><th>Type</th><th>Catégorie</th><th>Tags</th><th>Prix</th><th>Actif</th><th>Actions</th></tr></thead>
@@ -471,11 +470,11 @@ async function pgProducts() {
       <td style="font-size:.75rem;color:#475569">${esc(catMap[p.category_id]||'—')}</td>
       <td style="font-size:.7rem;color:#64748b;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc((p.tags||[]).join(', '))}">${esc((p.tags||[]).join(', ')||'—')}</td>
       <td>${p.is_free?bdg('free'):'<strong>'+fmt(p.price)+' DZD</strong>'}</td>
-      <td><label class="tog"><input type="checkbox" ${p.is_active?'checked':''} onchange="toggleProd('${esc(p.id)}',this.checked)"><span class="tog-sl"></span></label></td>
+      <td><label class="tog"><input type="checkbox" ${p.is_active?'checked':''} data-toggle="prod" data-id="${esc(p.id)}"><span class="tog-sl"></span></label></td>
       <td style="display:flex;gap:4px">
         <a href="../product?slug=${esc(p.slug)}" target="_blank" class="btn btn-b" style="text-decoration:none;font-size:.72rem;padding:4px 8px" title="Voir"><i class="fas fa-eye"></i></a>
-        <button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" title="Modifier" onclick="showEditProd(REG.${reg(p)})"><i class="fas fa-edit"></i></button>
-        <button class="btn btn-r" style="font-size:.72rem;padding:4px 8px" title="Supprimer" data-n="${esc(p.title)}" onclick="delProd('${esc(p.id)}',this.dataset.n)"><i class="fas fa-trash"></i></button>
+        <button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" title="Modifier" data-action="edit-prod" data-reg="${reg(p)}"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-r" style="font-size:.72rem;padding:4px 8px" title="Supprimer" data-action="del-prod" data-id="${esc(p.id)}" data-n="${esc(p.title)}"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`).join('')}</tbody></table></div>`;
 }
@@ -537,7 +536,7 @@ async function showUpload() {
         <div class="progress-txt" id="up-txt"></div>
       </div>
     </div>`,
-    `<button class="btn btn-p" onclick="doUpload()" id="up-btn"><i class="fas fa-upload"></i> Envoyer</button>`
+    `<button class="btn btn-p" data-action="do-upload" id="up-btn"><i class="fas fa-upload"></i> Envoyer</button>`
   );
 }
 
@@ -629,7 +628,7 @@ async function showEditProd(p) {
         </div>
       </div>
     </div>`,
-    `<button class="btn btn-p" onclick="saveEditProd('${esc(p.id)}')"><i class="fas fa-save"></i> Enregistrer</button>`
+    `<button class="btn btn-p" data-action="save-prod" data-id="${esc(p.id)}"><i class="fas fa-save"></i> Enregistrer</button>`
   );
 }
 
@@ -667,8 +666,8 @@ async function pgVideos() {
   const vids = r.data || [];
   document.getElementById('page').innerHTML = `
     <div class="filters">
-      <input placeholder="Rechercher vidéo…" oninput="filterTable('vid-tbl',null,null,this.value)">
-      <button class="btn btn-p" onclick="showVideoForm()"><i class="fas fa-plus"></i> Ajouter une vidéo</button>
+      <input placeholder="Rechercher vidéo…" data-filter-table="vid-tbl">
+      <button class="btn btn-p" data-action="show-video-form"><i class="fas fa-plus"></i> Ajouter une vidéo</button>
     </div>
     <div class="card"><div class="card-hdr"><h3>🎬 Vidéos (${vids.length})</h3></div>
     <table><thead><tr><th>Titre</th><th>Source</th><th>YouTube ID</th><th>Actif</th><th>Actions</th></tr></thead>
@@ -676,10 +675,10 @@ async function pgVideos() {
       <td><strong>${esc(v.title)}</strong></td>
       <td>${esc(v.source||'—')}</td>
       <td><code style="font-size:.75rem">${esc(v.youtube_id||'—')}</code></td>
-      <td><label class="tog"><input type="checkbox" ${v.is_active?'checked':''} onchange="toggleVid('${esc(v.id)}')"><span class="tog-sl"></span></label></td>
+      <td><label class="tog"><input type="checkbox" ${v.is_active?'checked':''} data-toggle="vid" data-id="${esc(v.id)}"><span class="tog-sl"></span></label></td>
       <td style="display:flex;gap:5px">
-        <button class="btn btn-b" onclick="showVideoForm(REG.${reg(v)})"><i class="fas fa-edit"></i></button>
-        <button class="btn btn-r" data-n="${esc(v.title)}" onclick="delVid('${esc(v.id)}',this.dataset.n)"><i class="fas fa-trash"></i></button>
+        <button class="btn btn-b" data-action="show-video-form" data-reg="${reg(v)}"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-r" data-action="del-vid" data-id="${esc(v.id)}" data-n="${esc(v.title)}"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`).join('')}</tbody></table></div>`;
 }
@@ -695,7 +694,7 @@ function showVideoForm(v={}) {
       <div class="fld"><label>Source / Chaîne</label><input type="text" id="vf-src" value="${esc(v.source||'')}" placeholder="Ex: AQC TV"/></div>
       <div class="fld"><label>Description</label><textarea id="vf-desc">${esc(v.description||'')}</textarea></div>
     </div>`,
-    `<button class="btn btn-p" onclick="saveVid('${esc(v.id||'')}')"><i class="fas fa-save"></i> ${v.id?'Modifier':'Ajouter'}</button>`
+    `<button class="btn btn-p" data-action="save-vid" data-id="${esc(v.id||'')}"><i class="fas fa-save"></i> ${v.id?'Modifier':'Ajouter'}</button>`
   );
 }
 
@@ -726,19 +725,19 @@ async function pgArticles() {
   const arts = r.data || [];
   document.getElementById('page').innerHTML = `
     <div class="filters">
-      <input placeholder="Rechercher article…" oninput="filterTable('art-tbl',null,null,this.value)">
-      <button class="btn btn-p" onclick="showArtForm()"><i class="fas fa-plus"></i> Nouvel article</button>
+      <input placeholder="Rechercher article…" data-filter-table="art-tbl">
+      <button class="btn btn-p" data-action="show-art-form"><i class="fas fa-plus"></i> Nouvel article</button>
     </div>
     <div class="card"><div class="card-hdr"><h3>📰 Articles (${arts.length})</h3></div>
     <table><thead><tr><th>Titre</th><th>Catégorie</th><th>Publié</th><th>Date</th><th>Actions</th></tr></thead>
     <tbody id="art-tbl">${arts.map(a=>`<tr data-search="${esc(a.title.toLowerCase())}">
       <td><strong>${esc(a.title)}</strong></td>
       <td>${esc(a.category||'—')}</td>
-      <td><label class="tog"><input type="checkbox" ${a.is_published?'checked':''} onchange="toggleArt('${esc(a.id)}')"><span class="tog-sl"></span></label></td>
+      <td><label class="tog"><input type="checkbox" ${a.is_published?'checked':''} data-toggle="art" data-id="${esc(a.id)}"><span class="tog-sl"></span></label></td>
       <td>${dt(a.created_at)}</td>
       <td style="display:flex;gap:5px">
-        <button class="btn btn-b" onclick="showArtForm(REG.${reg(a)})"><i class="fas fa-edit"></i></button>
-        <button class="btn btn-r" data-n="${esc(a.title)}" onclick="delArt('${esc(a.id)}',this.dataset.n)"><i class="fas fa-trash"></i></button>
+        <button class="btn btn-b" data-action="show-art-form" data-reg="${reg(a)}"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-r" data-action="del-art" data-id="${esc(a.id)}" data-n="${esc(a.title)}"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`).join('') || '<tr><td colspan="5" class="no-data">Aucun article</td></tr>'}</tbody></table></div>`;
 }
@@ -757,7 +756,7 @@ function showArtForm(a={}) {
         </select></div>
       </div>
     </div>`,
-    `<button class="btn btn-p" onclick="saveArt('${esc(a.id||'')}')"><i class="fas fa-save"></i> ${a.id?'Modifier':'Publier'}</button>`
+    `<button class="btn btn-p" data-action="save-art" data-id="${esc(a.id||'')}"><i class="fas fa-save"></i> ${a.id?'Modifier':'Publier'}</button>`
   );
 }
 
@@ -789,8 +788,8 @@ async function pgCategories() {
   const cats = r.data || [];
   document.getElementById('page').innerHTML = `
     <div class="filters">
-      <input placeholder="Rechercher une catégorie…" oninput="filterTable('cat-tbl',null,null,this.value)">
-      <button class="btn btn-p" onclick="showCatForm()"><i class="fas fa-plus"></i> Nouvelle catégorie</button>
+      <input placeholder="Rechercher une catégorie…" data-filter-table="cat-tbl">
+      <button class="btn btn-p" data-action="show-cat-form"><i class="fas fa-plus"></i> Nouvelle catégorie</button>
     </div>
     <div class="card"><div class="card-hdr"><h3>📁 Catégories (${cats.length})</h3></div>
     <table><thead><tr><th>Icône</th><th>Nom (FR)</th><th>Slug</th><th>Produits</th><th>Vidéos</th><th>Actif</th><th>Actions</th></tr></thead>
@@ -801,11 +800,11 @@ async function pgCategories() {
       <td style="text-align:center"><span style="font-weight:700;color:#1B3A6B">${esc(c.products_count||0)}</span></td>
       <td style="text-align:center"><span style="font-weight:700;color:#059669">${esc(c.videos_count||0)}</span></td>
       <td style="text-align:center">
-        <label class="tog"><input type="checkbox" ${c.is_active!==false?'checked':''} onchange="toggleCat('${esc(c.id)}',this.checked)">
+        <label class="tog"><input type="checkbox" ${c.is_active!==false?'checked':''} data-toggle="cat" data-id="${esc(c.id)}">
         <span class="tog-sl"></span></label>
       </td>
       <td style="display:flex;gap:4px">
-        <button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" onclick="showCatForm(REG.${reg(c)})"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" data-action="show-cat-form" data-reg="${reg(c)}"><i class="fas fa-edit"></i></button>
       </td>
     </tr>`).join('')}</tbody></table></div>`;
 }
@@ -830,7 +829,7 @@ function showCatForm(c={}) {
       <div class="fld"><label>Ordre d'affichage</label>
         <input type="number" id="cf-order" value="${esc(c.sort_order||0)}" min="0"/></div>
     </div>`,
-    `<button class="btn btn-p" onclick="saveCat('${esc(c.id||'')}')"><i class="fas fa-save"></i> ${isEdit?'Enregistrer':'Créer'}</button>`
+    `<button class="btn btn-p" data-action="save-cat" data-id="${esc(c.id||'')}"><i class="fas fa-save"></i> ${isEdit?'Enregistrer':'Créer'}</button>`
   );
 }
 
@@ -865,7 +864,7 @@ async function pgNiveaux() {
   document.getElementById('page').innerHTML = `
     <div class="filters">
       <span style="font-size:.82rem;color:#64748b">Les niveaux structurent les sujets d'examen et le filtre de niveau dans les produits.</span>
-      <button class="btn btn-p" onclick="showLvlForm()"><i class="fas fa-plus"></i> Nouveau niveau</button>
+      <button class="btn btn-p" data-action="show-lvl-form"><i class="fas fa-plus"></i> Nouveau niveau</button>
     </div>
     <div class="card"><div class="card-hdr"><h3>🎓 Niveaux de formation (${lvls.length})</h3></div>
     <table><thead><tr><th>Icône</th><th>Libellé (FR)</th><th>Valeur DB</th><th>Couleur</th><th>Ordre</th><th>Actif</th><th>Actions</th></tr></thead>
@@ -877,10 +876,10 @@ async function pgNiveaux() {
           <span style="font-size:.75rem;color:#64748b;margin-left:4px">${esc(l.color||'')}</span></td>
       <td style="text-align:center;color:#64748b">${esc(l.sort_order||0)}</td>
       <td style="text-align:center"><label class="tog">
-        <input type="checkbox" ${l.is_active!==false?'checked':''} onchange="toggleLvl('${esc(l.id)}',REG.${reg(l)}.label_fr,this.checked)">
+        <input type="checkbox" ${l.is_active!==false?'checked':''} data-toggle="lvl" data-id="${esc(l.id)}" data-reg="${reg(l)}">
         <span class="tog-sl"></span></label>
       </td>
-      <td><button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" onclick="showLvlForm(REG.${reg(l)})"><i class="fas fa-edit"></i></button></td>
+      <td><button class="btn btn-p" style="font-size:.72rem;padding:4px 8px" data-action="show-lvl-form" data-reg="${reg(l)}"><i class="fas fa-edit"></i></button></td>
     </tr>`).join('')}</tbody></table></div>
     <div class="card" style="margin-top:12px">
       <div class="card-hdr"><h3>ℹ️ Valeur DB (study_level)</h3></div>
@@ -901,8 +900,8 @@ function showLvlForm(l={}) {
           <input type="text" id="lf-icon" value="${esc(l.icon||'🎓')}" style="font-size:1.4rem;text-align:center"/></div>
         <div class="fld"><label>Couleur (hex)</label>
           <div style="display:flex;gap:6px;align-items:center">
-            <input type="color" id="lf-color-pick" value="${esc(l.color||'#1B3A6B')}" style="width:40px;height:36px;border:none;cursor:pointer;border-radius:6px" oninput="document.getElementById('lf-color').value=this.value"/>
-            <input type="text" id="lf-color" value="${esc(l.color||'#1B3A6B')}" style="flex:1" oninput="document.getElementById('lf-color-pick').value=this.value"/>
+            <input type="color" id="lf-color-pick" value="${esc(l.color||'#1B3A6B')}" style="width:40px;height:36px;border:none;cursor:pointer;border-radius:6px"/>
+            <input type="text" id="lf-color" value="${esc(l.color||'#1B3A6B')}" style="flex:1"/>
           </div>
         </div>
       </div>
@@ -917,8 +916,12 @@ function showLvlForm(l={}) {
       <div class="fld"><label>Ordre d'affichage</label>
         <input type="number" id="lf-order" value="${esc(l.sort_order||0)}" min="0"/></div>
     </div>`,
-    `<button class="btn btn-p" onclick="saveLvl('${esc(l.id||'')}')"><i class="fas fa-save"></i> ${isEdit?'Enregistrer':'Créer'}</button>`
+    `<button class="btn btn-p" data-action="save-lvl" data-id="${esc(l.id||'')}"><i class="fas fa-save"></i> ${isEdit?'Enregistrer':'Créer'}</button>`
   );
+  // Synchronisation bidirectionnelle du sélecteur de couleur ↔ champ texte : propre à ce formulaire, posée à
+  // chaque ouverture (les deux champs sont recréés à chaque appel, comme tout le contenu de #modal-body).
+  document.getElementById('lf-color-pick').addEventListener('input', function () { document.getElementById('lf-color').value = this.value; });
+  document.getElementById('lf-color').addEventListener('input', function () { document.getElementById('lf-color-pick').value = this.value; });
 }
 
 async function saveLvl(id) {
@@ -972,7 +975,7 @@ async function pgCompanies() {
     <div class="card">
       <div class="card-hdr">
         <h3>🏢 Entreprises (${companies.length})</h3>
-        <button class="btn btn-b" onclick="showCompanyForm()">+ Ajouter</button>
+        <button class="btn btn-b" data-action="show-company-form">+ Ajouter</button>
       </div>
       <table class="tbl">
         <thead><tr>
@@ -989,9 +992,9 @@ async function pgCompanies() {
             <td>${c.is_premium?'⭐':'—'}</td>
             <td>${esc(c.views_count||0)}</td>
             <td>
-              <button class="btn btn-b btn-sm" onclick="showCompanyForm(REG.${reg(c)})">✏️</button>
+              <button class="btn btn-b btn-sm" data-action="show-company-form" data-reg="${reg(c)}">✏️</button>
               <a href="/entreprise.html?slug=${esc(c.slug)}" target="_blank" class="btn btn-b btn-sm">👁️</a>
-              <button class="btn btn-b btn-sm" style="color:#ef4444" data-n="${esc(c.name)}" onclick="deleteCompany('${esc(c.id)}',this.dataset.n)">🗑️</button>
+              <button class="btn btn-b btn-sm" style="color:#ef4444" data-action="delete-company" data-id="${esc(c.id)}" data-n="${esc(c.name)}">🗑️</button>
             </td>
           </tr>`).join('')}
         </tbody>
@@ -1080,8 +1083,8 @@ function showCompanyForm(c={}) {
         </label>
       </div>
     </div>`,
-    `<button class="btn btn-b" onclick="saveCompany('${esc(c.id||'')}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
-     <button class="btn" onclick="closeModal()">Annuler</button>`);
+    `<button class="btn btn-b" data-action="save-company" data-id="${esc(c.id||'')}">💾 ${isEdit?'Enregistrer':'Créer'}</button>
+     <button class="btn" data-action="close-modal">Annuler</button>`);
 }
 
 async function saveCompany(id) {
@@ -1149,7 +1152,7 @@ async function pgJobs() {
     <div class="card">
       <div class="card-hdr">
         <h3>💼 Offres d'emploi (${jobs.length})</h3>
-        <button class="btn btn-b" onclick="showJobForm()">+ Ajouter</button>
+        <button class="btn btn-b" data-action="show-job-form">+ Ajouter</button>
       </div>
       <table class="tbl">
         <thead><tr>
@@ -1167,8 +1170,8 @@ async function pgJobs() {
             <td>${esc(j.views_count||0)}</td>
             <td>${j.expires_at?new Date(j.expires_at).toLocaleDateString('fr-DZ'):'—'}</td>
             <td>
-              <button class="btn btn-b btn-sm" onclick="showJobForm(REG.${reg(j)})">✏️</button>
-              <button class="btn btn-b btn-sm" style="color:#ef4444" data-n="${esc(j.title)}" onclick="deleteJob('${esc(j.id)}',this.dataset.n)">🗑️</button>
+              <button class="btn btn-b btn-sm" data-action="show-job-form" data-reg="${reg(j)}">✏️</button>
+              <button class="btn btn-b btn-sm" style="color:#ef4444" data-action="delete-job" data-id="${esc(j.id)}" data-n="${esc(j.title)}">🗑️</button>
             </td>
           </tr>`).join('')}
         </tbody>
@@ -1267,8 +1270,8 @@ async function showJobForm(j={}) {
         </label>
       </div>
     </div>`,
-    `<button class="btn btn-b" onclick="saveJob('${esc(j.id||'')}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
-     <button class="btn" onclick="closeModal()">Annuler</button>`);
+    `<button class="btn btn-b" data-action="save-job" data-id="${esc(j.id||'')}">💾 ${isEdit?'Enregistrer':'Créer'}</button>
+     <button class="btn" data-action="close-modal">Annuler</button>`);
 }
 
 async function saveJob(id) {
@@ -1328,7 +1331,7 @@ async function pgTenders() {
     <div class="card">
       <div class="card-hdr">
         <h3>📋 Appels d'offres (${tenders.length})</h3>
-        <button class="btn btn-b" onclick="showTenderForm()">+ Ajouter</button>
+        <button class="btn btn-b" data-action="show-tender-form">+ Ajouter</button>
       </div>
       <table class="tbl">
         <thead><tr>
@@ -1346,8 +1349,8 @@ async function pgTenders() {
             <td>${fmtDate(t.deadline_at)}</td>
             <td>${t.is_featured?'⭐':'—'}</td>
             <td>
-              <button class="btn btn-b btn-sm" onclick="showTenderForm(REG.${reg(t)})">✏️</button>
-              <button class="btn btn-b btn-sm" style="color:#ef4444" data-n="${esc(t.title)}" onclick="deleteTender('${esc(t.id)}',this.dataset.n)">🗑️</button>
+              <button class="btn btn-b btn-sm" data-action="show-tender-form" data-reg="${reg(t)}">✏️</button>
+              <button class="btn btn-b btn-sm" style="color:#ef4444" data-action="delete-tender" data-id="${esc(t.id)}" data-n="${esc(t.title)}">🗑️</button>
             </td>
           </tr>`).join('')}
         </tbody>
@@ -1466,8 +1469,8 @@ async function showTenderForm(t={}) {
         </label>
       </div>
     </div>`,
-    `<button class="btn btn-b" onclick="saveTender('${esc(t.id||'')}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
-     <button class="btn" onclick="closeModal()">Annuler</button>`);
+    `<button class="btn btn-b" data-action="save-tender" data-id="${esc(t.id||'')}">💾 ${isEdit?'Enregistrer':'Créer'}</button>
+     <button class="btn" data-action="close-modal">Annuler</button>`);
 }
 
 async function saveTender(id) {
@@ -1528,7 +1531,7 @@ async function pgProfessionals() {
     <div class="card">
       <div class="card-hdr">
         <h3>👷 Annuaire professionnel (${pros.length})</h3>
-        <button class="btn btn-b" onclick="showProForm()">+ Ajouter</button>
+        <button class="btn btn-b" data-action="show-pro-form">+ Ajouter</button>
       </div>
       <table class="tbl">
         <thead><tr>
@@ -1547,8 +1550,8 @@ async function pgProfessionals() {
             <td><span class="tag-chip">${esc(p.availability||'—')}</span></td>
             <td>${p.is_verified?'✅':'❌'}</td>
             <td>
-              <button class="btn btn-b btn-sm" onclick="showProForm(REG.${reg(p)})">✏️</button>
-              <button class="btn btn-b btn-sm" style="color:#ef4444" data-n="${esc(p.first_name+' '+p.last_name)}" onclick="deletePro('${esc(p.id)}',this.dataset.n)">🗑️</button>
+              <button class="btn btn-b btn-sm" data-action="show-pro-form" data-reg="${reg(p)}">✏️</button>
+              <button class="btn btn-b btn-sm" style="color:#ef4444" data-action="delete-pro" data-id="${esc(p.id)}" data-n="${esc(p.first_name+' '+p.last_name)}">🗑️</button>
             </td>
           </tr>`).join('')}
         </tbody>
@@ -1667,8 +1670,8 @@ function showProForm(p={}) {
         </label>
       </div>
     </div>`,
-    `<button class="btn btn-b" onclick="savePro('${esc(p.id||'')}')">💾 ${isEdit?'Enregistrer':'Créer'}</button>
-     <button class="btn" onclick="closeModal()">Annuler</button>`);
+    `<button class="btn btn-b" data-action="save-pro" data-id="${esc(p.id||'')}">💾 ${isEdit?'Enregistrer':'Créer'}</button>
+     <button class="btn" data-action="close-modal">Annuler</button>`);
 }
 
 async function savePro(id) {
@@ -1739,7 +1742,7 @@ function openModal(title, body, foot='') {
   document.getElementById('modal-title').textContent = title;
   document.getElementById('modal-body').innerHTML = body;
   document.getElementById('modal-foot').innerHTML = foot +
-    '<button class="btn" style="background:#f1f5f9;color:#475569" onclick="closeModal()">Fermer</button>';
+    '<button class="btn" style="background:#f1f5f9;color:#475569" data-action="close-modal">Fermer</button>';
   document.getElementById('modal').classList.add('open');
 }
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
@@ -1753,6 +1756,85 @@ function filterTable(tbId, selId, attr, searchVal) {
     tr.style.display = matchSel && matchSrch ? '' : 'none';
   });
 }
+
+// ── ÉVÉNEMENTS (socle statique) ────────────────────────────────────────────────
+// Le contenu de #page et de #modal-foot/#modal-body est reconstruit en permanence (innerHTML) par les
+// fonctions pgXxx()/showXxxForm() ci-dessus : un addEventListener posé sur un bouton précis serait perdu au
+// re-rendu suivant. On délègue donc sur les conteneurs stables (#page, #modal), posés une seule fois ici.
+document.getElementById('pass').addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.querySelectorAll('.nav-btn[data-page]').forEach((btn) => {
+  btn.addEventListener('click', () => loadPage(btn.dataset.page));
+});
+document.getElementById('logout-btn').addEventListener('click', doLogout);
+document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+
+// Actions déclenchées par un clic dans #page (tables, boutons d'ajout/édition/suppression, raccourcis) —
+// data-reg pointe vers un objet complet stocké dans REG (voir reg()), utilisé pour préremplir un formulaire.
+document.getElementById('page').addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const a = el.dataset;
+  switch (a.action) {
+    case 'load-page':         loadPage(a.page); break;
+    case 'validate-pay':      validatePay(a.id, a.order); break;
+    case 'reject-pay':        rejectPay(a.id); break;
+    case 'show-upload':       showUpload(); break;
+    case 'edit-prod':         showEditProd(REG[a.reg]); break;
+    case 'del-prod':          delProd(a.id, a.n); break;
+    case 'show-video-form':   showVideoForm(a.reg ? REG[a.reg] : undefined); break;
+    case 'del-vid':           delVid(a.id, a.n); break;
+    case 'show-art-form':     showArtForm(a.reg ? REG[a.reg] : undefined); break;
+    case 'del-art':           delArt(a.id, a.n); break;
+    case 'show-cat-form':     showCatForm(a.reg ? REG[a.reg] : undefined); break;
+    case 'show-lvl-form':     showLvlForm(a.reg ? REG[a.reg] : undefined); break;
+    case 'show-company-form': showCompanyForm(a.reg ? REG[a.reg] : undefined); break;
+    case 'delete-company':    deleteCompany(a.id, a.n); break;
+    case 'show-job-form':     showJobForm(a.reg ? REG[a.reg] : undefined); break;
+    case 'delete-job':        deleteJob(a.id, a.n); break;
+    case 'show-tender-form':  showTenderForm(a.reg ? REG[a.reg] : undefined); break;
+    case 'delete-tender':     deleteTender(a.id, a.n); break;
+    case 'show-pro-form':     showProForm(a.reg ? REG[a.reg] : undefined); break;
+    case 'delete-pro':        deletePro(a.id, a.n); break;
+  }
+});
+
+// Cases à cocher (bascules actif/publié) et listes déroulantes de filtre dans #page
+document.getElementById('page').addEventListener('change', (e) => {
+  const el = e.target;
+  if (el.dataset.toggle === 'prod') return toggleProd(el.dataset.id);
+  if (el.dataset.toggle === 'vid')  return toggleVid(el.dataset.id);
+  if (el.dataset.toggle === 'art')  return toggleArt(el.dataset.id);
+  if (el.dataset.toggle === 'cat')  return toggleCat(el.dataset.id, el.checked);
+  if (el.dataset.toggle === 'lvl')  return toggleLvl(el.dataset.id, REG[el.dataset.reg].label_fr, el.checked);
+  if (el.dataset.filterTable) return filterTable(el.dataset.filterTable, el.id, el.dataset.filterAttr);
+});
+
+// Recherche en direct (barres de filtre texte) dans #page
+document.getElementById('page').addEventListener('input', (e) => {
+  if (e.target.dataset.filterTable) filterTable(e.target.dataset.filterTable, null, null, e.target.value);
+});
+
+// Boutons du pied de modale (Enregistrer/Envoyer/Fermer/Annuler) : le contenu de #modal-foot change à
+// chaque appel de openModal() — délégation ici aussi, pour la même raison que sur #page.
+document.getElementById('modal-foot').addEventListener('click', (e) => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const a = el.dataset;
+  switch (a.action) {
+    case 'close-modal':  closeModal(); break;
+    case 'do-upload':    doUpload(); break;
+    case 'save-prod':    saveEditProd(a.id); break;
+    case 'save-vid':     saveVid(a.id); break;
+    case 'save-art':     saveArt(a.id); break;
+    case 'save-cat':     saveCat(a.id); break;
+    case 'save-lvl':     saveLvl(a.id); break;
+    case 'save-company': saveCompany(a.id); break;
+    case 'save-job':     saveJob(a.id); break;
+    case 'save-tender':  saveTender(a.id); break;
+    case 'save-pro':     savePro(a.id); break;
+  }
+});
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 (async () => {
