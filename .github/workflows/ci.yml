@@ -52,9 +52,28 @@ jobs:
       - name: Tests
         run: npm test
 
-  # Construit l'image de production (Dockerfile jamais exécuté avant ce job) et vérifie qu'elle contient ce qu'il faut.
+  # Construit l'image de production (Dockerfile jamais exécuté avant ce job) et vérifie qu'elle contient ce qu'il faut,
+  # puis la fait vraiment tourner contre un PostgreSQL réel : migrations (railway.json preDeployCommand) + démarrage +
+  # /health répond 200 depuis l'extérieur du conteneur, comme le ferait le healthcheck de Railway.
   docker:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: handassi_docker
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # --network host (Linux uniquement, disponible sur ubuntu-latest) : le conteneur atteint directement le service
+      # PostgreSQL exposé sur le runner, sans avoir à connaître son nom réseau Docker.
+      DOCKER_DB_URL: postgres://postgres:postgres@localhost:5432/handassi_docker
     steps:
       - uses: actions/checkout@v4
       - name: Fichiers de déploiement valides
@@ -71,6 +90,32 @@ jobs:
           --entrypoint node al-handassa:ci -e "require('/app/backend/src/app.js'); console.log('app.js chargé'); process.exit(0)"
       - name: Fonctionne sans root et avec un dossier uploads inscriptible
         run: docker run --rm --entrypoint sh al-handassa:ci -c 'test "$(id -u)" != 0 && touch backend/uploads/.w && echo OK'
+      - name: Migrations dans le conteneur, contre un vrai PostgreSQL (exactement la commande du preDeployCommand)
+        run: >
+          docker run --rm --network host -e DB_SSL=false -e DATABASE_URL=$DOCKER_DB_URL
+          --entrypoint node al-handassa:ci backend/migrations/run.js
+      - name: Démarrage réel du conteneur (migrations déjà appliquées) et /health interrogé depuis l'hôte
+        run: |
+          docker run -d --name hds-ci --network host \
+            -e NODE_ENV=production -e PORT=5000 -e DB_SSL=false -e DATABASE_URL=$DOCKER_DB_URL \
+            -e JWT_SECRET=ci-only-secret-0123456789abcdef0123456789 \
+            -e JWT_REFRESH_SECRET=ci-only-refresh-secret-fedcba9876543210 \
+            al-handassa:ci
+          code=000
+          for i in $(seq 1 20); do
+            code=$(curl -s -o /tmp/health.json -w '%{http_code}' http://localhost:5000/health || echo 000)
+            [ "$code" = "200" ] && break
+            sleep 1
+          done
+          echo "code=$code"; cat /tmp/health.json 2>/dev/null; echo
+          test "$code" = "200"
+          grep -q '"db":"ok"' /tmp/health.json
+      - name: Journaux du conteneur (pour diagnostic, même en cas de succès)
+        if: always()
+        run: docker logs hds-ci
+      - name: Arrêt du conteneur
+        if: always()
+        run: docker rm -f hds-ci || true
 
   # deploy/nginx/*.conf n'a jamais tourné (pas de nginx sur le poste de développement) : validé ici avec un vrai nginx
   # (le même install que deploy/setup.sh) et de faux certificats, comme le ferait `nginx -t` sur le VPS après déploiement.
