@@ -198,10 +198,10 @@ async function api(method, path, body) {
   if (!r.ok) throw new Error(d.error || d.message || 'Erreur ' + r.status);
   return d;
 }
-async function apiUpload(path, formData) {
+async function apiUpload(path, formData, method = 'POST') {
   const token = localStorage.getItem('hds_token');
   const r = await fetch(API + path, {
-    method: 'POST',
+    method,
     headers: { 'Authorization': 'Bearer ' + token },
     body: formData
   });
@@ -1119,12 +1119,11 @@ async function saveCompany(id) {
   if (cover) fd.append('cover', cover);
 
   try {
-    const token = localStorage.getItem('admin_token');
-    const url   = id ? `/api/companies/admin/${id}` : '/api/companies/admin';
-    const method= id ? 'PATCH' : 'POST';
-    const resp  = await fetch(url, { method, headers:{'Authorization':'Bearer '+token}, body:fd });
-    const data  = await resp.json();
-    if (!data.success) throw new Error(data.message);
+    // apiUpload() (comme doUpload() pour les produits) : le bon jeton (hds_token) et la bonne origine
+    // (API = HDS_SERVER + '/api' — indispensable dès que le front est servi séparément du backend, voir
+    // js/config.js). L'appel manuel précédent lisait une clé localStorage jamais écrite (admin_token) et une
+    // URL relative codée en dur : créer ou modifier une entreprise a toujours échoué avant ce correctif.
+    await apiUpload(id ? '/companies/admin/'+id : '/companies/admin', fd, id ? 'PATCH' : 'POST');
     toast(id?'✅ Entreprise modifiée':'✅ Entreprise créée','ok');
     closeModal(); pgCompanies();
   } catch(e) { toast(e.message,'err'); }
@@ -1720,12 +1719,8 @@ async function savePro(id) {
   if (photo) fd.append('photo', photo);
 
   try {
-    const token = localStorage.getItem('admin_token');
-    const url   = id ? `/api/professionals/admin/${id}` : '/api/professionals/admin';
-    const method= id ? 'PATCH' : 'POST';
-    const resp  = await fetch(url, { method, headers:{'Authorization':'Bearer '+token}, body:fd });
-    const data  = await resp.json();
-    if (!data.success) throw new Error(data.message);
+    // Voir le commentaire équivalent dans saveCompany() : apiUpload() plutôt qu'un fetch manuel cassé.
+    await apiUpload(id ? '/professionals/admin/'+id : '/professionals/admin', fd, id ? 'PATCH' : 'POST');
     toast(id?'✅ Profil modifié':'✅ Profil créé','ok');
     closeModal(); pgProfessionals();
   } catch(e) { toast(e.message,'err'); }
