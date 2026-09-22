@@ -10,6 +10,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const { testConnection, pool } = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 const uploadsGuard = require('./middleware/uploadsGuard');
+const sentry = require('./config/sentry');
+sentry.init();   // no-op tant que SENTRY_DSN n'est pas défini (voir config/sentry.js)
 
 // ── Routes ──
 const authRoutes = require('./routes/auth');
@@ -350,13 +352,17 @@ async function start() {
 // Express 4 n'intercepte pas les rejets des handlers async : sans ce garde-fou, une seule promesse
 // rejetée (ex. connexion PostgreSQL indisponible) arrête tout le service pour tous les utilisateurs.
 process.on('unhandledRejection', (reason) => {
-  console.error('[unhandledRejection]', reason instanceof Error ? reason.stack : reason);
+  const err = reason instanceof Error ? reason : new Error(String(reason));
+  console.error('[unhandledRejection]', err.stack);
+  sentry.captureError(err);
 });
-// Exception synchrone non attrapée : l'état du processus est incertain → on journalise et on laisse
-// le superviseur (pm2, Railway) relancer proprement.
+// Exception synchrone non attrapée : l'état du processus est incertain → on journalise, on alerte (Sentry) et on
+// laisse le superviseur (pm2, Railway) relancer proprement. flush() avant de quitter : sans lui, process.exit()
+// couperait l'envoi à Sentry, qui se fait en arrière-plan.
 process.on('uncaughtException', (err) => {
   console.error('[uncaughtException]', err.stack || err);
-  process.exit(1);
+  sentry.captureError(err);
+  sentry.flush().finally(() => process.exit(1));
 });
 
 // Les tests d'intégration importent l'application et l'écoutent eux-mêmes sur un port libre (tests/helpers.js).

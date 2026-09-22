@@ -259,6 +259,13 @@ moniteur externe sur `https://<domaine>/health` toutes les minutes (UptimeRobot,
 avec une alerte email/SMS : c'est ce qui manque tant qu'aucun n'est configuré. Ne pas surveiller `/` : la page d'accueil
 resterait « verte » base éteinte.
 
+**Suivi d'erreurs (Sentry)** — inactif tant que `SENTRY_DSN` n'est pas défini, aucun compte requis pour faire
+tourner le site sans lui. Pour l'activer : créer un projet Node sur [sentry.io](https://sentry.io) (gratuit jusqu'à
+5 000 évènements/mois), copier son DSN dans `SENTRY_DSN`. Seules les vraies anomalies sont signalées — une erreur
+500 inattendue, une exception qui aurait fait planter le processus — jamais les refus normaux (401/403/404,
+validation, contraintes de la base) : voir `backend/src/config/sentry.js`. Aucune donnée de requête (en-têtes, corps,
+mots de passe, jetons) n'est envoyée automatiquement, seuls la méthode et le chemin de la requête en échec.
+
 ## Variables d'environnement de production
 
 Obligatoires : `NODE_ENV=production`, `DATABASE_URL` (ou `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASSWORD`),

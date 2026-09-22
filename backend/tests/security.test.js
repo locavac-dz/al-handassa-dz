@@ -70,6 +70,47 @@ describe('sécurité : limitation de débit, fichiers du dépôt, en-têtes', ()
     });
   });
 
+  describe('suivi d\'erreurs (config/sentry via middleware/errorHandler)', () => {
+    const sentry = require('../src/config/sentry');
+    const { pool } = require('../src/config/database');
+    let calls;
+    before(() => { calls = []; sentry.captureError = (err, extra) => calls.push({ err, extra }); });
+    after(() => { delete sentry.captureError; });   // retire la substitution, restaure la fonction du module
+
+    it('une vraie erreur 500 (panne de la base) est signalée', async () => {
+        calls.length = 0;
+        const original = pool.query;
+        pool.query = async () => { throw new Error('connexion perdue'); };
+        const r = await ctx.call('GET', '/api/products?limit=100');
+        pool.query = original;
+        assert.equal(r.status, 500);
+        assert.equal(calls.length, 1);
+        assert.equal(calls[0].err.message, 'connexion perdue');
+        assert.equal(calls[0].extra.method, 'GET');
+    });
+
+    it('une erreur client normale (404) n\'est PAS signalée : ce n\'est pas une anomalie', async () => {
+      calls.length = 0;
+      const r = await ctx.call('GET', '/api/products/00000000-0000-4000-8000-000000000000');
+      assert.equal(r.status, 404);
+      assert.equal(calls.length, 0);
+    });
+
+    it('une erreur de validation (422) n\'est PAS signalée', async () => {
+      calls.length = 0;
+      const r = await ctx.call('POST', '/api/auth/register', { body: { email: 'pas-un-email' } });
+      assert.equal(r.status, 422);
+      assert.equal(calls.length, 0);
+    });
+
+    it('une entrée invalide refusée par PostgreSQL (uuid mal formé, 400) n\'est PAS signalée', async () => {
+      calls.length = 0;
+      const r = await ctx.call('GET', '/api/products/pas-un-uuid/reviews');
+      assert.equal(r.status, 400);
+      assert.equal(calls.length, 0);
+    });
+  });
+
   describe('en-têtes', () => {
     it('l\'API applique une CSP stricte (default-src \'none\'), les pages une CSP adaptée au site', async () => {
       const api = await ctx.call('GET', '/api/study-levels');

@@ -1,3 +1,5 @@
+const sentry = require('../config/sentry');
+
 function errorHandler(err, req, res, next) {
   const isDev = process.env.NODE_ENV === 'development';
 
@@ -49,6 +51,7 @@ function errorHandler(err, req, res, next) {
 
   console.error(`[ERROR] ${req.method} ${req.path}:`, err.message);
   if (isDev) console.error(err.stack);
+  sentry.captureError(err, { method: req.method, path: req.path });   // seulement les vraies anomalies (500)
 
   res.status(500).json({
     error: 'Erreur interne du serveur.',
