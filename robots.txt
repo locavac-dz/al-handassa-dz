@@ -8,8 +8,6 @@ Disallow: /uploads/products/
 Disallow: /account.html
 Disallow: /reset-password.html
 Disallow: /verify-email.html
-Disallow: /api-test.html
-Disallow: /admin.html
 Disallow: /cart.html
 Disallow: /checkout.html
 Disallow: /dashboard.html

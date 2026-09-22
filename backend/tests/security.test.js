@@ -68,6 +68,16 @@ describe('sécurité : limitation de débit, fichiers du dépôt, en-têtes', ()
         assert.equal((await ctx.call('GET', p)).status, 404, p);
       }
     });
+
+    it('les anciennes pages admin orphelines (supprimées, superseded par admin/index.html) restent absentes', async () => {
+      // Ces fichiers ont existé, n'étaient liés depuis aucune page, exclus par robots.txt, et ont été supprimés :
+      // un 200 ici signalerait qu'ils ont été recréés sans être vraiment reliés au site (voir CLAUDE.md).
+      for (const p of ['/admin.html', '/api-test.html', '/admin/login.html', '/admin/dashboard.html',
+        '/admin/js/admin.js', '/admin/js/api.js', '/admin/css/admin.css', '/js/admin.js', '/css/admin.css']) {
+        assert.equal((await ctx.call('GET', p)).status, 404, p);
+      }
+      assert.equal((await ctx.call('GET', '/admin/')).status, 200, 'le vrai panneau admin reste servi');
+    });
   });
 
   describe('suivi d\'erreurs (config/sentry via middleware/errorHandler)', () => {
