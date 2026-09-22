@@ -218,7 +218,7 @@
   <div style="max-width:700px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden">
     <div style="background:#065f46;padding:20px 24px;display:flex;justify-content:space-between;align-items:center">
       <span style="color:#fff;font-weight:700;font-size:1rem">Détail de l'appel d'offres</span>
-      <button onclick="closeAoModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
+      <button id="ao-modal-close" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
     </div>
     <div id="ao-modal-body" style="padding:24px"></div>
   </div>
@@ -311,7 +311,7 @@ function cardHTML(t) {
     ? `<span class="ao-deadline${days!==null&&days<=7?' soon':''}">⏰ ${days!==null&&days>=0?`${days} j restants`:'Clôturé'} — ${fmtDate(t.deadline_at)}</span>`
     : '';
 
-  return `<div class="ao-card${t.is_featured?' featured':''}" onclick="openAoModal('${esc(t.slug)}')">
+  return `<div class="ao-card${t.is_featured?' featured':''}" data-slug="${esc(t.slug)}">
     <div class="ao-card-top">
       <div>
         <div class="ao-card-ref">${t.is_featured?'⭐ ':''}${esc(t.reference||'Réf. non précisée')}</div>
@@ -416,6 +416,13 @@ function closeAoModal() {
 }
 document.getElementById('ao-modal').addEventListener('click', e => {
   if (e.target===e.currentTarget) closeAoModal();
+});
+document.getElementById('ao-modal-close').addEventListener('click', closeAoModal);
+
+// Délégation : #ao-list est reconstruit (innerHTML) à chaque chargement/filtrage.
+document.getElementById('ao-list').addEventListener('click', e => {
+  const card = e.target.closest('.ao-card');
+  if (card) openAoModal(card.dataset.slug);
 });
 
 // Filtres

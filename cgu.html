@@ -163,9 +163,9 @@
         <li><a href="contact.html">Contact</a></li>
       </ul>
       <div class="nav-actions">
-        <button class="btn btn-outline btn-sm" id="nav-login-btn" onclick="location.href='index.html#auth'">Connexion</button>
-        <button class="btn btn-primary btn-sm" id="nav-register-btn" onclick="location.href='index.html#auth'">S'inscrire</button>
-        <button class="btn btn-ghost btn-sm" id="nav-user-btn" style="display:none" onclick="location.href='dashboard.html'">
+        <button class="btn btn-outline btn-sm" id="nav-login-btn">Connexion</button>
+        <button class="btn btn-primary btn-sm" id="nav-register-btn">S'inscrire</button>
+        <button class="btn btn-ghost btn-sm" id="nav-user-btn" style="display:none">
           <i class="fas fa-user-circle"></i> <span id="nav-user-name"></span>
         </button>
       </div>
@@ -442,6 +442,10 @@
     document.getElementById('nav-toggle').addEventListener('click', () => {
       document.getElementById('nav-links').classList.toggle('open');
     });
+
+    document.getElementById('nav-login-btn').addEventListener('click', () => { location.href = 'index.html#auth'; });
+    document.getElementById('nav-register-btn').addEventListener('click', () => { location.href = 'index.html#auth'; });
+    document.getElementById('nav-user-btn').addEventListener('click', () => { location.href = 'dashboard.html'; });
   </script>
 </body>
 </html>

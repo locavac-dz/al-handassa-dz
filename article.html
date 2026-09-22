@@ -149,10 +149,10 @@
       <!-- Partage -->
       <div class="article-share">
         <p><i class="fas fa-share-alt"></i> Partager cet article</p>
-        <div class="share-btns">
-          <button class="share-btn twitter" onclick="shareArticle('twitter')"><i class="fab fa-twitter"></i> Twitter</button>
-          <button class="share-btn linkedin" onclick="shareArticle('linkedin')"><i class="fab fa-linkedin"></i> LinkedIn</button>
-          <button class="share-btn copy" onclick="shareArticle('copy')"><i class="fas fa-copy"></i> Copier le lien</button>
+        <div class="share-btns" id="share-btns">
+          <button class="share-btn twitter" data-platform="twitter"><i class="fab fa-twitter"></i> Twitter</button>
+          <button class="share-btn linkedin" data-platform="linkedin"><i class="fab fa-linkedin"></i> LinkedIn</button>
+          <button class="share-btn copy" data-platform="copy"><i class="fas fa-copy"></i> Copier le lien</button>
         </div>
       </div>
     </article>

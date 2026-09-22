@@ -1036,6 +1036,11 @@ document.getElementById('payment-modal').addEventListener('click', e => {
 document.getElementById('auth-prompt').addEventListener('click', e => {
   if (e.target === e.currentTarget) e.currentTarget.style.display = 'none';
 });
+document.getElementById('pay-modal-close-btn').addEventListener('click', () => productApp.closePayModal());
+document.getElementById('auth-prompt-cancel-btn').addEventListener('click', () => {
+  document.getElementById('auth-prompt').style.display = 'none';
+});
+document.getElementById('wishlist-btn').addEventListener('click', () => productApp.toggleWishlist());
 
 // ── Démarrage ─────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => productApp.init());

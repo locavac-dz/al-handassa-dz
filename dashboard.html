@@ -34,7 +34,7 @@
 <nav style="background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 16px 0; position: sticky; top: 0; z-index: 100;">
   <div style="max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;">
     <a href="index.html" style="font-weight: 700; color: #1B3A6B; text-decoration: none;">Al Handassa</a>
-    <button onclick="logout()" style="padding: 8px 16px; background: #fee2e2; color: #dc2626; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Déconnexion</button>
+    <button id="logout-btn" style="padding: 8px 16px; background: #fee2e2; color: #dc2626; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Déconnexion</button>
   </div>
 </nav>
 
@@ -117,7 +117,7 @@
         <label style="display: block; margin-bottom: 8px; font-weight: 600;">Téléphone:</label>
         <input type="tel" id="settings-phone" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-family: Cairo;">
       </div>
-      <button onclick="saveSettings()" style="padding: 12px 24px; background: #1B3A6B; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Enregistrer</button>
+      <button id="save-settings-btn" style="padding: 12px 24px; background: #1B3A6B; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -166,6 +166,8 @@
     alert('✅ Paramètres enregistrés!');
   }
 
+  document.getElementById('logout-btn').addEventListener('click', logout);
+  document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
   window.addEventListener('DOMContentLoaded', loadUserProfile);
 </script>
 </body>

@@ -110,20 +110,20 @@
 
 <div class="auth-wrap">
   <div class="auth-header">
-    <img src="img/logo-full.png" alt="Al Handassa.dz" class="auth-logo" onerror="this.style.display='none'" />
+    <img src="img/logo-full.png" alt="Al Handassa.dz" class="auth-logo" id="auth-logo" />
     <h1>Bienvenue sur Al Handassa.dz</h1>
   </div>
 
   <div class="auth-tabs">
-    <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Connexion</button>
-    <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Inscription</button>
+    <button class="auth-tab active" id="tab-login">Connexion</button>
+    <button class="auth-tab" id="tab-register">Inscription</button>
   </div>
 
   <div class="auth-body">
 
     <!-- CONNEXION -->
     <div class="panel active" id="panel-login">
-      <form id="login-form" onsubmit="doLogin(event)">
+      <form id="login-form">
         <div class="form-group">
           <label class="form-label">Email *</label>
           <input type="email" id="l-email" class="form-input" placeholder="exemple@email.com" required autocomplete="email" />
@@ -134,13 +134,13 @@
         </div>
         <button type="submit" class="btn btn-primary" id="btn-login">🚀 Se Connecter</button>
         <div id="login-msg" class="msg"></div>
-        <div class="link-row"><a href="#" onclick="switchTab('register');return false">Pas encore de compte ? S'inscrire</a></div>
+        <div class="link-row"><a href="#" id="link-to-register">Pas encore de compte ? S'inscrire</a></div>
       </form>
     </div>
 
     <!-- INSCRIPTION -->
     <div class="panel" id="panel-register">
-      <form id="register-form" onsubmit="doRegister(event)">
+      <form id="register-form">
         <div class="row-2">
           <div class="form-group">
             <label class="form-label">Prénom *</label>
@@ -179,7 +179,7 @@
         </div>
         <button type="submit" class="btn btn-secondary" id="btn-register">✅ Créer mon Compte Gratuit</button>
         <div id="register-msg" class="msg"></div>
-        <div class="link-row"><a href="#" onclick="switchTab('login');return false">Déjà un compte ? Se connecter</a></div>
+        <div class="link-row"><a href="#" id="link-to-login">Déjà un compte ? Se connecter</a></div>
       </form>
     </div>
 
@@ -295,6 +295,22 @@ async function doRegister(e) {
     btn.disabled = false; btn.textContent = '✅ Créer mon Compte Gratuit';
   }
 }
+
+// error : le contrôle img.complete/naturalWidth couvre le cas où l'image a déjà fini de charger (avec ou sans
+// succès) avant que ce script ne s'exécute — un addEventListener posé après coup rate l'événement dans ce cas
+// (vérifié : contrairement à l'attribut onerror inline, qui est lié dès le parsing de la balise <img>).
+(function () {
+  const logo = document.getElementById('auth-logo');
+  const hide = () => { logo.style.display = 'none'; };
+  logo.addEventListener('error', hide);
+  if (logo.complete && logo.naturalWidth === 0) hide();
+})();
+document.getElementById('tab-login').addEventListener('click', () => switchTab('login'));
+document.getElementById('tab-register').addEventListener('click', () => switchTab('register'));
+document.getElementById('link-to-register').addEventListener('click', (e) => { e.preventDefault(); switchTab('register'); });
+document.getElementById('link-to-login').addEventListener('click', (e) => { e.preventDefault(); switchTab('login'); });
+document.getElementById('login-form').addEventListener('submit', doLogin);
+document.getElementById('register-form').addEventListener('submit', doRegister);
 
 // Support ?tab=register dans l'URL
 if (new URLSearchParams(location.search).get('tab') === 'register') {

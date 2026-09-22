@@ -274,4 +274,8 @@ async function loadArticle() {
 document.addEventListener('DOMContentLoaded', () => {
   updateNav();
   loadArticle();
+  document.getElementById('share-btns').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-platform]');
+    if (btn) shareArticle(btn.dataset.platform);
+  });
 });

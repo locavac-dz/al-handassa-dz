@@ -51,7 +51,7 @@
 
     <div class="search-input-wrap">
       <input type="text" id="search-input" class="search-input" placeholder="Recherchez par titre, catégorie, tags..." />
-      <button class="search-btn" onclick="performSearch()">Chercher</button>
+      <button class="search-btn" id="search-btn">Chercher</button>
     </div>
   </div>
 
@@ -124,7 +124,7 @@ async function performSearch(query) {
         : `<span>${icon}</span>`;
 
       html += `
-        <div class="result-card" onclick="location.href='product.html?slug=${encodeURIComponent(p.slug)}'">
+        <div class="result-card" data-slug="${escHtml(p.slug)}">
           <div class="result-card-thumb">${thumbImg}</div>
           <div class="result-card-body">
             <div class="result-title">${escHtml(p.title)}</div>
@@ -169,6 +169,15 @@ window.addEventListener('DOMContentLoaded', () => {
   if (cartBtn) {
     cartBtn.addEventListener('click', () => location.href = 'cart.html');
   }
+
+  document.getElementById('search-btn').addEventListener('click', () => performSearch());
+
+  // Délégation : #search-content est remplacé (innerHTML) à chaque recherche, l'écouteur posé une fois ici
+  // reste valide (contrairement à un addEventListener sur chaque .result-card, à refaire à chaque rendu).
+  document.getElementById('search-content').addEventListener('click', (e) => {
+    const card = e.target.closest('.result-card');
+    if (card) location.href = 'product.html?slug=' + encodeURIComponent(card.dataset.slug);
+  });
 });
 
 // Recherche au appui sur Entrée

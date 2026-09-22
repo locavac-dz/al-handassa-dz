@@ -114,7 +114,7 @@
             <button class="btn-buy" id="cta-btn" disabled>
               <i class="fas fa-spinner fa-spin"></i> Chargement…
             </button>
-            <button class="btn-wishlist-page" id="wishlist-btn" onclick="productApp.toggleWishlist()">
+            <button class="btn-wishlist-page" id="wishlist-btn">
               <i class="far fa-heart"></i> Ajouter aux favoris
             </button>
           </div>
@@ -172,7 +172,7 @@
   <div class="pay-modal">
     <div class="pay-modal-header">
       <h2>Finaliser l'achat</h2>
-      <button class="pay-modal-close" onclick="productApp.closePayModal()"><i class="fas fa-times"></i></button>
+      <button class="pay-modal-close" id="pay-modal-close-btn"><i class="fas fa-times"></i></button>
     </div>
     <div class="pay-modal-body" id="pay-modal-body">
       <!-- Rempli dynamiquement -->
@@ -190,7 +190,7 @@
     <div class="auth-prompt-btns">
       <a href="index.html#login" class="btn btn-primary">Se connecter</a>
       <a href="index.html#register" class="btn btn-outline">Créer un compte</a>
-      <button class="btn" style="background:transparent;color:#94a3b8;font-size:.82rem" onclick="document.getElementById('auth-prompt').style.display='none'">Annuler</button>
+      <button class="btn" style="background:transparent;color:#94a3b8;font-size:.82rem" id="auth-prompt-cancel-btn">Annuler</button>
     </div>
   </div>
 </div>

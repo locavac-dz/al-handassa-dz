@@ -191,7 +191,7 @@
   <div style="max-width:640px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden">
     <div style="background:linear-gradient(135deg,#1B3A6B,#4a1d96);padding:20px 24px;display:flex;justify-content:space-between;align-items:center">
       <span style="color:#fff;font-weight:700;font-size:1rem">Profil professionnel</span>
-      <button onclick="closeProModal()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
+      <button id="pro-modal-close" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
     </div>
     <div id="pro-modal-body" style="padding:24px"></div>
   </div>
@@ -287,7 +287,7 @@ function cardHTML(pr) {
     pr.availability ? `<span class="pro-badge" style="background:${avColor.bg||'#f3f4f6'};color:${avColor.color||'#6b7280'}">${esc(pr.availability)}</span>` : '',
   ].filter(Boolean).join('');
 
-  return `<div class="pro-card${pr.is_premium?' premium':''}" onclick="openProModal('${esc(pr.slug)}')">
+  return `<div class="pro-card${pr.is_premium?' premium':''}" data-slug="${esc(pr.slug)}">
     <div class="pro-avatar">${avatar}</div>
     <div class="pro-name">${esc(pr.first_name)} ${esc(pr.last_name)}</div>
     ${pr.title?`<div class="pro-title">${esc(pr.title)}</div>`:''}
@@ -374,6 +374,13 @@ function closeProModal() {
 }
 document.getElementById('pro-modal').addEventListener('click', e => {
   if (e.target===e.currentTarget) closeProModal();
+});
+document.getElementById('pro-modal-close').addEventListener('click', closeProModal);
+
+// Délégation : la liste des professionnels est reconstruite (innerHTML) à chaque chargement/filtrage.
+document.getElementById('ann-grid').addEventListener('click', e => {
+  const card = e.target.closest('.pro-card');
+  if (card) openProModal(card.dataset.slug);
 });
 
 // Filtres

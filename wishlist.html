@@ -73,21 +73,27 @@
       card.className = 'wishlist-card';
       card.innerHTML = `
         <div class="wishlist-thumb">
-          <img src="${HDS_SERVER}${item.thumbnail_url || '/img/placeholder.png'}" alt="${item.title}" onerror="this.style.display='none'">
+          <img src="${HDS_SERVER}${item.thumbnail_url || '/img/placeholder.png'}" alt="${item.title}">
         </div>
         <div class="wishlist-body">
           <div class="wishlist-title-card">${item.title}</div>
           <div class="wishlist-price">${item.price.toLocaleString('fr-DZ')} DA</div>
           <div class="wishlist-actions">
-            <button class="btn-sm btn-add-cart" onclick="addToCartFromWishlist(${JSON.stringify(item).replace(/"/g, '&quot;')})">
-              🛒 Panier
-            </button>
-            <button class="btn-sm btn-remove" onclick="removeFromWishlist(${item.id})">
-              ✕
-            </button>
+            <button class="btn-sm btn-add-cart">🛒 Panier</button>
+            <button class="btn-sm btn-remove">✕</button>
           </div>
         </div>
       `;
+      // « item » reste capturé par la fermeture : plus besoin de le sérialiser dans un attribut HTML
+      // (l'ancien JSON.stringify(item).replace(/"/g, '&quot;') était fragile — tout autre caractère spécial
+      // dans le titre l'aurait cassé).
+      const img = card.querySelector('img');
+      const hideBrokenImg = () => { img.style.display = 'none'; };
+      img.addEventListener('error', hideBrokenImg);
+      if (img.complete && img.naturalWidth === 0) hideBrokenImg();   // déjà en échec avant l'attache de l'écouteur
+
+      card.querySelector('.btn-add-cart').addEventListener('click', () => addToCartFromWishlist(item));
+      card.querySelector('.btn-remove').addEventListener('click', () => removeFromWishlist(item.id));
       grid.appendChild(card);
     });
   }
