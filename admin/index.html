@@ -853,7 +853,10 @@ async function saveCat(id) {
 }
 
 async function toggleCat(id, active) {
-  try { await api('PUT', '/admin/categories/'+id, { is_active: active, name_fr: '_keep_' }); }
+  // name_fr: '_keep_' n'est plus nécessaire depuis que PUT /admin/categories/:id conserve les champs absents
+  // (COALESCE) au lieu de les écraser — avant ce correctif, CE contournement renommait la catégorie à chaque
+  // bascule (voir backend/src/routes/admin.js).
+  try { await api('PUT', '/admin/categories/'+id, { is_active: active }); }
   catch { /* rechargement suffira */ }
 }
 

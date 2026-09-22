@@ -434,11 +434,19 @@ router.post('/categories', async (req, res, next) => {
 router.put('/categories/:id', async (req, res, next) => {
   try {
     const { name_fr, name_ar, icon, description, sort_order, is_active } = req.body;
+    // COALESCE : un champ absent du corps (undefined -> NULL côté PostgreSQL) conserve sa valeur actuelle au lieu
+    // d'être écrasé. Avant ce correctif, un appel partiel — ex. toggleCat() côté admin, qui ne bascule QUE
+    // is_active — effaçait silencieusement name_ar/icon/description/sort_order (RGPD non concerné, mais perte de
+    // données réelle : reproduit, une bascule renommait la catégorie en la valeur de contournement "_keep_" et
+    // remettait sort_order à 0). sort_order est casté en entier seulement s'il est fourni, jamais forcé à 0.
     const result = await query(
-      `UPDATE categories SET name_fr=$1, name_ar=$2, icon=$3, description=$4,
-       sort_order=$5, is_active=$6 WHERE id=$7 RETURNING *`,
-      [name_fr, name_ar || name_fr, icon, description || null,
-       parseInt(sort_order) || 0, is_active !== false, req.params.id]
+      `UPDATE categories SET
+         name_fr=COALESCE($1, name_fr), name_ar=COALESCE($2, name_ar), icon=COALESCE($3, icon),
+         description=COALESCE($4, description), sort_order=COALESCE($5, sort_order),
+         is_active=COALESCE($6, is_active)
+       WHERE id=$7 RETURNING *`,
+      [name_fr, name_ar, icon, description,
+       sort_order !== undefined ? parseInt(sort_order) || 0 : undefined, is_active, req.params.id]
     );
     if (!result.rows.length) throw new AppError('Catégorie introuvable.', 404);
     res.json({ data: result.rows[0] });
@@ -756,11 +764,18 @@ router.put('/study-levels/:id', async (req, res, next) => {
       }
     }
 
+    // COALESCE : un champ absent du corps (undefined -> NULL côté PostgreSQL) conserve sa valeur actuelle au
+    // lieu d'être écrasé. Avant ce correctif, un appel partiel — ex. toggleLvl() côté admin, qui n'envoie que
+    // label_fr et is_active — mettait db_value à NULL, violant sa contrainte NOT NULL (400 systématique :
+    // la bascule active/inactif d'un niveau ne fonctionnait jamais). label_fr reste obligatoire (vérifié
+    // ci-dessus) ; sort_order n'est casté en entier que s'il est fourni, jamais forcé à 0.
     const result = await query(
-      `UPDATE study_levels SET label_fr=$1, label_ar=$2, icon=$3, color=$4,
-       db_value=$5, sort_order=$6, is_active=$7 WHERE id=$8 RETURNING *`,
-      [label_fr, label_ar || label_fr, icon || '🎓', color || '#1B3A6B',
-       db_value, parseInt(sort_order) || 0, is_active !== false, req.params.id]
+      `UPDATE study_levels SET
+         label_fr=$1, label_ar=COALESCE($2, label_ar), icon=COALESCE($3, icon), color=COALESCE($4, color),
+         db_value=COALESCE($5, db_value), sort_order=COALESCE($6, sort_order), is_active=COALESCE($7, is_active)
+       WHERE id=$8 RETURNING *`,
+      [label_fr, label_ar, icon, color,
+       db_value, sort_order !== undefined ? parseInt(sort_order) || 0 : undefined, is_active, req.params.id]
     );
     if (!result.rows.length) throw new AppError('Niveau introuvable.', 404);
     res.json({ data: result.rows[0] });
