@@ -243,7 +243,7 @@
         <h2>✉️ Envoyer un message</h2>
         <p>Remplissez le formulaire ci-dessous et nous vous répondrons par email.</p>
 
-        <form id="contact-form" onsubmit="submitContact(event)">
+        <form id="contact-form">
           <div class="form-row">
             <div class="form-group">
               <label for="cf-name">Nom complet <span>*</span></label>
@@ -409,6 +409,7 @@ async function submitContact(e) {
 document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
   document.querySelector('.nav-links')?.classList.toggle('open');
 });
+document.getElementById('contact-form').addEventListener('submit', submitContact);
 </script>
 </body>
 </html>

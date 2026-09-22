@@ -180,8 +180,15 @@
     const fmt = (n) => Number(n || 0).toLocaleString('fr-DZ');
     const imgUrl = (u) => (!u ? '' : /^https?:\/\//i.test(u) ? u : HDS_SERVER + u);
     const thumb = (u, fallback) => u
-      ? `<img src="${esc(imgUrl(u))}" alt="" loading="lazy" onerror="this.remove()">`
+      ? `<img src="${esc(imgUrl(u))}" alt="" loading="lazy" data-thumb-fallback="1">`
       : fallback;
+    // « error » ne remonte pas (bubbling) : capture=true nécessaire pour déléguer sur document plutôt que
+    // d'attacher un écouteur par vignette (les fragments de thumb() sont insérés à des endroits différents).
+    // Écouteur posé ici, avant que la moindre vignette existe (thumb() n'est appelée que plus bas, après
+    // récupération des données) : pas de risque de rater un échec de chargement survenu avant l'attache.
+    document.addEventListener('error', (e) => {
+      if (e.target.dataset?.thumbFallback) e.target.remove();
+    }, true);
 
     async function getJSON(path) {
       const res = await fetch(API + path);

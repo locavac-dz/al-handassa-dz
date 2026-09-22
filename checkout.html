@@ -46,7 +46,7 @@
 <div class="checkout-container">
   <div class="checkout-header">Finaliser votre commande</div>
 
-  <form class="checkout-form" id="checkout-form" onsubmit="submitOrder(event)">
+  <form class="checkout-form" id="checkout-form">
     <!-- Formulaire -->
     <div>
       <!-- Données personnelles -->
@@ -164,6 +164,8 @@ window.addEventListener('DOMContentLoaded', () => {
     alert('Votre panier est vide');
     location.href = 'cart.html';
   }
+
+  document.getElementById('checkout-form').addEventListener('submit', submitOrder);
 });
 
 function renderOrderSummary() {

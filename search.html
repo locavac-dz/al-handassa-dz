@@ -120,7 +120,7 @@ async function performSearch(query) {
       const icon = '📄';
       const hasThumb = p.thumbnail_url;
       const thumbImg = hasThumb
-        ? `<img src="${escHtml(HDS_SERVER + p.thumbnail_url)}" alt="${escHtml(p.title)}" onerror="this.style.display='none'">`
+        ? `<img src="${escHtml(HDS_SERVER + p.thumbnail_url)}" alt="${escHtml(p.title)}" data-thumb-fallback="1">`
         : `<span>${icon}</span>`;
 
       html += `
@@ -178,6 +178,13 @@ window.addEventListener('DOMContentLoaded', () => {
     const card = e.target.closest('.result-card');
     if (card) location.href = 'product.html?slug=' + encodeURIComponent(card.dataset.slug);
   });
+
+  // « error » ne remonte pas (bubbling) : capture=true nécessaire pour déléguer sur #search-content plutôt que
+  // d'attacher un écouteur à chaque vignette (recréées à chaque recherche). Écouteur posé au chargement de la
+  // page, avant la première recherche : pas de risque de rater un échec de chargement survenu avant l'attache.
+  document.getElementById('search-content').addEventListener('error', (e) => {
+    if (e.target.dataset?.thumbFallback) e.target.style.display = 'none';
+  }, true);
 });
 
 // Recherche au appui sur Entrée
