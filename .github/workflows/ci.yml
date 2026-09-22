@@ -71,3 +71,32 @@ jobs:
           --entrypoint node al-handassa:ci -e "require('/app/backend/src/app.js'); console.log('app.js chargé'); process.exit(0)"
       - name: Fonctionne sans root et avec un dossier uploads inscriptible
         run: docker run --rm --entrypoint sh al-handassa:ci -c 'test "$(id -u)" != 0 && touch backend/uploads/.w && echo OK'
+
+  # deploy/nginx/*.conf n'a jamais tourné (pas de nginx sur le poste de développement) : validé ici avec un vrai nginx
+  # (le même install que deploy/setup.sh) et de faux certificats, comme le ferait `nginx -t` sur le VPS après déploiement.
+  nginx:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Installation de nginx
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq nginx
+      - name: Installation des fichiers (comme l'indique l'en-tête de handassi.dz.conf)
+        run: |
+          sudo cp deploy/nginx/security-headers.conf /etc/nginx/snippets/handassi-security-headers.conf
+          sudo cp deploy/nginx/proxy.conf            /etc/nginx/snippets/handassi-proxy.conf
+          sudo cp deploy/nginx/handassi.dz.conf       /etc/nginx/sites-available/handassi.dz
+          sudo ln -s /etc/nginx/sites-available/handassi.dz /etc/nginx/sites-enabled/handassi.dz
+          sudo rm -f /etc/nginx/sites-enabled/default   # comme en production : un seul site actif
+      - name: Faux certificat (nginx -t exige que les fichiers ssl_certificate existent et soient valides)
+        run: |
+          sudo mkdir -p /etc/letsencrypt/live/handassi.dz
+          sudo openssl req -x509 -nodes -days 1 -newkey rsa:2048 -subj "/CN=handassi.dz" \
+            -keyout /etc/letsencrypt/live/handassi.dz/privkey.pem \
+            -out    /etc/letsencrypt/live/handassi.dz/fullchain.pem
+          sudo cp /etc/letsencrypt/live/handassi.dz/fullchain.pem /etc/letsencrypt/live/handassi.dz/chain.pem
+      - name: nginx -t
+        run: sudo nginx -t
+      - name: Garde-fou — /uploads/ ne doit jamais être servi par un « alias » (contournerait le paywall)
+        run: |
+          ! grep -qE '^\s*alias\s' deploy/nginx/handassi.dz.conf   # directive « alias », pas le mot dans un commentaire
+          grep -A2 'location \^~ /uploads/' deploy/nginx/handassi.dz.conf | grep -q 'proxy_pass http://127.0.0.1:5000'
