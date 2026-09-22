@@ -59,20 +59,21 @@ app.use(helmet({
   }
 }));
 
-// CSP des pages (HTML/CSS/JS du site, servis par ce même serveur) : les pages utilisent des scripts et des
-// gestionnaires d'événements inline (onclick=…), Font Awesome et Chart.js depuis cdnjs, Google Fonts, et un
-// <iframe> same-origin pour les aperçus PDF. L'ancienne politique (script-src-attr 'none', styles/polices 'self',
-// frame-src 'none') cassait les boutons, les icônes et les aperçus dès que le front était servi par Express.
-// Contrepartie assumée : 'unsafe-inline' (déjà présent pour les <script>) couvre désormais aussi les attributs
-// onclick ; la protection repose sur l'échappement systématique des données (esc()), pas sur la CSP.
-// Le retour vers script-src-attr 'none' passe par la migration des gestionnaires inline vers addEventListener.
+// CSP des pages (HTML/CSS/JS du site, servis par ce même serveur) : les pages utilisent des scripts inline,
+// Font Awesome et Chart.js depuis cdnjs, Google Fonts, et un <iframe> same-origin pour les aperçus PDF.
+// Les 77 gestionnaires d'événements inline (onclick=, onchange=, oninput=, onsubmit=, onerror=…) qui obligeaient
+// scriptSrcAttr à 'unsafe-inline' ont tous été migrés vers addEventListener le 22/09/2026 (délégation sur les
+// conteneurs stables pour le contenu régénéré par innerHTML — voir admin/index.html, le plus gros cas) : plus
+// aucune page n'utilise d'attribut on*=, scriptSrcAttr peut donc redevenir 'none'. `scriptSrc` garde
+// 'unsafe-inline' pour les <script> inline eux-mêmes (non concernés par cette migration) ; la protection XSS
+// continue de reposer sur l'échappement systématique des données (esc()), pas sur la CSP.
 const CDN = 'https://cdnjs.cloudflare.com';
 const pageCsp = helmet.contentSecurityPolicy({
   useDefaults: false,
   directives: {
     defaultSrc: ["'self'"],
     scriptSrc: ["'self'", "'unsafe-inline'", CDN],
-    scriptSrcAttr: ["'unsafe-inline'"],
+    scriptSrcAttr: ["'none'"],
     styleSrc: ["'self'", "'unsafe-inline'", CDN, 'https://fonts.googleapis.com'],
     fontSrc: ["'self'", CDN, 'https://fonts.gstatic.com', 'data:'],
     imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
