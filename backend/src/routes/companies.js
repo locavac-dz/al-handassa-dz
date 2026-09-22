@@ -29,7 +29,10 @@ const updateCompanyValidation = [
 ];
 
 // ── Upload config ─────────────────────────────────────────
-const uploadDir = path.join(__dirname, '../../../uploads/companies');
+// __dirname = backend/src/routes : deux ../ pour remonter à backend/uploads (celui servi par app.js), pas
+// trois — qui remontait jusqu'à la racine du dépôt (uploads/ à la racine, jamais servi, gitignore ≠ celui-ci).
+// Comparer middleware/upload.js (__dirname = backend/src/middleware, même deux ../), utilisé ailleurs sans ce bug.
+const uploadDir = path.join(__dirname, '../../uploads/companies');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({

@@ -31,7 +31,9 @@ const updateProValidation = [
   ...proFieldChecks,
 ];
 
-const uploadDir = path.join(__dirname, '../../../uploads/professionals');
+// __dirname = backend/src/routes : deux ../ pour remonter à backend/uploads (celui servi par app.js), pas
+// trois — qui remontait jusqu'à la racine du dépôt (uploads/ à la racine, jamais servi). Voir companies.js.
+const uploadDir = path.join(__dirname, '../../uploads/professionals');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({
