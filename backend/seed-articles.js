@@ -895,12 +895,12 @@ async function main() {
         title, slug, excerpt, content, category_id,
         thumbnail_url, read_time_min, is_free, price,
         language, tags, bibliography, doi,
-        is_published, published_at
+        is_published, status, published_at
       ) VALUES (
         $1,$2,$3,$4,$5,
         $6,$7,TRUE,0,
         'fr',$8,$9,$10,
-        TRUE,NOW()
+        TRUE,'published',NOW()
       )`,
       [
         a.title, slug, a.excerpt, a.content, a.category_id,
